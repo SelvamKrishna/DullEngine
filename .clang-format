@@ -1,0 +1,20 @@
+Language: Cpp
+BasedOnStyle: Google
+
+# Basic Formatting
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+ColumnLimit: 100
+ContinuationIndentWidth: 2
+AccessModifierOffset: -2
+
+# Constructor formatting (no indentation)
+ConstructorInitializerIndentWidth: 0 # <-- Critical for no indentation
+BreakConstructorInitializers: BeforeColon # <-- Puts each init on new line after colon
+
+# Allow short constructs
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLoopsOnASingleLine: true
