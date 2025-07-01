@@ -26,12 +26,12 @@ protected:
   State _state = State::Uninitialized;
 
 private:
-  virtual void _Init() {}
-  virtual void _Update() {}
-  virtual void _FixedUpdate() {}
+  virtual void _init() {}
+  virtual void _update() {}
+  virtual void _fixedUpdate() {}
 
-  void _UpdateTree();
-  void _FixedUpdateTree();
+  void _updateTree();
+  void _fixedUpdateTree();
 
 public:
   explicit Node(const std::string &name);
@@ -42,25 +42,25 @@ public:
   Node &operator=(const Node &) = delete;
   Node &operator=(Node &&) noexcept = default;
 
-  void Free() noexcept;
+  void free() noexcept;
 
-  void AddChild(std::unique_ptr<Node> child);
-  void RemoveChild(Node *child);
+  void addChild(std::unique_ptr<Node> child);
+  void removeChild(Node *child);
 
-  [[nodiscard]] Node &ChildByIndex(size_t index);
-  [[nodiscard]] Node &ChildByName(std::string_view name);
+  [[nodiscard]] Node &childByIndex(size_t index);
+  [[nodiscard]] Node &childByName(std::string_view name);
 
   template <typename NodeT>
     requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] NodeT *ChildByType() {
+  [[nodiscard]] NodeT *childByType() {
     for (auto &child : _children)
       if (NodeT *casted = dynamic_cast<NodeT *>(child.get()); casted) return casted;
 
     return nullptr;
   }
 
-  [[nodiscard]] inline size_t ChildCount() const noexcept { return _children.size(); }
-  [[nodiscard]] inline const Node *Parent() const noexcept { return _parent; }
-  [[nodiscard]] inline std::string_view Name() const noexcept { return _name; }
-  [[nodiscard]] inline const ChildrenArray *Children() const noexcept { return &_children; }
+  [[nodiscard]] inline size_t childCount() const noexcept { return _children.size(); }
+  [[nodiscard]] inline const Node *parent() const noexcept { return _parent; }
+  [[nodiscard]] inline std::string_view name() const noexcept { return _name; }
+  [[nodiscard]] inline const ChildrenArray *children() const noexcept { return &_children; }
 };

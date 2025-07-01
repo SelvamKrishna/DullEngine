@@ -7,12 +7,12 @@
 
 class App {
 private:
-  static constexpr float kFixedFrameRate = 60.0f;
-  static constexpr float kFixedDeltaTime = 1.0f / kFixedFrameRate;
+  static constexpr float k_fixed_frame_rate = 60.0f;
+  static constexpr float k_fixed_delta_time = 1.0f / k_fixed_frame_rate;
 
   std::unique_ptr<Node> _root;
   float _accumulator = 0.0f;
-  bool _isRunning = false;
+  bool _is_running = false;
 
   // TODO: Implement Render System
   // TODO: Implement Physics System
@@ -28,21 +28,21 @@ private:
   App& operator=(App&&) = delete;
 
 public:
-  [[nodiscard]] static inline App& Instance() noexcept {
+  [[nodiscard]] static inline App& instance() noexcept {
     static App instance;
     return instance;
   }
 
-  void Init(int width, int height, std::string title);
-  void Run();
-  inline void Quit() noexcept { _isRunning = false; }
+  void init(int width, int height, std::string title);
+  void run();
+  inline void quit() noexcept { _is_running = false; }
 
-  void SetRoot(Node* root) noexcept {
+  void setRoot(Node* root) noexcept {
     _root.reset(root);
-    if (_root) _root->_Init();
+    if (_root) _root->_init();
     _root->_state = Node::State::Active;
   }
 
-  [[nodiscard]] inline Node* Root() noexcept { return _root.get(); }
-  [[nodiscard]] inline const Node* Root() const noexcept { return _root.get(); }
+  [[nodiscard]] inline Node* root() noexcept { return _root.get(); }
+  [[nodiscard]] inline const Node* root() const noexcept { return _root.get(); }
 };
