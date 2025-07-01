@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../vendor/raylib.h"
+#include "../../vendor/raylib.h"
 #include "vec2.hpp"
 
 class Rect {

@@ -1,4 +1,4 @@
-# Compiler and flags
+# Makefile for building a C++ project with Raylib
 CXX := g++
 CXXFLAGS := -std=c++20 -Iinclude -Isource -Ivendor
 
@@ -7,33 +7,33 @@ RELEASE_FLAGS := -Wall -Wextra -Werror -O3
 
 LDFLAGS := vendor/libraylib.a -lwinmm -lgdi32 -lopengl32
 
-# Directory structure
+# Directories
 SOURCE_DIR := source
-TESTS_DIR := tests
+APP_DIR := app
 BUILD_DIR := build
 
-# Engine source and object files
+# Compile engine sources
 ENGINE_SRC := $(wildcard $(SOURCE_DIR)/*/*.cpp) $(wildcard $(SOURCE_DIR)/*/*/*.cpp)
-ENGINE_OBJ := $(ENGINE_SRC:$(SOURCE_DIR)/%.cpp=$(BUILD_DIR)/engine/%.o)
+ENGINE_OBJ := $(ENGINE_SRC:$(SOURCE_DIR)/%.cpp=$(BUILD_DIR)/$(SOURCE_DIR)/%.o)
 
-# Sandbox/test files
-SANDBOX_SRC := $(wildcard $(TESTS_DIR)/*.cpp)
-SANDBOX_OBJ := $(SANDBOX_SRC:$(TESTS_DIR)/%.cpp=$(BUILD_DIR)/sandbox/%.o)
+# Compile project sources
+PROJECT_SRC := $(wildcard $(APP_DIR)/*.cpp)
+PROJECT_OBJ := $(PROJECT_SRC:$(APP_DIR)/%.cpp=$(BUILD_DIR)/$(APP_DIR)/%.o)
 
 # Output targets
 ENGINE_LIB := $(BUILD_DIR)/libdullengine.a
-SANDBOX_BIN := $(BUILD_DIR)/sandbox.exe
+PROJECT_BIN := $(BUILD_DIR)/application.exe
 
 # Default target
 all: debug
 
 # Debug build
 debug: CXXFLAGS += $(DEBUG_FLAGS)
-debug: $(SANDBOX_BIN)
+debug: $(PROJECT_BIN)
 
 # Release build
 release: CXXFLAGS += $(RELEASE_FLAGS)
-release: $(SANDBOX_BIN)
+release: $(PROJECT_BIN)
 
 # Build static engine library
 $(ENGINE_LIB): $(ENGINE_OBJ)
@@ -41,23 +41,23 @@ $(ENGINE_LIB): $(ENGINE_OBJ)
 	ar rcs $@ $^
 
 # Compile engine sources
-$(BUILD_DIR)/engine/%.o: $(SOURCE_DIR)/%.cpp
+$(BUILD_DIR)/$(SOURCE_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Compile sandbox/test sources
-$(BUILD_DIR)/sandbox/%.o: $(TESTS_DIR)/%.cpp
+# Compile project sources
+$(BUILD_DIR)/$(APP_DIR)/%.o: $(APP_DIR)/%.cpp
 	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Link sandbox binary
-$(SANDBOX_BIN): $(SANDBOX_OBJ) $(ENGINE_LIB)
+# Link project binary
+$(PROJECT_BIN): $(PROJECT_OBJ) $(ENGINE_LIB)
 	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-# Run sandbox
+# Run project
 run: debug
-	$(SANDBOX_BIN)
+	$(PROJECT_BIN)
 
 # Clean build output
 clean:

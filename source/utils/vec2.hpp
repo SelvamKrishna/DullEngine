@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "../vendor/raylib.h"
+#include "../../vendor/raylib.h"
 
 struct Vec2 {
 public:
@@ -17,7 +17,7 @@ public:
   // Copy from raylib::Vector2 to Vec2
   constexpr Vec2(const Vector2 &vec) noexcept : x(vec.x), y(vec.y) {}
 
-  inline static Vec2 Unit(float unit = 0.0f) { return {unit, unit}; }
+  inline static Vec2 unit(float unit = 0.0f) { return {unit, unit}; }
 
   constexpr Vec2 operator+(const Vec2 &other) const noexcept { return {x + other.x, y + other.y}; }
   constexpr Vec2 operator-(const Vec2 &other) const noexcept { return {x - other.x, y - other.y}; }
@@ -86,33 +86,33 @@ public:
 
   constexpr Vec2 operator-() const noexcept { return {-x, -y}; }
 
-  [[nodiscard]] float Length() const noexcept { return std::sqrt(x * x + y * y); }
+  [[nodiscard]] float length() const noexcept { return std::sqrt(x * x + y * y); }
 
-  [[nodiscard]] Vec2 Normalized() const noexcept {
-    float len = Length();
-    if (len == 0.0f) return Vec2::Zero();
+  [[nodiscard]] Vec2 normalized() const noexcept {
+    float len = length();
+    if (len == 0.0f) return Vec2::zero();
     return {x / len, y / len};
   }
 
-  void Normalize() noexcept {
-    float len = Length();
+  void normalize() noexcept {
+    float len = length();
     if (len != 0.0f) {
       x /= len;
       y /= len;
     }
   }
 
-  constexpr float Dot(const Vec2 &other) const noexcept { return x * other.x + y * other.y; }
-  constexpr float Cross(const Vec2 &other) const noexcept { return x * other.y - y * other.x; }
+  constexpr float dot(const Vec2 &other) const noexcept { return x * other.x + y * other.y; }
+  constexpr float cross(const Vec2 &other) const noexcept { return x * other.y - y * other.x; }
 
-  [[nodiscard]] float Distance(const Vec2 &other) const noexcept {
-    return (*this - other).Length();
+  [[nodiscard]] float distance(const Vec2 &other) const noexcept {
+    return (*this - other).length();
   }
 
-  inline static constexpr Vec2 Zero() noexcept { return {0.f, 0.f}; }
-  inline static constexpr Vec2 One() noexcept { return {1.f, 1.f}; }
-  inline static constexpr Vec2 Up() noexcept { return {0.f, 1.f}; }
-  inline static constexpr Vec2 Down() noexcept { return {0.f, -1.f}; }
-  inline static constexpr Vec2 Left() noexcept { return {-1.f, 0.f}; }
-  inline static constexpr Vec2 Right() noexcept { return {1.f, 0.f}; }
+  inline static constexpr Vec2 zero() noexcept { return {0.f, 0.f}; }
+  inline static constexpr Vec2 one() noexcept { return {1.f, 1.f}; }
+  inline static constexpr Vec2 up() noexcept { return {0.f, 1.f}; }
+  inline static constexpr Vec2 down() noexcept { return {0.f, -1.f}; }
+  inline static constexpr Vec2 left() noexcept { return {-1.f, 0.f}; }
+  inline static constexpr Vec2 right() noexcept { return {1.f, 0.f}; }
 };

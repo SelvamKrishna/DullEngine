@@ -22,32 +22,32 @@ private:
   TimeSystem &operator=(const TimeSystem &) = delete;
   TimeSystem &operator=(TimeSystem &&) = delete;
 
-  inline void _UpdateInfo() noexcept {
+  inline void _updateInfo() noexcept {
     _totalTime += _deltaTime;
     _frameCount++;
   }
 
 public:
-  [[nodiscard]] static inline TimeSystem &Instance() noexcept {
+  [[nodiscard]] static inline TimeSystem &instance() noexcept {
     static TimeSystem instance;
     return instance;
   }
 
-  inline void SetTimeScale(float scale) noexcept { _timeScale = (scale > 0.0f) ? scale : 0.0f; }
+  inline void setTimeScale(float scale) noexcept { _timeScale = (scale > 0.0f) ? scale : 0.0f; }
 
-  [[nodiscard]] inline float DeltaTime() const noexcept { return _deltaTime; }
-  [[nodiscard]] inline float TotalTime() const noexcept { return _totalTime; }
-  [[nodiscard]] inline float TimeScale() const noexcept { return _timeScale; }
-  [[nodiscard]] inline bool IsPaused() const noexcept { return _isPaused; }
-  [[nodiscard]] inline uint64_t FrameCount() const noexcept { return _frameCount; }
+  [[nodiscard]] inline float deltaTime() const noexcept { return _deltaTime; }
+  [[nodiscard]] inline float totalTime() const noexcept { return _totalTime; }
+  [[nodiscard]] inline float timeScale() const noexcept { return _timeScale; }
+  [[nodiscard]] inline bool isPaused() const noexcept { return _isPaused; }
+  [[nodiscard]] inline uint64_t frameCount() const noexcept { return _frameCount; }
 
-  [[nodiscard]] inline float ScaledDeltaTime() const noexcept { return _deltaTime * _timeScale; }
+  [[nodiscard]] inline float scaledDeltaTime() const noexcept { return _deltaTime * _timeScale; }
 
-  [[nodiscard]] inline uint64_t FPS() const noexcept {
+  [[nodiscard]] inline uint64_t fps() const noexcept {
     return (_deltaTime > 0.0f) ? static_cast<uint64_t>(1.0f / _deltaTime) : 0;
   }
 
-  inline void Pause() noexcept { _isPaused = true; }
-  inline void Unpause() noexcept { _isPaused = false; }
-  inline void TogglePause() noexcept { _isPaused = !_isPaused; }
+  inline void pause() noexcept { _isPaused = true; }
+  inline void unpause() noexcept { _isPaused = false; }
+  inline void togglePause() noexcept { _isPaused = !_isPaused; }
 };
