@@ -28,6 +28,7 @@ void Scene::_fixedUpdate() {
 
 void Scene::addNode(Node* node) {
   if (!node) return nullNodeError();
+  node->_state = Node::State::Active;
   _nodes.emplace_back(node);
 }
 
