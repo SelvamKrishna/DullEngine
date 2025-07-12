@@ -4,8 +4,6 @@
 #include <stdexcept>
 
 #include "../../vendor/raylib.h"
-#include "../plugins/audio_system.hpp"
-#include "../plugins/time_system.hpp"
 
 App::~App() {
   if (_root) {
@@ -14,6 +12,27 @@ App::~App() {
   }
 
   CloseWindow();
+}
+
+void App::_processNull() {
+  _render_system._drawNull();
+}
+
+void App::_processPhysics(float delta_time) {
+  _accumulator += delta_time;
+
+  while (_accumulator >= k_fixed_delta_time) [[unlikely]] {
+    _root->_fixedUpdate();
+    _accumulator -= k_fixed_delta_time;
+  }
+}
+
+void App::_process() {
+  _processPhysics(_time_system.deltaTime());
+
+  _root->_update();
+  _render_system._update();
+  _audio_system._update();
 }
 
 void App::init(const int width, const int height, std::string title) {
@@ -28,9 +47,6 @@ void App::run() {
   if (!_is_running) throw std::runtime_error("App is not yet initialized.");
   if (!_root) throw std::runtime_error("App root is not yet set.");
 
-  TimeSystem& time_system = TimeSystem::instance();
-  AudioSystem& audio_system = AudioSystem::instance();
-
   while (_is_running) [[likely]] {
     try {
       if (WindowShouldClose()) [[unlikely]] {
@@ -38,35 +54,14 @@ void App::run() {
         break;
       }
 
-      const float k_delta_time = GetFrameTime();
-      time_system._deltaTime = k_delta_time;
-      time_system._updateInfo();
+      _time_system._updateInfo(GetFrameTime());
 
-      if (time_system.isPaused()) {
-        BeginDrawing();
-        EndDrawing();
-        continue;
-      }
+      if (_time_system.isPaused()) _processNull();
+      else _process();
 
-      _accumulator += k_delta_time;
-
-      while (_accumulator >= k_fixed_delta_time) [[unlikely]] {
-        _root->_fixedUpdate();
-        _accumulator -= k_fixed_delta_time;
-      }
-
-      _root->_updateTree();
-
-      // TODO: Proper Render System
-      BeginDrawing();
-      ClearBackground(BLACK);
-      DrawFPS(10, 10);
-      EndDrawing();
-
-      audio_system._update();
     } catch (std::exception& e) {
       _is_running = false;
-      std::cerr << "Exception: " << e.what() << std::endl;
+      std::cerr << "Runtime Exception: \n" << e.what() << std::endl;
     }
   }
 }

@@ -5,13 +5,16 @@
 
 #include "../../vendor/raylib.h"
 
+/// UNTESTED:
+/// Class for managing sounds and music in the application.
+/// A global singleton system which holds all audio resources.
 class AudioSystem {
 private:
   friend class App;
 
 private:
-  std::unordered_map<std::string, Sound> _sounds;
-  std::unordered_map<std::string, Music> _musics;
+  std::unordered_map<std::string, Sound> _sounds;  // One-shot audio effects
+  std::unordered_map<std::string, Music> _musics;  // Looping audio streams
   Music *_music = nullptr;
 
 private:

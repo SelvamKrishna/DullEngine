@@ -7,5 +7,6 @@ int main() {
 
   Node* main_root = new Node("root");
   app.setRoot(main_root);
+
   app.run();
 }

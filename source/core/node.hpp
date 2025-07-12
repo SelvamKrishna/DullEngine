@@ -6,6 +6,8 @@
 #include <type_traits>
 #include <vector>
 
+/// A base class for all nodes in the application.
+/// Nodes can be used to create a hierarchy of objects, such as game entities or UI components
 class Node {
 private:
   friend class App;

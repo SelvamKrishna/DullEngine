@@ -2,16 +2,15 @@
 
 #include <cstdint>
 
+/// A singleton class for managing time-related information in the application.
 class TimeSystem {
 private:
   friend class App;
 
 private:
-  float _deltaTime = 0.0f;
-  float _totalTime = 0.0f;
-  float _timeScale = 1.0f;
-  uint64_t _frameCount = 0;
-  bool _isPaused = false;
+  float _delta_time = 0.0f;
+  float _time_scale = 1.0f;
+  bool _is_paused = false;
 
 private:
   TimeSystem() = default;
@@ -22,10 +21,7 @@ private:
   TimeSystem &operator=(const TimeSystem &) = delete;
   TimeSystem &operator=(TimeSystem &&) = delete;
 
-  inline void _updateInfo() noexcept {
-    _totalTime += _deltaTime;
-    _frameCount++;
-  }
+  inline void _updateInfo(float delta_time) noexcept { _delta_time = delta_time * _time_scale; }
 
 public:
   [[nodiscard]] static inline TimeSystem &instance() noexcept {
@@ -33,21 +29,17 @@ public:
     return instance;
   }
 
-  inline void setTimeScale(float scale) noexcept { _timeScale = (scale > 0.0f) ? scale : 0.0f; }
+  inline void setTimeScale(float scale) noexcept { _time_scale = scale > 0.0f ? scale : 0.0f; }
 
-  [[nodiscard]] inline float deltaTime() const noexcept { return _deltaTime; }
-  [[nodiscard]] inline float totalTime() const noexcept { return _totalTime; }
-  [[nodiscard]] inline float timeScale() const noexcept { return _timeScale; }
-  [[nodiscard]] inline bool isPaused() const noexcept { return _isPaused; }
-  [[nodiscard]] inline uint64_t frameCount() const noexcept { return _frameCount; }
-
-  [[nodiscard]] inline float scaledDeltaTime() const noexcept { return _deltaTime * _timeScale; }
+  [[nodiscard]] inline float deltaTime() const noexcept { return _delta_time; }
+  [[nodiscard]] inline float timeScale() const noexcept { return _time_scale; }
+  [[nodiscard]] inline bool isPaused() const noexcept { return _is_paused; }
 
   [[nodiscard]] inline uint64_t fps() const noexcept {
-    return (_deltaTime > 0.0f) ? static_cast<uint64_t>(1.0f / _deltaTime) : 0;
+    return (_delta_time > 0.0f) ? static_cast<uint64_t>(1.0f / _delta_time) : 0;
   }
 
-  inline void pause() noexcept { _isPaused = true; }
-  inline void unpause() noexcept { _isPaused = false; }
-  inline void togglePause() noexcept { _isPaused = !_isPaused; }
+  inline void pause() noexcept { _is_paused = true; }
+  inline void unpause() noexcept { _is_paused = false; }
+  inline void togglePause() noexcept { _is_paused = !_is_paused; }
 };
