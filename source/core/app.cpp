@@ -6,32 +6,27 @@
 #include "../../vendor/raylib.h"
 
 App::~App() {
-  if (_root) {
-    _root->free();
-    _root.reset();
-  }
-
   CloseWindow();
 }
 
 void App::_processNull() {
-  _render_system._drawNull();
+  _render_system->_drawNull();
 }
 
-void App::_processPhysics(float delta_time) {
+void App::_processFixed(float delta_time) {
   _accumulator += delta_time;
 
   while (_accumulator >= k_fixed_delta_time) [[unlikely]] {
-    _root->_fixedUpdate();
+    _current_scene->_fixedUpdate();
     _accumulator -= k_fixed_delta_time;
   }
 }
 
 void App::_process() {
-  _processPhysics(_time_system.deltaTime());
+  _processFixed(_time_system.deltaTime());
 
-  _root->_update();
-  _render_system._update();
+  _current_scene->_update();
+  _render_system->_update();
   _audio_system._update();
 }
 
@@ -45,7 +40,9 @@ void App::init(const int width, const int height, std::string title) {
 
 void App::run() {
   if (!_is_running) throw std::runtime_error("App is not yet initialized.");
-  if (!_root) throw std::runtime_error("App root is not yet set.");
+  if (!_current_scene) throw std::runtime_error("App current scene is not yet set.");
+
+  if (!_render_system) _render_system = &RenderSystem::instance();
 
   while (_is_running) [[likely]] {
     try {
