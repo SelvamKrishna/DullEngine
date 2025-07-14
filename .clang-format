@@ -10,11 +10,18 @@ ContinuationIndentWidth: 2
 AccessModifierOffset: -2
 
 # Constructor formatting (no indentation)
-ConstructorInitializerIndentWidth: 0 # <-- Critical for no indentation
-BreakConstructorInitializers: BeforeColon # <-- Puts each init on new line after colon
+ConstructorInitializerIndentWidth: 0
+BreakConstructorInitializers: BeforeColon
 
 # Allow short constructs
 AllowShortBlocksOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Inline
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 AllowShortLoopsOnASingleLine: true
+
+# Function argument breaking
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: false
+AlignAfterOpenBracket: Align
+PenaltyBreakBeforeFirstCallParameter: 0

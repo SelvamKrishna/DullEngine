@@ -1,25 +1,15 @@
 #pragma once
 
-#include <cstdint>
 #include <string>
 
-/// A base class for all nodes in the application.
-/// Nodes can be used to create a hierarchy of objects, such as game entities or UI components
+/// A base class for all processing elements in the application.
 class Node {
-private:
-  friend class App;
   friend class Scene;
 
-public:
-  enum class State : uint8_t {
-    Uninitialized,
-    Active,
-    Disabled,
-  };
-
 protected:
+  /// TODO: Add a better method of identification for nodes.
   std::string _name;
-  State _state = State::Uninitialized;
+  bool _is_active = true;
 
 private:
   virtual void _init() {}
@@ -34,4 +24,9 @@ public:
   Node(Node &&) noexcept = default;
   Node &operator=(const Node &) = delete;
   Node &operator=(Node &&) noexcept = default;
+
+  inline void setActive(bool node_state) noexcept { _is_active = node_state; }
+
+  [[nodiscard]] inline const std::string &name() const noexcept { return _name; }
+  [[nodiscard]] inline bool isActive() const noexcept { return _is_active; }
 };

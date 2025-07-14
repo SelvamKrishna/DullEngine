@@ -12,7 +12,7 @@ int main() {
   app.setCurrentScene(scene);
 
   GridRenderSystem& gridRenderSystem = GridRenderSystem::instance();
-  gridRenderSystem.setGrid(dynamic_cast<Grid*>(scene->getNodeByType<Grid>()));
+  gridRenderSystem.setGrid(dynamic_cast<Grid*>(scene->getNode<Grid>()));
   app.setRenderSystem(&gridRenderSystem);
 
   app.run();
