@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../vendor/raylib.h"
+
 #include "vec2.hpp"
 
 struct Rect {

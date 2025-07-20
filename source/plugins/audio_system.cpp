@@ -1,4 +1,5 @@
 #include "audio_system.hpp"
+
 #include "../utils/debug.hpp"
 
 AudioSystem::~AudioSystem() {
@@ -114,7 +115,7 @@ void AudioSystem::loadMusic(const std::string &music_name, const std::string &fi
 
 void AudioSystem::playMusic(const std::string &music_name) {
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("AudioSystem::playMusic(): Audio device not initialized");
+        DULL_WARN("Unable to play '%s': Audio system not yet initialized.", music_name);
         return;
     }
 

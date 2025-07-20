@@ -1,5 +1,7 @@
 #include "app.hpp"
+
 #include "../../vendor/raylib.h"
+
 #include <memory>
 
 App::~App() { CloseWindow(); }
@@ -25,7 +27,7 @@ void App::_process() {
 
 void App::init(int window_width, int window_height, const std::string &title) {
     if (_is_running) {
-        DULL_WARN("App::init() called multiple times (window already initialized)");
+        DULL_WARN("App already initialized.");
         return;
     }
 
@@ -37,7 +39,7 @@ void App::init(int window_width, int window_height, const std::string &title) {
 
 void App::run() {
     if (!_is_running) {
-        DULL_WARN("App::run() called without prior initialization (call init() first)");
+        DULL_WARN("Failed to run application: Run flag is set to false.");
         return;
     }
 
@@ -46,7 +48,7 @@ void App::run() {
     }
 
     if (!_current_scene) {
-        DULL_WARN("Trying to run application without setting initializing current scene");
+        DULL_WARN("Failed to run application: Current scene not yet set.");
         return;
     }
 
@@ -62,7 +64,7 @@ void App::run() {
 
         } catch (const std::exception &RUNTIME_ERR) {
             _is_running = false;
-            DULL_WARN("Runtime error: %s", RUNTIME_ERR.what());
+            DULL_WARN("App Runtime Error: %s", RUNTIME_ERR.what());
         }
     }
 }

@@ -3,10 +3,13 @@
 #include "../plugins/audio_system.hpp"
 #include "../plugins/render_system.hpp"
 #include "../plugins/time_system.hpp"
+
 #include "../utils/debug.hpp"
+
 #include "scene.hpp"
-#include <corecrt_terminate.h>
+
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <typeinfo>
@@ -49,7 +52,8 @@ public:
             return *_current_scene;
         }
 
-        DULL_ERROR("Trying to access Current scene without setting it.");
+        DULL_ERROR("Failed to get current scene: Scene not yet set.");
+        throw std::runtime_error(TRACE_MSG("Failed to get current scene: Scene not yet set."));
     }
 
     [[nodiscard]] bool isRunning() const noexcept { return _is_running; }

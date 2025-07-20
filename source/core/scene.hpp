@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "../utils/debug.hpp"
+
 #include "node.hpp"
 
 /// A class to represent a group of nodes that are processed together.
@@ -40,7 +41,7 @@ public:
             }
         }
 
-        DULL_WARN("dynamic_cast failed; getNode");
+        DULL_WARN("Failed to get node: Node type not found.");
         return nullptr;
     }
 };

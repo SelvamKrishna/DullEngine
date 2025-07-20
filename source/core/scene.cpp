@@ -22,7 +22,7 @@ void Scene::_fixedUpdate() {
 
 void Scene::addNode(Node *node) {
     if (node == nullptr) {
-        throw std::runtime_error(TRACE_MSG("Trying to add empty node to scene."));
+        DULL_ERROR("Failed to add node: Provided nullptr instead of node.");
     }
 
     node->setActive(true);
@@ -31,7 +31,7 @@ void Scene::addNode(Node *node) {
 
 void Scene::removeNode(Node *node) {
     if (node == nullptr) {
-        throw std::runtime_error(TRACE_MSG("Given nullptr as argument for removeNode() function."));
+        DULL_ERROR("Failed to remove node: Provided nullptr instead of node.");
     }
 
     for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
@@ -41,7 +41,7 @@ void Scene::removeNode(Node *node) {
         }
     }
 
-    DULL_WARN("Trying to remove Non existing node.");
+    DULL_WARN("Failed to remove node: Node not found.");
 }
 
 void Scene::clear() { _nodes.clear(); }
@@ -51,7 +51,7 @@ void Scene::clear() { _nodes.clear(); }
         return _nodes[index].get();
     }
 
-    DULL_WARN("Index out of range on getNodebyIndex().");
+    DULL_WARN("Failed to get node: Index out of range.");
     return nullptr;
 }
 
@@ -64,6 +64,6 @@ void Scene::clear() { _nodes.clear(); }
         }
     }
 
-    DULL_WARN("No node with name '%s' in scene.", name);
+    DULL_WARN("Failed to get node '%s': Node not found.", name);
     return nullptr;
 }

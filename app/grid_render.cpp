@@ -1,24 +1,24 @@
 #include "grid_render.hpp"
-#include "../source/utils/vec2.hpp"
+
+#include "../vendor/raylib.h"
 
 void GridRenderSystem::_update() {
-    static Vec2 cell_size;
-    cell_size.x = (float)GetScreenWidth() / (float)_grid->getWidth();
-    cell_size.y = (float)GetScreenHeight() / (float)_grid->getHeight();
-    Color cell_color;
+    int cell_size_x = GetScreenWidth() / _grid->getWidth();
+    int cell_size_y = GetScreenHeight() / _grid->getHeight();
 
     BeginDrawing();
     ClearBackground(WHITE);
 
     for (int row = 0; row < _grid->getHeight(); ++row) {
         for (int col = 0; col < _grid->getWidth(); ++col) {
-            cell_color = _grid->getCell(row, col) == 1 ? BLACK : GRAY;
+            int posX = col * cell_size_x;
+            int posY = row * cell_size_y;
 
-            DrawRectangleLines(col * (int)cell_size.x,
-                               row * (int)cell_size.y,
-                               (int)cell_size.x,
-                               (int)cell_size.y,
-                               cell_color);
+            if (_grid->getCell(row, col) == 1) {
+                DrawRectangle(posX, posY, cell_size_x, cell_size_y, BLACK);
+            }
+
+            DrawRectangleLines(posX, posY, cell_size_x, cell_size_y, GRAY);
         }
     }
 

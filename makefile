@@ -2,8 +2,8 @@
 CXX := g++
 CXXFLAGS := -std=c++20 -Iinclude -Isource -Ivendor
 
-DEBUG_FLAGS := -Wall -Wextra -g -O2
-RELEASE_FLAGS := -Wall -Wextra -Werror -O3
+DEBUG_FLAGS := -Wall -Wextra -g -O2 -DDEBUG
+RELEASE_FLAGS := -Wall -Wextra -Werror -O3 -DNDEBUG -DDULL_MODE_DEBUG
 
 LDFLAGS := vendor/libraylib.a -lwinmm -lgdi32 -lopengl32
 

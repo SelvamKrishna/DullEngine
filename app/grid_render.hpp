@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../source/plugins/render_system.hpp"
+
 #include "grid.hpp"
 
 class GridRenderSystem : public RenderSystem {
