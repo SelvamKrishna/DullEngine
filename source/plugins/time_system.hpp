@@ -4,42 +4,46 @@
 
 /// A singleton class for managing time-related information in the application.
 class TimeSystem {
-private:
-  friend class App;
+    friend class App;
 
 private:
-  float _delta_time = 0.0f;
-  float _time_scale = 1.0f;
-  bool _is_paused = false;
+    static constexpr float FIXED_FRAME_RATE = 60.0F;
+    static constexpr float FIXED_DELTA_TIME = 1.0F / FIXED_FRAME_RATE;
 
-private:
-  TimeSystem() = default;
-  ~TimeSystem() = default;
+    float _delta_time = 0.0F;
+    float _time_scale = 1.0F;
+    bool _is_paused = false;
 
-  TimeSystem(const TimeSystem &) = delete;
-  TimeSystem(TimeSystem &&) = delete;
-  TimeSystem &operator=(const TimeSystem &) = delete;
-  TimeSystem &operator=(TimeSystem &&) = delete;
+    TimeSystem() = default;
+    ~TimeSystem() = default;
 
-  inline void _updateInfo(float delta_time) noexcept { _delta_time = delta_time * _time_scale; }
+    void _updateInfo(float delta_time) noexcept { _delta_time = delta_time * _time_scale; }
 
 public:
-  [[nodiscard]] static inline TimeSystem &instance() noexcept {
-    static TimeSystem instance;
-    return instance;
-  }
+    TimeSystem(const TimeSystem &) = delete;
+    TimeSystem(TimeSystem &&) = delete;
+    TimeSystem &operator=(const TimeSystem &) = delete;
+    TimeSystem &operator=(TimeSystem &&) = delete;
 
-  inline void setTimeScale(float scale) noexcept { _time_scale = scale > 0.0f ? scale : 0.0f; }
+    [[nodiscard]] static TimeSystem &instance() noexcept {
+        static TimeSystem instance;
+        return instance;
+    }
 
-  [[nodiscard]] inline float deltaTime() const noexcept { return _delta_time; }
-  [[nodiscard]] inline float timeScale() const noexcept { return _time_scale; }
-  [[nodiscard]] inline bool isPaused() const noexcept { return _is_paused; }
+    [[nodiscard]] static float fixedFrameRate() noexcept { return FIXED_FRAME_RATE; }
+    [[nodiscard]] static float fixedDeltaTime() noexcept { return FIXED_DELTA_TIME; }
 
-  [[nodiscard]] inline uint64_t fps() const noexcept {
-    return (_delta_time > 0.0f) ? static_cast<uint64_t>(1.0f / _delta_time) : 0;
-  }
+    void setTimeScale(float scale) noexcept { _time_scale = scale > 0.0F ? scale : 0.0F; }
 
-  inline void pause() noexcept { _is_paused = true; }
-  inline void unpause() noexcept { _is_paused = false; }
-  inline void togglePause() noexcept { _is_paused = !_is_paused; }
+    [[nodiscard]] float deltaTime() const noexcept { return _delta_time; }
+    [[nodiscard]] float timeScale() const noexcept { return _time_scale; }
+    [[nodiscard]] bool isPaused() const noexcept { return _is_paused; }
+
+    [[nodiscard]] uint64_t fps() const noexcept {
+        return _delta_time > 0.0F ? static_cast<uint64_t>(1.0F / _delta_time) : 0;
+    }
+
+    void pause() noexcept { _is_paused = true; }
+    void unpause() noexcept { _is_paused = false; }
+    void togglePause() noexcept { _is_paused = !_is_paused; }
 };

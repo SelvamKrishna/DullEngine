@@ -1,27 +1,33 @@
+---
 Language: Cpp
-BasedOnStyle: Google
+BasedOnStyle: LLVM
 
-# Basic Formatting
-IndentWidth: 2
-TabWidth: 2
+# Access modifier formatting
+AccessModifierOffset: -4  # This removes indentation completely
+# (Negative value aligns with class scope)
+
+# Core formatting
+ColumnLimit: 110
+IndentWidth: 4
 UseTab: Never
-ColumnLimit: 100
-ContinuationIndentWidth: 2
-AccessModifierOffset: -2
 
-# Constructor formatting (no indentation)
-ConstructorInitializerIndentWidth: 0
-BreakConstructorInitializers: BeforeColon
-
-# Allow short constructs
-AllowShortBlocksOnASingleLine: true
-AllowShortFunctionsOnASingleLine: Inline
-AllowShortIfStatementsOnASingleLine: AllIfsAndElse
-AllowShortLoopsOnASingleLine: true
-
-# Function argument breaking
-BinPackArguments: false
-BinPackParameters: false
+# Parentheses and functions
+AllowAllParametersOfDeclarationOnNextLine: false
 AllowAllArgumentsOnNextLine: false
-AlignAfterOpenBracket: Align
-PenaltyBreakBeforeFirstCallParameter: 0
+BinPackParameters: false
+BinPackArguments: false
+PenaltyBreakBeforeFirstCallParameter: 100
+
+# Brace wrapping
+BraceWrapping:
+  AfterFunction: true
+  AfterClass: true
+  AfterControlStatement: Never
+
+# Spacing
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+
+...
+
+# (Keep all your other existing settings)

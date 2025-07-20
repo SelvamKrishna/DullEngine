@@ -1,61 +1,77 @@
 #pragma once
 
-#include <string>
-
 #include "../plugins/audio_system.hpp"
 #include "../plugins/render_system.hpp"
 #include "../plugins/time_system.hpp"
+#include "../utils/debug.hpp"
 #include "scene.hpp"
+#include <corecrt_terminate.h>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <typeinfo>
 
-/// A singleton class to manage the application.
 class App {
 private:
-  /// TODO: Move to Time System
-  static constexpr float k_fixed_frame_rate = 60.0f;
-  static constexpr float k_fixed_delta_time = 1.0f / k_fixed_frame_rate;
+    std::unique_ptr<Scene> _current_scene;
+    float _accumulator = 0.0F;
+    bool _is_running = false;
 
-  Scene* _current_scene = nullptr;
-  float _accumulator = 0.0f;  /// Accumulator for fixed updates
-  bool _is_running = false;
+    TimeSystem &_time_sys = TimeSystem::instance();
+    AudioSystem &_audio_sys = AudioSystem::instance();
+    std::unique_ptr<RenderSystem> _render_sys;
 
-  TimeSystem& _time_system = TimeSystem::instance();
-  AudioSystem& _audio_system = AudioSystem::instance();
-  RenderSystem* _render_system = nullptr;
-  /// TODO: Implement Overridable Physics System
+    App() = default;
+    ~App();
 
-private:
-  App() = default;
-  ~App();
-
-  void _processNull();                   /// Process when the app is paused or null
-  void _processFixed(float delta_time);  /// Process fixed updates
-  void _process();                       /// Process regular updates
+    inline static void _processNull();
+    inline void _processFixed();
+    inline void _process();
 
 public:
-  App(const App&) = delete;
-  App(App&&) = delete;
-  App& operator=(const App&) = delete;
-  App& operator=(App&&) = delete;
+    static App &instance() {
+        static App instance;
+        return instance;
+    }
 
-  [[nodiscard]] static inline App& instance() noexcept {
-    static App instance;
-    return instance;
-  }
+    App(const App &) = delete;
+    App &operator=(const App &) = delete;
 
-  void init(int window_width, int window_height, const std::string& title);
-  void run();
-  inline void quit() noexcept { _is_running = false; }
+    void init(int window_width, int window_height, const std::string &title);
+    void run();
+    void quit() noexcept { _is_running = false; }
 
-  void setCurrentScene(Scene* scene) noexcept { _current_scene = scene; }
-  void setRenderSystem(RenderSystem* render_system) { _render_system = render_system; }
+    void setCurrentScene(std::unique_ptr<Scene> scene) { _current_scene = std::move(scene); }
+    void setRenderSystem(std::unique_ptr<RenderSystem> render_sys) { _render_sys = std::move(render_sys); }
 
-  [[nodiscard]] inline Scene& currentScene() noexcept { return *_current_scene; }
-  [[nodiscard]] bool isRunning() const noexcept { return _is_running; }
+    Scene &currentScene() {
+        if (_current_scene) {
+            return *_current_scene;
+        }
 
-  [[nodiscard]] inline TimeSystem& timeSystem() noexcept { return _time_system; }
-  [[nodiscard]] inline AudioSystem& audioSystem() noexcept { return _audio_system; }
-  [[nodiscard]] inline RenderSystem& renderSystem() noexcept { return *_render_system; }
+        DULL_ERROR("Trying to access Current scene without setting it.");
+    }
 
-  [[nodiscard]] inline float fixedFrameRate() const noexcept { return k_fixed_frame_rate; }
-  [[nodiscard]] inline float fixedDeltaTime() const noexcept { return k_fixed_delta_time; }
+    [[nodiscard]] bool isRunning() const noexcept { return _is_running; }
+
+    TimeSystem &timeSystem() noexcept { return _time_sys; }
+    AudioSystem &audioSystem() noexcept { return _audio_sys; }
+    RenderSystem &renderSystem() {
+        if (!_render_sys) {
+            _render_sys = std::make_unique<RenderSystem>();
+        }
+
+        return *_render_sys;
+    }
+
+    template <typename RenderSystemT>
+        requires std::is_base_of_v<RenderSystem, RenderSystemT>
+    RenderSystemT &renderSystem() {
+        if (auto *casted_sys = dynamic_cast<RenderSystemT *>(_render_sys.get())) {
+            return *casted_sys;
+        }
+
+        DULL_WARN("Unable to cast render system to given type");
+        throw std::bad_cast();
+    }
 };

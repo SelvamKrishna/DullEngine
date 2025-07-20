@@ -1,3 +1,5 @@
 #include "node.hpp"
 
-Node::Node(const std::string &name) : _name(name) {}
+#include <utility>
+
+Node::Node(std::string name) : _name(std::move(name)) {}

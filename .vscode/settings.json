@@ -1,3 +1,8 @@
 {
-  "CodeGPT.apiKey": "CodeGPT Plus Beta"
+  "files.associations": {
+    "*.hpp": "cpp",
+    "format": "cpp",
+    "vector": "cpp",
+    "xstring": "cpp"
+  }
 }

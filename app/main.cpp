@@ -2,18 +2,20 @@
 #include "../source/core/node.hpp"
 #include "grid.hpp"
 #include "grid_render.hpp"
+#include <memory>
+#include <utility>
 
 int main() {
-  App& app = App::instance();
-  app.init(800, 800, "Test Window");
+    App &app = App::instance();
+    app.init(800, 800, "Draw Grid - Sandbox");
 
-  Scene* scene = new Scene(0);
-  scene->addNode(new Grid(100, 100));
-  app.setCurrentScene(scene);
+    auto scene = std::make_unique<Scene>(1);
+    scene->addNode(new Grid());
+    app.setCurrentScene(std::move(scene));
 
-  GridRenderSystem& gridRenderSystem = GridRenderSystem::instance();
-  gridRenderSystem.setGrid(dynamic_cast<Grid*>(scene->getNode<Grid>()));
-  app.setRenderSystem(&gridRenderSystem);
+    auto render_sys = std::make_unique<GridRenderSystem>();
+    render_sys->setGrid(app.currentScene().getNode<Grid>());
+    app.setRenderSystem(std::move(render_sys));
 
-  app.run();
+    app.run();
 }

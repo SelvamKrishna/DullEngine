@@ -1,60 +1,68 @@
 #include "app.hpp"
-
 #include "../../vendor/raylib.h"
-#include "../utils/debug.hpp"
+#include <memory>
 
-App::~App() {
-  CloseWindow();
-}
+App::~App() { CloseWindow(); }
 
-void App::_processNull() {
-  _render_system->_drawNull();
-}
+void App::_processNull() { RenderSystem::_drawNull(); }
 
-void App::_processFixed(float delta_time) {
-  _accumulator += delta_time;
+void App::_processFixed() {
+    _accumulator += _time_sys.deltaTime();
 
-  while (_accumulator >= k_fixed_delta_time) [[unlikely]] {
-    _current_scene->_fixedUpdate();
-    _accumulator -= k_fixed_delta_time;
-  }
+    while (_accumulator >= TimeSystem::FIXED_DELTA_TIME) [[unlikely]] {
+        _current_scene->_fixedUpdate();
+        _accumulator -= TimeSystem::FIXED_DELTA_TIME;
+    }
 }
 
 void App::_process() {
-  _processFixed(_time_system.deltaTime());
+    _processFixed();
 
-  _current_scene->_update();
-  _render_system->_update();
-  _audio_system._update();
+    _current_scene->_update();
+    _render_sys->_update();
+    _audio_sys._update();
 }
 
-void App::init(const int window_width, const int window_height, const std::string& title) {
-  InitWindow(window_width, window_height, title.c_str());
-  SetExitKey(KEY_NULL);
-  _is_running = true;
+void App::init(int window_width, int window_height, const std::string &title) {
+    if (_is_running) {
+        DULL_WARN("App::init() called multiple times (window already initialized)");
+        return;
+    }
 
-  AudioSystem::instance()._init();
+    InitWindow(window_width, window_height, title.c_str());
+    SetExitKey(KEY_NULL);
+    _is_running = true;
+    AudioSystem::_init();
 }
 
 void App::run() {
-  if (!_is_running) DULL_WARN("_is_running = false; run");
-  if (!_current_scene) DULL_WARN("_current_scene = nullptr; run");
-
-  if (!_render_system) _render_system = &RenderSystem::instance();
-
-  while (_is_running) [[likely]] {
-    try {
-      if (WindowShouldClose()) [[unlikely]] {
-        _is_running = false;
-        break;
-      }
-
-      _time_system._updateInfo(GetFrameTime());
-      _time_system.isPaused() ? _processNull() : _process();
-
-    } catch (std::exception& runtime_err) {
-      _is_running = false;
-      DULL_WARN("%s", runtime_err.what());
+    if (!_is_running) {
+        DULL_WARN("App::run() called without prior initialization (call init() first)");
+        return;
     }
-  }
+
+    if (!_render_sys) {
+        _render_sys = std::make_unique<RenderSystem>();
+    }
+
+    if (!_current_scene) {
+        DULL_WARN("Trying to run application without setting initializing current scene");
+        return;
+    }
+
+    while (_is_running) [[likely]] {
+        try {
+            if (WindowShouldClose()) [[unlikely]] {
+                _is_running = false;
+                break;
+            }
+
+            _time_sys._updateInfo(GetFrameTime());
+            _time_sys.isPaused() ? _processNull() : _process();
+
+        } catch (const std::exception &RUNTIME_ERR) {
+            _is_running = false;
+            DULL_WARN("Runtime error: %s", RUNTIME_ERR.what());
+        }
+    }
 }
