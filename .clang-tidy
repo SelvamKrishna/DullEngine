@@ -27,13 +27,17 @@ CheckOptions:
     value:           camelCase
   - key:             readability-identifier-naming.PrivateMethodCase
     value:           _camelCase
+  - key:             readability-identifier-naming.ProtectedMethodCase
+    value:           _camelCase
 
-  # =============== Variable Naming (SNAKE_CASE ENFORCEMENT) ===============
+  # =============== Variable Naming ===============
   - key:             readability-identifier-naming.VariableCase
     value:           snake_case
   - key:             readability-identifier-naming.MemberCase
     value:           snake_case
   - key:             readability-identifier-naming.PrivateMemberCase
+    value:           _snake_case
+  - key:             readability-identifier-naming.ProtectedMemberCase
     value:           _snake_case
   - key:             readability-identifier-naming.ParameterCase
     value:           snake_case
@@ -54,6 +58,10 @@ CheckOptions:
   - key:             readability-identifier-naming.PrivateMemberPrefix
     value:           _
   - key:             readability-identifier-naming.PrivateMethodPrefix
+    value:           _
+  - key:             readability-identifier-naming.ProtectedMemberPrefix
+    value:           _
+  - key:             readability-identifier-naming.ProtectedMethodPrefix
     value:           _
 
 # Enforcement Settings

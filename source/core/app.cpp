@@ -64,7 +64,7 @@ void App::run() {
 
         } catch (const std::exception &RUNTIME_ERR) {
             _is_running = false;
-            DULL_WARN("App Runtime Error: %s", RUNTIME_ERR.what());
+            DULL_WARN("App Runtime Error: {}", RUNTIME_ERR.what());
         }
     }
 }

@@ -40,18 +40,18 @@ void AudioSystem::_update() {
 
 void AudioSystem::loadSound(const std::string &sound_name, const std::string &file_path) {
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to load '%s': Audio system not initialized.", sound_name);
+        DULL_WARN("Unable to load '{}': Audio system not initialized.", sound_name);
         return;
     }
 
     if (_sounds.find(sound_name) != _sounds.end()) {
-        DULL_WARN("Unable to load '%s': Name already exist.", sound_name);
+        DULL_WARN("Unable to load '{}': Name already exist.", sound_name);
         return;
     }
 
     Sound sound = LoadSound(file_path.c_str());
     if (!IsSoundValid(sound)) {
-        DULL_WARN("Unable to load '%s': '%s' invalid.", sound_name, file_path);
+        DULL_WARN("Unable to load '{}': '{}' invalid.", sound_name, file_path);
         return;
     }
 
@@ -60,18 +60,18 @@ void AudioSystem::loadSound(const std::string &sound_name, const std::string &fi
 
 void AudioSystem::playSound(const std::string &sound_name) {
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to play '%s': Audio system not initialized.", sound_name);
+        DULL_WARN("Unable to play '{}': Audio system not initialized.", sound_name);
         return;
     }
 
     auto it = _sounds.find(sound_name);
     if (it == _sounds.end()) {
-        DULL_WARN("Unable to play '%s': Sound not found.", sound_name);
+        DULL_WARN("Unable to play '{}': Sound not found.", sound_name);
         return;
     }
 
     if (!IsSoundValid(it->second)) {
-        DULL_WARN("Unable to play '%s': Sound invalid.", sound_name);
+        DULL_WARN("Unable to play '{}': Sound invalid.", sound_name);
         return;
     }
 
@@ -81,7 +81,7 @@ void AudioSystem::playSound(const std::string &sound_name) {
 void AudioSystem::unloadSound(const std::string &sound_name) {
     auto it = _sounds.find(sound_name);
     if (it == _sounds.end()) {
-        DULL_WARN("Unable to unload '%s': Sound not found.", sound_name);
+        DULL_WARN("Unable to unload '{}': Sound not found.", sound_name);
         return;
     }
 
@@ -95,18 +95,18 @@ void AudioSystem::unloadSound(const std::string &sound_name) {
 
 void AudioSystem::loadMusic(const std::string &music_name, const std::string &file_path) {
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to load '%s': Audio system not initialized.", music_name);
+        DULL_WARN("Unable to load '{}': Audio system not initialized.", music_name);
         return;
     }
 
     if (_musics.find(music_name) != _musics.end()) {
-        DULL_WARN("Unable to load '%s': Name already exist.", music_name);
+        DULL_WARN("Unable to load '{}': Name already exist.", music_name);
         return;
     }
 
     Music music = LoadMusicStream(file_path.c_str());
     if (IsMusicValid(music)) {
-        DULL_WARN("Unable to load '%s': '%s' invalid.", music_name, file_path);
+        DULL_WARN("Unable to load '{}': '{}' invalid.", music_name, file_path);
         return;
     }
 
@@ -115,18 +115,18 @@ void AudioSystem::loadMusic(const std::string &music_name, const std::string &fi
 
 void AudioSystem::playMusic(const std::string &music_name) {
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to play '%s': Audio system not yet initialized.", music_name);
+        DULL_WARN("Unable to play '{}': Audio system not yet initialized.", music_name);
         return;
     }
 
     auto it = _musics.find(music_name);
     if (it == _musics.end()) {
-        DULL_WARN("Unable to play '%s': Music not found.", music_name);
+        DULL_WARN("Unable to play '{}': Music not found.", music_name);
         return;
     }
 
     if (!IsMusicValid(it->second)) {
-        DULL_WARN("Unable to play '%s': Music invalid.", music_name);
+        DULL_WARN("Unable to play '{}': Music invalid.", music_name);
         return;
     }
 
@@ -150,7 +150,7 @@ void AudioSystem::stopMusic() {
 void AudioSystem::unloadMusic(const std::string &music_name) {
     auto it = _musics.find(music_name);
     if (it == _musics.end()) {
-        DULL_WARN("Unable to unload '%s': Music not found.", music_name);
+        DULL_WARN("Unable to unload '{}': Music not found.", music_name);
         return;
     }
 

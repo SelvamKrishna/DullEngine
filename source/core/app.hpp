@@ -79,3 +79,5 @@ public:
         throw std::bad_cast();
     }
 };
+
+#define CURRENT_SCENE App::instance().currentScene()

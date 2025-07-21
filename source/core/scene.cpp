@@ -25,8 +25,11 @@ void Scene::addNode(Node *node) {
         DULL_ERROR("Failed to add node: Provided nullptr instead of node.");
     }
 
+    node->_init();
     node->setActive(true);
     _nodes.emplace_back(node);
+
+    DULL_INFO("Added node '{}'.", node->_name);
 }
 
 void Scene::removeNode(Node *node) {
@@ -64,6 +67,6 @@ void Scene::clear() { _nodes.clear(); }
         }
     }
 
-    DULL_WARN("Failed to get node '%s': Node not found.", name);
+    DULL_WARN("Failed to get node '{}': Node not found.", name);
     return nullptr;
 }

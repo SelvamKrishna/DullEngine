@@ -1,0 +1,39 @@
+#include "ball.hpp"
+
+#include "../source/core/app.hpp"
+#include "../source/plugins/time_system.hpp"
+#include "paddle.hpp"
+
+#include <random>
+
+void Ball::_init() {
+    std::random_device rand_device;
+    std::bernoulli_distribution rand_bool_dist(0.5F);
+    std::mt19937 gen(rand_device());
+
+    _direction = {.down = rand_bool_dist(gen), .right = rand_bool_dist(gen)};
+    _pos = {(float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2};
+}
+
+void Ball::_update() {
+    const float MOVEMENT = _speed * DELTA_TIME;
+    const auto SCREEN_WIDTH = static_cast<float>(GetScreenWidth());
+    const auto SCREEN_HEIGHT = static_cast<float>(GetScreenHeight());
+
+    if (_pos.y <= _radius || _pos.y >= SCREEN_HEIGHT - _radius) [[unlikely]] {
+        _direction.down = !_direction.down;
+    }
+
+    if (CURRENT_SCENE.getNode<PlayerPaddle>()->isBallCollided(*this) ||
+        CURRENT_SCENE.getNode<AIPaddle>()->isBallCollided(*this)) [[unlikely]] {
+        _direction.right = !_direction.right; // Flip horizontal direction
+    }
+
+    if (_pos.x <= -_radius || _pos.x >= SCREEN_WIDTH + _radius) [[unlikely]] {
+        _init();
+        return;
+    }
+
+    _pos.x += _direction.right ? MOVEMENT : -MOVEMENT;
+    _pos.y += _direction.down ? MOVEMENT : -MOVEMENT;
+}

@@ -47,3 +47,5 @@ public:
     void unpause() noexcept { _is_paused = false; }
     void togglePause() noexcept { _is_paused = !_is_paused; }
 };
+
+#define DELTA_TIME TimeSystem::instance().deltaTime()

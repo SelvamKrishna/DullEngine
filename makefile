@@ -63,4 +63,7 @@ run: debug
 clean:
 	@if exist "$(BUILD_DIR)" rmdir /s /q "$(BUILD_DIR)"
 
-.PHONY: all debug release run clean
+app:
+	@if exist "$(BUILD_DIR)/$(APP_DIR)" rmdir /s /q "$(BUILD_DIR)/$(APP_DIR)" 
+
+.PHONY: all debug release run clean app
