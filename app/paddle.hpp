@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -43,6 +44,8 @@ public:
 
 class AIPaddle : public Paddle {
 private:
+    std::weak_ptr<Ball> _ball_ref;
+
     void _init() final;
     void _update() final;
 

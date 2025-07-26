@@ -1,76 +1,118 @@
 #include "scene.hpp"
+#include "node.hpp"
+#include <algorithm>
+#include <cstddef>
+#include <format>
+#include <memory>
+#include <utility>
 
-Scene::Scene(size_t node_buffer_size) { _nodes.reserve(node_buffer_size); }
+void Scene::_init() {
+    size_t index = 0;
 
-Scene::~Scene() { clear(); }
+    for (auto &node : _nodes) {
+        if (node == nullptr) [[unlikely]] {
+            _nodes.erase(_nodes.begin() + static_cast<long long>(index++));
+            continue;
+        }
+
+        node->_init();
+        node->setActive(true);
+
+        index++;
+    }
+}
 
 void Scene::_update() {
+    size_t index = 0;
+
     for (auto &node : _nodes) {
-        if (node && node->_is_active) {
-            node->_update();
+        try {
+            if (node == nullptr) [[unlikely]] {
+                _nodes.erase(_nodes.begin() + static_cast<long long>(index++));
+                continue;
+            }
+
+            if (node->_is_active && node->_is_updating) {
+                node->_update();
+            }
+        } catch (const std::exception &e) {
+            ErrorCtx("Scene updating")
+                .failFallback(std::format("Exception in node '{}': {}", node->_name, e.what()));
         }
+
+        index++;
     }
 }
 
 void Scene::_fixedUpdate() {
     for (auto &node : _nodes) {
-        if (node && node->_is_active) {
-            node->_fixedUpdate();
+        try {
+            if (node->_is_active && node->_is_fixed_updating) {
+                node->_fixedUpdate();
+            }
+        } catch (const std::exception &e) {
+            ErrorCtx("Scene fixed updating")
+                .failFallback(std::format("Exception in node '{}': {}", node->_name, e.what()));
         }
     }
 }
 
-void Scene::addNode(Node *node) {
-    if (node == nullptr) [[unlikely]] {
-        ErrorCtx("Add node to scene").failFallback("Null pointer provided");
-        return;
-    }
-
-    node->_init();
-    node->setActive(true);
-    _nodes.emplace_back(node);
-
-    DULL_INFO("Added node '{}'.", node->_name);
-}
-
-void Scene::removeNode(Node *node) {
-    ErrorCtx err("Remove node from scene");
+void Scene::addNode(std::unique_ptr<Node> node) {
+    ErrorCtx err(std::format("Add node '{}' to scene", node->_name));
 
     if (node == nullptr) [[unlikely]] {
         err.failFallback("Null pointer provided");
         return;
     }
 
-    for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
-        if (it->get() == node) {
-            _nodes.erase(it);
+    for (const auto &node_it : _nodes) {
+        if (node_it->_name == node->_name) [[unlikely]] {
+            err.failFallback("Node with name already exists");
             return;
         }
     }
 
-    err.failFallback("Not found");
+    DULL_INFO("Added node '{}' to scene.", node->_name);
+    _nodes.emplace_back(std::move(node));
 }
 
-void Scene::clear() { _nodes.clear(); }
-
-[[nodiscard]] Node *Scene::getNodeByIndex(size_t index) {
-    if (index < _nodes.size()) {
-        return _nodes[index].get();
+void Scene::removeNodeByIndex(size_t index) {
+    if (index >= _nodes.size()) {
+        ErrorCtx("Remove node by index").failFallback("Index out of range");
+        return;
     }
 
-    ErrorCtx("Get node by index").failFallback("Index out of range");
-    return nullptr;
+    _nodes[index]->setActive(false);
+    _nodes.erase(_nodes.begin() + static_cast<long long>(index));
 }
 
-[[nodiscard]] Node *Scene::getNodeByName(const std::string &name) {
-    /// FIXME: Name collision not dealt with.
+void Scene::removeNodeByName(std::string_view name) {
+    auto it = std::ranges::find_if(_nodes, [name](const auto &node) { return node->_name == name; });
 
-    for (auto &node : _nodes) {
-        if (node && node->_name == name) {
-            return node.get();
-        }
+    if (it == _nodes.end()) {
+        ErrorCtx("Remove node by name").failFallback("Not found");
+        return;
     }
 
-    ErrorCtx("Get node by name").failFallback("Not found");
-    return nullptr;
+    _nodes.erase(it);
+}
+
+[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByIndex(size_t index) {
+    if (index >= _nodes.size()) {
+        ErrorCtx("Get node by index").failFallback("Index out of range");
+        return {};
+    }
+
+    return _nodes[index];
+}
+
+[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByName(std::string_view name) {
+    auto it = std::ranges::find_if(_nodes, [name](const auto &node) { return node->_name == name; });
+
+    if (it == _nodes.end()) {
+        ErrorCtx("Get node by name").failFallback("Not found");
+        return {};
+    }
+
+    return *it;
 }

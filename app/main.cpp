@@ -1,27 +1,24 @@
 #include "../source/core/app.hpp"
 #include "../source/core/node.hpp"
 
-#include "../source/plugins/audio_system.hpp"
-
 #include "ball.hpp"
 #include "paddle.hpp"
 #include "pong_render.hpp"
 
 #include <memory>
-#include <utility>
 
 int main() {
     App &app = App::instance();
     app.init(800, 800, "Pong - Sandbox");
+    app.setCurrentScene(std::make_unique<Scene>());
 
-    auto scene = std::make_unique<Scene>(3);
+    auto &scene = CURRENT_SCENE;
 
-    scene->addNode(new PlayerPaddle());
-    scene->addNode(new AIPaddle());
-    scene->addNode(new Ball());
+    scene.addNode(std::make_unique<PlayerPaddle>());
+    scene.addNode(std::make_unique<AIPaddle>());
+    scene.addNode(std::make_unique<Ball>());
 
-    app.setCurrentScene(std::move(scene));
-    app.setRenderSystem(std::move(std::make_unique<PongRenderSystem>()));
+    app.setRenderSystem(std::make_unique<PongRenderSystem>());
 
     app.run();
 }

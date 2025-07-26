@@ -1,10 +1,13 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
 
+/// INCOMPLETE:
+/// Observer for signal calls
 class Observer {
     friend class SignalSystem;
 
@@ -17,11 +20,14 @@ public:
     void detachSignal(std::string_view signal);
 };
 
+/// INCOMPLETE:
+/// Handles signals and observer logic
+/// TODO: Thread safety
 class SignalSystem {
     friend class App;
 
 private:
-    std::unordered_map<std::string, std::vector<Observer *>> _signal_links;
+    std::unordered_map<std::string, std::vector<std::weak_ptr<Observer>>> _signal_links;
 
     explicit SignalSystem() = default;
     ~SignalSystem() = default;

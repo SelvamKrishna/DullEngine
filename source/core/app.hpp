@@ -2,6 +2,7 @@
 
 #include "../plugins/audio_system.hpp"
 #include "../plugins/render_system.hpp"
+#include "../plugins/signal_system.hpp"
 #include "../plugins/time_system.hpp"
 
 #include "../utils/debug.hpp"
@@ -12,6 +13,7 @@
 #include <string>
 #include <type_traits>
 
+/// A singleton class handling all resources and logic of the application
 class App {
 private:
     std::unique_ptr<Scene> _current_scene;
@@ -21,6 +23,7 @@ private:
     TimeSystem _time_sys;
     AudioSystem _audio_sys;
     std::unique_ptr<RenderSystem> _render_sys;
+    SignalSystem _signal_sys;
 
     App() = default;
     ~App();
@@ -80,6 +83,8 @@ public:
 
         ErrorCtx("Get render system").failExit("Bad cast");
     }
+
+    [[nodiscard]] constexpr SignalSystem &signalSystem() noexcept { return _signal_sys; }
 };
 
 #define CURRENT_SCENE App::instance().currentScene()
@@ -87,3 +92,4 @@ public:
 #define AUDIO_SYS App::instance().audioSystem()
 #define RENDER_SYS() App::instance().renderSystem()
 #define RENDER_SYS_AS(Type) App::instance().renderSystem<Type>()
+#define SIGNAL_SYS App::instance().signalSystem()

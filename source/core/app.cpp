@@ -51,6 +51,7 @@ void App::run() {
         _render_sys = std::make_unique<RenderSystem>();
     }
 
+    _current_scene->_init();
     _render_sys->_init();
 
     while (_is_running) [[likely]] {

@@ -3,12 +3,13 @@
 #include "../source/plugins/render_system.hpp"
 #include "ball.hpp"
 #include "paddle.hpp"
+#include <memory>
 
 class PongRenderSystem : public RenderSystem {
 private:
-    Paddle *_player_pad;
-    Paddle *_ai_pad;
-    Ball *_ball;
+    std::weak_ptr<Paddle> _player_pad_ref;
+    std::weak_ptr<Paddle> _ai_pad_ref;
+    std::weak_ptr<Ball> _ball_ref;
 
     void _init() final;
     void _update() final;

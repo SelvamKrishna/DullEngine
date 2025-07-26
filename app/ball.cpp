@@ -23,8 +23,8 @@ void Ball::_update() {
         _direction.down = !_direction.down;
     }
 
-    if (CURRENT_SCENE.getNode<PlayerPaddle>()->isBallCollided(*this) ||
-        CURRENT_SCENE.getNode<AIPaddle>()->isBallCollided(*this)) [[unlikely]] {
+    if (CURRENT_SCENE.getNode<PlayerPaddle>().lock()->isBallCollided(*this) ||
+        CURRENT_SCENE.getNode<AIPaddle>().lock()->isBallCollided(*this)) [[unlikely]] {
         _direction.right = !_direction.right; // Flip horizontal direction
     }
 
