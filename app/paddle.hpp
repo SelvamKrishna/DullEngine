@@ -3,8 +3,8 @@
 #include <string>
 #include <utility>
 
+#include "../source/core/app.hpp"
 #include "../source/core/node.hpp"
-#include "../source/plugins/time_system.hpp"
 #include "../source/utils/rect.hpp"
 #include "ball.hpp"
 
@@ -13,10 +13,11 @@ protected:
     Rect _rect = {0, (float)GetScreenHeight() / 2, 20, 100};
     float _speed = 500.0F;
 
-    void _moveUp() { _rect.y = std::max<float>(_rect.y - (_speed * DELTA_TIME), 0); }
+    void _moveUp() { _rect.y = std::max<float>(_rect.y - (_speed * TIME_SYS.deltaTime()), 0); }
 
     void _moveDown() {
-        _rect.y = std::min<float>(_rect.y + (_speed * DELTA_TIME), (float)GetScreenHeight() - _rect.height);
+        _rect.y = std::min<float>(_rect.y + (_speed * TIME_SYS.deltaTime()),
+                                  (float)GetScreenHeight() - _rect.height);
     }
 
 public:

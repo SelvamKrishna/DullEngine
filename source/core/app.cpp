@@ -26,9 +26,8 @@ void App::_process() {
 }
 
 void App::init(int window_width, int window_height, const std::string &title) {
-    if (_is_running) {
-        DULL_WARN("App already initialized.");
-        return;
+    if (_is_running) [[unlikely]] {
+        ErrorCtx("App initialization").failExit("Run flag set to true");
     }
 
     InitWindow(window_width, window_height, title.c_str());
@@ -38,19 +37,21 @@ void App::init(int window_width, int window_height, const std::string &title) {
 }
 
 void App::run() {
+    ErrorCtx err("App mainloop");
+
     if (!_is_running) {
-        DULL_WARN("Failed to run application: Run flag is set to false.");
-        return;
+        err.failExit("Run flag set to false");
+    }
+
+    if (!_current_scene) {
+        err.failExit("Current scene not yet set");
     }
 
     if (!_render_sys) {
         _render_sys = std::make_unique<RenderSystem>();
     }
 
-    if (!_current_scene) {
-        DULL_WARN("Failed to run application: Current scene not yet set.");
-        return;
-    }
+    _render_sys->_init();
 
     while (_is_running) [[likely]] {
         try {
@@ -64,7 +65,7 @@ void App::run() {
 
         } catch (const std::exception &RUNTIME_ERR) {
             _is_running = false;
-            DULL_WARN("App Runtime Error: {}", RUNTIME_ERR.what());
+            ErrorCtx("Runtime").failExit(RUNTIME_ERR.what());
         }
     }
 }

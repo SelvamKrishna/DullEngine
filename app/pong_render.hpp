@@ -10,9 +10,6 @@ private:
     Paddle *_ai_pad;
     Ball *_ball;
 
+    void _init() final;
     void _update() final;
-
-public:
-    PongRenderSystem(Paddle *player_pad, Paddle *ai_pad, Ball *ball)
-        : _player_pad(player_pad), _ai_pad(ai_pad), _ball(ball) {}
 };

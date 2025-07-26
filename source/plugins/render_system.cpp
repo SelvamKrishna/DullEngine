@@ -2,7 +2,7 @@
 
 #include "../../vendor/raylib.h"
 
-void RenderSystem::_drawNull() {
+void RenderSystem::_drawNull() noexcept {
     BeginDrawing();
     EndDrawing();
 }

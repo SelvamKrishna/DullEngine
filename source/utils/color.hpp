@@ -16,10 +16,10 @@ public:
 
     constexpr ColorRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) noexcept : r(r), g(g), b(b), a(a) {}
 
-    // Constructor from a raylib::Color
+    // From raylib::Color
     constexpr ColorRGBA(const Color &color) noexcept : r(color.r), g(color.g), b(color.b), a(color.a) {}
 
-    // Copy to raylib::Color from ColorRGBA
+    // To raylib::Color
     constexpr operator Color() const noexcept { return {r, g, b, a}; }
 
     constexpr ColorRGBA operator+(const ColorRGBA &other) const noexcept {

@@ -41,7 +41,7 @@ public:
             }
         }
 
-        DULL_WARN("Failed to get node: Node type not found.");
+        ErrorCtx("Get node by type").failFallback("Not found");
         return nullptr;
     }
 };

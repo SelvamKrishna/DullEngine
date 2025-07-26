@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-/// A singleton class for managing time-related information in the application.
+/// A class for managing time-related information in the application.
 class TimeSystem {
     friend class App;
 
@@ -25,27 +25,20 @@ public:
     TimeSystem &operator=(const TimeSystem &) = delete;
     TimeSystem &operator=(TimeSystem &&) = delete;
 
-    [[nodiscard]] static TimeSystem &instance() noexcept {
-        static TimeSystem instance;
-        return instance;
-    }
+    [[nodiscard]] constexpr static float fixedFrameRate() noexcept { return FIXED_FRAME_RATE; }
+    [[nodiscard]] constexpr static float fixedDeltaTime() noexcept { return FIXED_DELTA_TIME; }
 
-    [[nodiscard]] static float fixedFrameRate() noexcept { return FIXED_FRAME_RATE; }
-    [[nodiscard]] static float fixedDeltaTime() noexcept { return FIXED_DELTA_TIME; }
+    constexpr void setTimeScale(float scale) noexcept { _time_scale = scale > 0.0F ? scale : 0.0F; }
 
-    void setTimeScale(float scale) noexcept { _time_scale = scale > 0.0F ? scale : 0.0F; }
+    [[nodiscard]] constexpr float deltaTime() const noexcept { return _delta_time; }
+    [[nodiscard]] constexpr float timeScale() const noexcept { return _time_scale; }
+    [[nodiscard]] constexpr bool isPaused() const noexcept { return _is_paused; }
 
-    [[nodiscard]] float deltaTime() const noexcept { return _delta_time; }
-    [[nodiscard]] float timeScale() const noexcept { return _time_scale; }
-    [[nodiscard]] bool isPaused() const noexcept { return _is_paused; }
-
-    [[nodiscard]] uint64_t fps() const noexcept {
+    [[nodiscard]] constexpr uint64_t fps() const noexcept {
         return _delta_time > 0.0F ? static_cast<uint64_t>(1.0F / _delta_time) : 0;
     }
 
-    void pause() noexcept { _is_paused = true; }
-    void unpause() noexcept { _is_paused = false; }
-    void togglePause() noexcept { _is_paused = !_is_paused; }
+    constexpr void pause() noexcept { _is_paused = true; }
+    constexpr void unpause() noexcept { _is_paused = false; }
+    constexpr void togglePause() noexcept { _is_paused = !_is_paused; }
 };
-
-#define DELTA_TIME TimeSystem::instance().deltaTime()

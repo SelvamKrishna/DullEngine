@@ -1,8 +1,12 @@
 #include "audio_system.hpp"
 
 #include "../utils/debug.hpp"
+#include <format>
+#include <mutex>
 
 AudioSystem::~AudioSystem() {
+    stopMusic();
+
     for (auto &[name, sound] : _sounds) {
         UnloadSound(sound);
     }
@@ -18,7 +22,7 @@ AudioSystem::~AudioSystem() {
 
 void AudioSystem::_init() {
     if (IsAudioDeviceReady()) {
-        DULL_WARN("Audio system already initialized.");
+        ErrorCtx("Audio system initilalization").failFallback("Already initialized");
         return;
     }
 
@@ -27,7 +31,7 @@ void AudioSystem::_init() {
 
 void AudioSystem::_update() {
     if (!IsAudioDeviceReady()) [[unlikely]] {
-        DULL_WARN("Trying to process audio system without initialization.");
+        ErrorCtx("Audio system update").failFallback("Not initialized");
         return;
     }
 
@@ -38,50 +42,59 @@ void AudioSystem::_update() {
     UpdateMusicStream(*_music);
 }
 
-void AudioSystem::loadSound(const std::string &sound_name, const std::string &file_path) {
+void AudioSystem::loadSound(const std::string &sound_name, const std::string &file_path) noexcept {
+    std::lock_guard<std::mutex> lock(_mutex);
+    ErrorCtx err(std::format("Load sound '{}'", sound_name));
+
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to load '{}': Audio system not initialized.", sound_name);
+        err.failFallback("Audio system not initialized");
         return;
     }
 
     if (_sounds.find(sound_name) != _sounds.end()) {
-        DULL_WARN("Unable to load '{}': Name already exist.", sound_name);
+        err.failFallback("Name already exist");
         return;
     }
 
     Sound sound = LoadSound(file_path.c_str());
     if (!IsSoundValid(sound)) {
-        DULL_WARN("Unable to load '{}': '{}' invalid.", sound_name, file_path);
+        err.failFallback(std::format("File path '{}' invalid", file_path));
         return;
     }
 
     _sounds[sound_name] = sound;
+    DULL_INFO("Sound loaded successfully: {}", sound_name);
 }
 
-void AudioSystem::playSound(const std::string &sound_name) {
+void AudioSystem::playSound(const std::string &sound_name) noexcept {
+    std::lock_guard<std::mutex> lock(_mutex);
+    ErrorCtx err(std::format("Play sound '{}'", sound_name));
+
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to play '{}': Audio system not initialized.", sound_name);
+        err.failFallback("Audio system not initialized");
         return;
     }
 
     auto it = _sounds.find(sound_name);
     if (it == _sounds.end()) {
-        DULL_WARN("Unable to play '{}': Sound not found.", sound_name);
+        err.failFallback("Not found");
         return;
     }
 
     if (!IsSoundValid(it->second)) {
-        DULL_WARN("Unable to play '{}': Sound invalid.", sound_name);
+        err.failFallback("Invalid sound");
         return;
     }
 
     PlaySound(it->second);
 }
 
-void AudioSystem::unloadSound(const std::string &sound_name) {
+void AudioSystem::unloadSound(const std::string &sound_name) noexcept {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     auto it = _sounds.find(sound_name);
     if (it == _sounds.end()) {
-        DULL_WARN("Unable to unload '{}': Sound not found.", sound_name);
+        ErrorCtx(std::format("Unload sound '{}'", sound_name)).failFallback("Not found");
         return;
     }
 
@@ -91,54 +104,65 @@ void AudioSystem::unloadSound(const std::string &sound_name) {
 
     UnloadSound(it->second);
     _sounds.erase(it);
+    DULL_INFO("Sound unloaded successfully: {}", sound_name);
 }
 
-void AudioSystem::loadMusic(const std::string &music_name, const std::string &file_path) {
+void AudioSystem::loadMusic(const std::string &music_name, const std::string &file_path) noexcept {
+    std::lock_guard<std::mutex> lock(_mutex);
+    ErrorCtx err(std::format("Load music '{}'", music_name));
+
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to load '{}': Audio system not initialized.", music_name);
+        err.failFallback("Audio system not initialized");
         return;
     }
 
     if (_musics.find(music_name) != _musics.end()) {
-        DULL_WARN("Unable to load '{}': Name already exist.", music_name);
+        err.failFallback("Name already exist");
         return;
     }
 
     Music music = LoadMusicStream(file_path.c_str());
     if (IsMusicValid(music)) {
-        DULL_WARN("Unable to load '{}': '{}' invalid.", music_name, file_path);
+        err.failFallback(std::format("File path '{}' invalid", file_path));
         return;
     }
 
     _musics[music_name] = music;
+    DULL_INFO("Music loaded successfully: {}", music_name);
 }
 
-void AudioSystem::playMusic(const std::string &music_name) {
+void AudioSystem::playMusic(const std::string &music_name) noexcept {
+    std::lock_guard<std::mutex> lock(_mutex);
+    ErrorCtx err(std::format("Play music '{}'", music_name));
+
     if (!IsAudioDeviceReady()) {
-        DULL_WARN("Unable to play '{}': Audio system not yet initialized.", music_name);
+        err.failFallback("Audio system not initialized");
         return;
     }
 
     auto it = _musics.find(music_name);
     if (it == _musics.end()) {
-        DULL_WARN("Unable to play '{}': Music not found.", music_name);
+        err.failFallback("Not found");
         return;
     }
 
     if (!IsMusicValid(it->second)) {
-        DULL_WARN("Unable to play '{}': Music invalid.", music_name);
-        return;
-    }
-
-    if (_music == &it->second && IsMusicStreamPlaying(*_music)) {
+        err.failFallback("Invalid music");
         return;
     }
 
     _music = &it->second;
+
+    if (IsMusicStreamPlaying(*_music)) {
+        return;
+    }
+
     PlayMusicStream(*_music);
 }
 
-void AudioSystem::stopMusic() {
+void AudioSystem::stopMusic() noexcept {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_music == nullptr || !IsMusicStreamPlaying(*_music)) {
         return;
     }
@@ -147,10 +171,12 @@ void AudioSystem::stopMusic() {
     _music = nullptr;
 }
 
-void AudioSystem::unloadMusic(const std::string &music_name) {
+void AudioSystem::unloadMusic(const std::string &music_name) noexcept {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     auto it = _musics.find(music_name);
     if (it == _musics.end()) {
-        DULL_WARN("Unable to unload '{}': Music not found.", music_name);
+        ErrorCtx(std::format("Unload music {}", music_name)).failFallback("Not found");
         return;
     }
 
@@ -164,4 +190,5 @@ void AudioSystem::unloadMusic(const std::string &music_name) {
 
     UnloadMusicStream(it->second);
     _musics.erase(it);
+    DULL_INFO("Music unloaded successfully: {}", music_name);
 }

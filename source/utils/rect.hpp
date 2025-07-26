@@ -16,10 +16,10 @@ public:
     constexpr Rect(float x, float y, float width, float height) noexcept
         : x(x), y(y), width(width), height(height) {}
 
-    // Constructor from raylib::Rectangle
-    constexpr operator Rectangle() const noexcept { return {x, y, width, height}; }
-
-    // Copy from raylib::Rectangle to Rect
+    // From raylib::Rectangle
     constexpr Rect(const Rectangle &rect) noexcept
         : x(rect.x), y(rect.y), width(rect.width), height(rect.height) {}
+
+    // To raylib::Rectangle
+    constexpr operator Rectangle() const noexcept { return {x, y, width, height}; }
 };

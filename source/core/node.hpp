@@ -25,8 +25,8 @@ public:
     Node &operator=(const Node &) = delete;
     Node &operator=(Node &&) noexcept = default;
 
-    void setActive(bool node_state) noexcept { _is_active = node_state; }
+    constexpr void setActive(bool node_state) noexcept { _is_active = node_state; }
 
-    [[nodiscard]] const std::string &name() const noexcept { return _name; }
-    [[nodiscard]] bool isActive() const noexcept { return _is_active; }
+    [[nodiscard]] constexpr const std::string &name() const noexcept { return _name; }
+    [[nodiscard]] constexpr bool isActive() const noexcept { return _is_active; }
 };

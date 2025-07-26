@@ -8,8 +8,10 @@ struct Vec2 {
 
     constexpr Vec2(float x = 0.0F, float y = 0.0F) noexcept : x(x), y(y) {}
 
-    // Raylib compatible converters
+    // From raylib::Vector2
     constexpr Vec2(const Vector2 &vec) noexcept : x(vec.x), y(vec.y) {}
+
+    // To raylib::Vector2
     constexpr operator Vector2() const noexcept { return {x, y}; }
 
     static Vec2 unit(float unit = 0.0F) { return {unit, unit}; }

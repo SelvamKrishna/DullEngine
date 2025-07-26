@@ -1,7 +1,6 @@
 #include "ball.hpp"
 
 #include "../source/core/app.hpp"
-#include "../source/plugins/time_system.hpp"
 #include "paddle.hpp"
 
 #include <random>
@@ -16,7 +15,7 @@ void Ball::_init() {
 }
 
 void Ball::_update() {
-    const float MOVEMENT = _speed * DELTA_TIME;
+    const float MOVEMENT = _speed * TIME_SYS.deltaTime();
     const auto SCREEN_WIDTH = static_cast<float>(GetScreenWidth());
     const auto SCREEN_HEIGHT = static_cast<float>(GetScreenHeight());
 
