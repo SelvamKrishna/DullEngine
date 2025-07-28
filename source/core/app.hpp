@@ -13,7 +13,6 @@
 #include <string>
 #include <type_traits>
 
-/// A singleton class handling all resources and logic of the application
 class App {
 private:
     std::unique_ptr<Scene> _current_scene;

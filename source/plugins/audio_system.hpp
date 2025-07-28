@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 /// UNTESTED:
-/// Class for managing sounds and music in the application.
 /// TODO: Volume handling
 class AudioSystem {
     friend class App;

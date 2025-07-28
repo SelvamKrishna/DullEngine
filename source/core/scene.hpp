@@ -12,7 +12,6 @@
 
 /// TODO: Implement thread safety
 /// TODO: Better Scene management system
-/// A class to categorize and process a collection of nodes.
 class Scene {
     friend class App;
 

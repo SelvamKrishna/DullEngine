@@ -2,7 +2,6 @@
 
 #include <cstdint>
 
-/// A class for managing time-related information in the application.
 class TimeSystem {
     friend class App;
 

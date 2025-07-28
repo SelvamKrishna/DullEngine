@@ -1,7 +1,5 @@
 #pragma once
 
-/// Base class for managing rendering logic.
-/// Supports custom implementations via inheritance.
 class RenderSystem {
     friend class App;
 

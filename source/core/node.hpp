@@ -2,7 +2,6 @@
 
 #include <string>
 
-/// A base class for all processing elements in the application.
 class Node {
     friend class Scene;
 
