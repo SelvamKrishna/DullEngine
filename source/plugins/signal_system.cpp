@@ -1,151 +1,133 @@
 #include "signal_system.hpp"
-
 #include "../core/app.hpp"
-#include "../utils/debug.hpp"
 
 #include <algorithm>
 #include <format>
 #include <memory>
-#include <mutex>
 #include <string>
-#include <utility>
-#include <vector>
 
-void Observer::bindCallback(std::function<void()> callback) {
-    if (_callback != nullptr) {
-        ErrorCtx("Bind callback to observer").failFallback("Observer callback already set");
-    }
-
-    _callback = std::move(callback);
-}
+Observer::~Observer() { detachSignal(""); }
 
 void Observer::attachSignal(std::string_view signal) {
-    SIGNAL_SYS.bindObserver(weak_from_this(), std::string(signal));
+    if (signal.empty()) {
+        ErrorCtx("Attach signal to observer").failFallback("Signal can't be ''");
+        return;
+    }
+
+    SIGNAL_SYS.bindObserver(weak_from_this(), signal);
 }
 
 void Observer::detachSignal(std::string_view signal) {
-    SIGNAL_SYS.unbindObserver(weak_from_this(), std::string(signal));
-}
-
-void SignalSystem::_cleanupExpiredObserversFromSignal(const std::string &signal) {
-    DULL_WARN("Cleaning up expired observers from '{}'.", signal);
-
-    auto &observer_list = _signal_links.at(signal);
-
-    if (observer_list.empty()) {
+    if (signal.empty()) {
+        ErrorCtx("Detach signal from observer").failFallback("Signal can't be ''");
         return;
     }
 
-    for (auto it = observer_list.begin(); it != observer_list.end(); it++) {
-        if (it->expired()) {
-            observer_list.erase(it);
-        }
-    }
+    SIGNAL_SYS.unbindObserver(weak_from_this(), signal);
 }
 
-void SignalSystem::_cleanupExpiredObservers() {
-    DULL_WARN("Cleaning up expired observers.");
+void Observer::detachAllSignal() { SIGNAL_SYS.unbindObserver(weak_from_this(), ""); }
 
-    for (auto &[signal, observer_list] : _signal_links) {
-        _cleanupExpiredObserversFromSignal(signal);
-        observer_list.shrink_to_fit();
-    }
-}
+void SignalSystem::_removeObserver(const Observer *observer_ptr, std::string_view signal, ErrorCtx &err) {
+    auto signal_map = _signal_links.find(std::string(signal));
 
-void SignalSystem::_removeObserver(const Observer *observer_ptr, const std::string &signal, ErrorCtx &err) {
-    auto &observer_list = _signal_links.at(signal);
-
-    if (observer_list.empty()) {
-        err.failFallback("No observers in signal");
+    if (signal_map == _signal_links.end()) {
+        err.failFallback("Signal not found");
         return;
     }
 
-    auto it = std::ranges::find_if(observer_list, [observer_ptr](const auto &observer_ref) {
-        if (auto observer_shared = observer_ref.lock()) {
-            return observer_shared.get() == observer_ptr;
-        }
-
-        return false;
-    });
-
-    if (it == observer_list.end()) {
-        err.failFallback("Not found");
-        return;
-    }
-
-    observer_list.erase(it);
-}
-
-void SignalSystem::bindObserver(const std::weak_ptr<Observer> &observer, const std::string &signal) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    ErrorCtx err(std::format("Binding observer to '{}'", signal));
-
-    if (observer.expired()) {
-        err.failFallback("Observer expired");
-        return;
-    }
-
-    const auto *const observer_ptr = observer.lock().get();
-
-    std::vector<std::weak_ptr<Observer>> &observer_list = _signal_links.at(signal);
+    auto &observers_vec = signal_map->second;
     auto it =
-        std::ranges::find_if(observer_list, [observer_ptr](const std::weak_ptr<Observer> &observer_ref) {
-            if (auto observer_shared = observer_ref.lock()) {
-                return observer_shared.get() == observer_ptr;
+        std::ranges::find_if(observers_vec, [observer_ptr](const std::weak_ptr<Observer> &weak_observer) {
+            if (auto shared_observer = weak_observer.lock()) {
+                return shared_observer.get() == observer_ptr;
             }
 
             return false;
         });
 
-    if (it != observer_list.end()) {
-        err.failFallback("Observer already exist");
+    if (it == observers_vec.end()) {
+        err.failFallback("Observer not found");
         return;
     }
 
-    _signal_links[signal].emplace_back(observer);
-    DULL_INFO("Observer binded with '{}'", signal);
+    observers_vec.erase(it);
 }
 
-void SignalSystem::unbindObserver(const std::weak_ptr<Observer> &observer, const std::string &signal) {
+void SignalSystem::bindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal) {
     std::lock_guard<std::mutex> lock(_mutex);
-    ErrorCtx err(std::format("Unbinding observer from '{}'", signal));
 
     if (observer.expired()) {
-        err.failFallback("Observer expired");
-        _cleanupExpiredObserversFromSignal(signal);
+        ErrorCtx(std::format("Bind observer to signal '{}'", signal))
+            .failFallback("Expired observer provided");
         return;
     }
 
-    const auto *const observer_ptr = observer.lock().get();
+    _signal_links[std::string(signal)].emplace_back(observer);
+    DULL_INFO("Observer binded to signal '{}'.", signal);
+}
 
-    if (signal.empty()) [[unlikely]] {
+void SignalSystem::unbindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal) {
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    ErrorCtx err(std::format("Unbinding observer from signal '{}'", signal));
+
+    if (observer.expired()) {
+        err.failFallback("Expired observer provided");
+        return;
+    }
+
+    const Observer *const OBSERVER_PTR = observer.lock().get();
+
+    if (signal.empty()) {
         for (auto &[signal_it, _] : _signal_links) {
-            _removeObserver(observer_ptr, signal_it, err);
+            _removeObserver(OBSERVER_PTR, signal_it, err);
         }
     } else {
-        _removeObserver(observer_ptr, signal, err);
+        _removeObserver(OBSERVER_PTR, signal, err);
+    }
+
+    DULL_INFO("Observer unbinded from signal '{}'.", signal);
+}
+
+void SignalSystem::emitSignal(std::string_view signal) {
+    std::vector<std::shared_ptr<Observer>> to_call;
+
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+
+        auto it = _signal_links.find(std::string(signal));
+        if (it == _signal_links.end()) {
+            return;
+        }
+
+        for (auto &weak_observer : it->second) {
+            if (auto shared_observer = weak_observer.lock()) {
+                to_call.emplace_back(std::move(shared_observer));
+            }
+        }
+    }
+
+    for (auto &observer : to_call) {
+        if (!observer->_callback) {
+            ErrorCtx(std::format("Emit Signal '{}'", signal))
+                .failFallback("Null callback function for observer");
+            continue;
+        }
+
+        observer->_callback();
     }
 }
 
-void SignalSystem::emitSignal(const std::string &signal) {
-    std::lock_guard<std::mutex> lock(_mutex);
+void SignalSystem::cleanupExpiredObservers() {
+    DULL_WARN("[SIGNAL SYSTEM] Cleaning up all expired observers");
 
-    auto &observer_list = _signal_links.at(signal);
-
-    if (observer_list.empty()) {
-        return;
-    }
-
-    _cleanupExpiredObserversFromSignal(signal);
-
-    for (auto &observer_ref : observer_list) {
-        if (auto observer_shared = observer_ref.lock()) {
-            if (observer_shared->_callback == nullptr) {
-                ErrorCtx(std::format("Emit signal '{}'", signal)).failFallback("Unbinded observer callback");
-                continue;
+    for (auto &[_, observers_vec] : _signal_links) {
+        for (auto it = observers_vec.begin(); it != observers_vec.end(); it++) {
+            if (it->expired()) {
+                observers_vec.erase(it);
+                observers_vec.shrink_to_fit();
             }
-
-            observer_shared->_callback();
         }
     }
 }

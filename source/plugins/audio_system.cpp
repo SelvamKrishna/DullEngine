@@ -7,11 +7,11 @@
 AudioSystem::~AudioSystem() {
     stopMusic();
 
-    for (auto &[name, sound] : _sounds) {
+    for (auto &[_, sound] : _sounds) {
         UnloadSound(sound);
     }
 
-    for (auto &[name, music] : _musics) {
+    for (auto &[_, music] : _musics) {
         UnloadMusicStream(music);
     }
 

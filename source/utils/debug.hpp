@@ -61,11 +61,11 @@ private:
     std::string _operation;
     std::source_location _location;
 
-    enum class FailType : uint8_t { WARNING, CRITIKAL };
+    enum class FailType : uint8_t { Warning, Critikal };
 
     void _loggingHelper(FailType fail_type, std::string_view fail_reason) const noexcept {
         std::cerr << std::format("[DULL] [{}] {}:{} - {}: {}\n",
-                                 fail_type == FailType::WARNING ? "WARNING" : "CRITIKAL",
+                                 fail_type == FailType::Warning ? "WARNING" : "CRITIKAL",
                                  _location.file_name(),
                                  _location.line(),
                                  _operation,
@@ -82,11 +82,11 @@ public:
     ErrorCtx &operator=(ErrorCtx &&) = delete;
 
     void failFallback(std::string_view fail_reason) const noexcept {
-        _loggingHelper(FailType::WARNING, fail_reason);
+        _loggingHelper(FailType::Warning, fail_reason);
     }
 
     [[noreturn]] void failExit(std::string_view fail_reason) const noexcept {
-        _loggingHelper(FailType::CRITIKAL, fail_reason);
+        _loggingHelper(FailType::Critikal, fail_reason);
         std::abort();
     }
 };

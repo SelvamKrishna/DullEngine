@@ -19,12 +19,14 @@ void Ball::_update() {
     const auto SCREEN_WIDTH = static_cast<float>(GetScreenWidth());
     const auto SCREEN_HEIGHT = static_cast<float>(GetScreenHeight());
 
+    auto &scene = CURRENT_SCENE;
+
     if (_pos.y <= _radius || _pos.y >= SCREEN_HEIGHT - _radius) [[unlikely]] {
         _direction.down = !_direction.down;
     }
 
-    if (CURRENT_SCENE.getNode<PlayerPaddle>().lock()->isBallCollided(*this) ||
-        CURRENT_SCENE.getNode<AIPaddle>().lock()->isBallCollided(*this)) [[unlikely]] {
+    if (scene.getNode<PlayerPaddle>().lock()->isBallCollided(*this) ||
+        scene.getNode<AIPaddle>().lock()->isBallCollided(*this)) [[unlikely]] {
         _direction.right = !_direction.right; // Flip horizontal direction
     }
 

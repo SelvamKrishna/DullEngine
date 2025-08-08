@@ -1,29 +1,25 @@
-This is a OOPS engine built on top of raylib.
+ENGINE:
+    The Dull engine is a game engine template with many modifiable components for specific use cases.
+    This engine is a collection of systems which work together to create an Application.
 
-Engine Pipeline:
+APP:
+    The app is the main class responsible for processing all the systems and all other components of this application.
+    This is a singleton class ensuring only one instance of an application at a time.
+    This class also holds ownership of all systems and nodes of the application.
 
-1. App is started.
-2. App processes the current scene.
-3. Scene is a tree like structure of nodes.
-4. Nodes are processed in level order. root -> leaves.
-5. ... TBC.
+SYSTEMS:
+    The core feautures and functionalities of a game are divided into its own system.
+    Eg: Render System, Audio System, Signal System, Time System, etc...
+    Some systems can be modifided to perform more optimally to set your use case.
+    Such as writing your own grid render system based on tilemaps and coordinates.
 
-Core:
-  App: The main instance of the Application.
-    + scene.
-    + systems. (mod)
-    * Singleton.
-    * Updates the scene once every frame.
+NODE: 
+    Nodes are the base class for all processing elements of the application.
+    Eg: Player, Enemy, Collectibles, etc...
+    The node is a data structure which is updated every frame.
+    Nodes are collected in groups (Scenes) and processed from within the scene.
 
-  Scene: The collection of Nodes.
-    + root of the node tree.
-    * Traverses thru the tree and updates them.
-
-  Node: The building block of the application
-    + unique name.
-    + parent.
-    + list of children.
-    * A Interface.
-
-Todo:
-  Remove the need for Scene Class.
+SCENE:
+    The scene is a collection of nodes.
+    All nodes which will be processed at this current instance should be present in the current scene.
+    Only one scene can be active at a time.

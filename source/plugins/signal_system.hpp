@@ -18,17 +18,17 @@ private:
     std::function<void()> _callback;
 
 public:
-    Observer();
-    virtual ~Observer();
+    explicit Observer(std::function<void()> callback) : _callback(std::move(callback)) {}
+    ~Observer();
 
     Observer(const Observer &) = delete;
     Observer &operator=(const Observer &) = delete;
     Observer(Observer &&) = delete;
     Observer &operator=(Observer &&) = delete;
 
-    void bindCallback(std::function<void()> callback);
     void attachSignal(std::string_view signal);
     void detachSignal(std::string_view signal);
+    void detachAllSignal();
 };
 
 /// UNTESTED:
@@ -37,21 +37,20 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<Observer>>> _signal_links;
     std::mutex _mutex;
 
-    void _cleanupExpiredObserversFromSignal(const std::string &signal);
-    void _cleanupExpiredObservers();
-
-    void _removeObserver(const Observer *observer_ptr, const std::string &signal, ErrorCtx &err);
+    void _removeObserver(const Observer *observer_ptr, std::string_view signal, ErrorCtx &err);
 
 public:
     SignalSystem() = default;
     ~SignalSystem() = default;
 
     SignalSystem(const SignalSystem &) = delete;
-    SignalSystem(SignalSystem &&) = delete;
     SignalSystem &operator=(const SignalSystem &) = delete;
+    SignalSystem(SignalSystem &&) = delete;
     SignalSystem &operator=(SignalSystem &&) = delete;
 
-    void bindObserver(const std::weak_ptr<Observer> &observer, const std::string &signal);
-    void unbindObserver(const std::weak_ptr<Observer> &observer, const std::string &signal = "");
-    void emitSignal(const std::string &signal);
+    void bindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal);
+    void unbindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal = "");
+    void emitSignal(std::string_view signal);
+
+    void cleanupExpiredObservers();
 };

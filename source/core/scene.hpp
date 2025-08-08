@@ -10,7 +10,6 @@
 #include "../utils/debug.hpp"
 #include "node.hpp"
 
-/// TODO: Implement thread safety
 /// TODO: Better Scene management system
 class Scene {
     friend class App;
