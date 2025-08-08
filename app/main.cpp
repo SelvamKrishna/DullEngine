@@ -9,14 +9,21 @@
 
 int main() {
     App &app = App::instance();
-    app.init(800, 800, "Pong - Sandbox");
-    app.setCurrentScene(std::make_unique<Scene>());
+    app.init();
 
-    auto &scene = CURRENT_SCENE;
+    auto game_scene = std::make_unique<Scene>();
+    auto menu_scene = std::make_unique<Scene>();
 
-    scene.addNode(std::make_unique<PlayerPaddle>());
-    scene.addNode(std::make_unique<AIPaddle>());
-    scene.addNode(std::make_unique<Ball>());
+    game_scene->addNode(std::make_unique<PlayerPaddle>());
+    game_scene->addNode(std::make_unique<AIPaddle>());
+    game_scene->addNode(std::make_unique<Ball>());
+
+    menu_scene->addNode(std::make_unique<PlayerPaddle>());
+
+    SCENE_SYS.addScene(SceneID::GAME, std::move(game_scene));
+    SCENE_SYS.addScene(SceneID::MENU, std::move(menu_scene));
+
+    SCENE_SYS.setCurrent(SceneID::GAME);
 
     app.setRenderSystem(std::make_unique<PongRenderSystem>());
 

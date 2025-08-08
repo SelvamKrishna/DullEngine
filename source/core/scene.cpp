@@ -1,9 +1,11 @@
 #include "scene.hpp"
 #include "node.hpp"
+
 #include <algorithm>
 #include <cstddef>
 #include <format>
 #include <memory>
+#include <mutex>
 #include <utility>
 
 void Scene::_init() {
@@ -11,12 +13,11 @@ void Scene::_init() {
 
     for (auto &node : _nodes) {
         if (node == nullptr) [[unlikely]] {
-            _nodes.erase(_nodes.begin() + static_cast<long long>(index++));
-            continue;
+            _nodes.erase(_nodes.begin() + static_cast<long long>(index));
+        } else {
+            node->_init();
+            node->setActive(true);
         }
-
-        node->_init();
-        node->setActive(true);
 
         index++;
     }
@@ -58,6 +59,7 @@ void Scene::_fixedUpdate() {
 }
 
 void Scene::addNode(std::unique_ptr<Node> node) {
+    std::lock_guard<std::mutex> lock(_mutex);
     ErrorCtx err(std::format("Add node '{}' to scene", node->_name));
 
     if (node == nullptr) [[unlikely]] {
@@ -77,6 +79,7 @@ void Scene::addNode(std::unique_ptr<Node> node) {
 }
 
 void Scene::removeNodeByIndex(size_t index) {
+    std::lock_guard<std::mutex> lock(_mutex);
     if (index >= _nodes.size()) {
         ErrorCtx("Remove node by index").failFallback("Index out of range");
         return;
@@ -87,6 +90,7 @@ void Scene::removeNodeByIndex(size_t index) {
 }
 
 void Scene::removeNodeByName(std::string_view name) {
+    std::lock_guard<std::mutex> lock(_mutex);
     auto it = std::ranges::find_if(_nodes, [name](const auto &node) { return node->_name == name; });
 
     if (it == _nodes.end()) {
@@ -98,6 +102,7 @@ void Scene::removeNodeByName(std::string_view name) {
 }
 
 [[nodiscard]] std::weak_ptr<Node> Scene::getNodeByIndex(size_t index) {
+    std::lock_guard<std::mutex> lock(_mutex);
     if (index >= _nodes.size()) {
         ErrorCtx("Get node by index").failFallback("Index out of range");
         return {};
@@ -107,6 +112,7 @@ void Scene::removeNodeByName(std::string_view name) {
 }
 
 [[nodiscard]] std::weak_ptr<Node> Scene::getNodeByName(std::string_view name) {
+    std::lock_guard<std::mutex> lock(_mutex);
     auto it = std::ranges::find_if(_nodes, [name](const auto &node) { return node->_name == name; });
 
     if (it == _nodes.end()) {

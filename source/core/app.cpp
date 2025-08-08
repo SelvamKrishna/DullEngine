@@ -1,6 +1,7 @@
 #include "app.hpp"
 
 #include "../../vendor/raylib.h"
+#include "constants.hpp"
 
 #include <memory>
 
@@ -12,7 +13,7 @@ void App::_processFixed() {
     _accumulator += _time_sys.deltaTime();
 
     while (_accumulator >= TimeSystem::FIXED_DELTA_TIME) [[unlikely]] {
-        _current_scene->_fixedUpdate();
+        _scene_sys.currentScene()._fixedUpdate();
         _accumulator -= TimeSystem::FIXED_DELTA_TIME;
     }
 }
@@ -20,17 +21,17 @@ void App::_processFixed() {
 void App::_process() {
     _processFixed();
 
-    _current_scene->_update();
+    _scene_sys.currentScene()._update();
     _render_sys->_update();
     _audio_sys._update();
 }
 
-void App::init(int window_width, int window_height, const std::string &title) {
+void App::init() {
     if (_is_running) [[unlikely]] {
         ErrorCtx("App initialization").failExit("Run flag set to true");
     }
 
-    InitWindow(window_width, window_height, title.c_str());
+    InitWindow(GameInfo::WINDOW_WIDTH, GameInfo::WINDOW_HEIGHT, TITLE);
     SetExitKey(KEY_NULL);
     _is_running = true;
     AudioSystem::_init();
@@ -43,15 +44,11 @@ void App::run() {
         err.failExit("Run flag set to false");
     }
 
-    if (!_current_scene) {
-        err.failExit("Current scene not yet set");
-    }
-
     if (!_render_sys) {
         _render_sys = std::make_unique<RenderSystem>();
     }
 
-    _current_scene->_init();
+    _scene_sys.currentScene()._init();
     _render_sys->_init();
 
     while (_is_running) [[likely]] {

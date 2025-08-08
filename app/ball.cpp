@@ -31,7 +31,8 @@ void Ball::_update() {
     }
 
     if (_pos.x <= -_radius || _pos.x >= SCREEN_WIDTH + _radius) [[unlikely]] {
-        _init();
+        SCENE_SYS.ChangeScene(SceneID::MENU);
+        SIGNAL_SYS.emitSignal("over");
         return;
     }
 

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <string_view>
 #include <type_traits>
 #include <vector>
@@ -13,9 +14,11 @@
 /// TODO: Better Scene management system
 class Scene {
     friend class App;
+    friend class SceneSystem;
 
 private:
     static constexpr size_t DEFAULT_NODE_BUFFER_SIZE = 16;
+    mutable std::mutex _mutex;
     std::vector<std::shared_ptr<Node>> _nodes;
 
     void _init();
@@ -23,16 +26,16 @@ private:
     void _fixedUpdate();
 
 public:
-    constexpr explicit Scene(size_t node_buffer_size = DEFAULT_NODE_BUFFER_SIZE) noexcept {
+    explicit Scene(size_t node_buffer_size = DEFAULT_NODE_BUFFER_SIZE) noexcept {
         _nodes.reserve(node_buffer_size);
     }
 
     ~Scene() noexcept { clear(); }
 
     Scene(const Scene &) = delete;
-    Scene(Scene &&) = default;
+    Scene(Scene &&) = delete;
     Scene &operator=(const Scene &) = delete;
-    Scene &operator=(Scene &&) = default;
+    Scene &operator=(Scene &&) = delete;
 
     void addNode(std::unique_ptr<Node> node);
 
@@ -42,6 +45,8 @@ public:
     template <typename NodeT>
         requires std::is_base_of_v<Node, NodeT>
     void removeNode() {
+        std::lock_guard<std::mutex> lock(_mutex);
+
         auto it = std::ranges::find_if(_nodes, [](const auto &node) {
             return dynamic_cast<NodeT *>(node.get()) != nullptr;
         });
@@ -55,8 +60,6 @@ public:
         _nodes.erase(it);
     }
 
-    void clear() { _nodes.clear(); }
-
     [[nodiscard]] size_t nodeCount() const noexcept { return _nodes.size(); }
 
     [[nodiscard]] std::weak_ptr<Node> getNodeByIndex(size_t index);
@@ -65,6 +68,8 @@ public:
     template <typename NodeT>
         requires std::is_base_of_v<Node, NodeT>
     [[nodiscard]] std::weak_ptr<NodeT> getNode() {
+        std::lock_guard<std::mutex> lock(_mutex);
+
         auto it = std::ranges::find_if(_nodes, [](const auto &node) {
             return dynamic_cast<NodeT *>(node.get()) != nullptr;
         });
@@ -76,5 +81,13 @@ public:
         }
 
         return std::static_pointer_cast<NodeT>(*it);
+    }
+
+    void clear() {
+        for (auto &node : _nodes) {
+            node.reset();
+        }
+
+        _nodes.clear();
     }
 };

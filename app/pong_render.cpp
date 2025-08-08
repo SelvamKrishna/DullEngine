@@ -9,6 +9,14 @@ void PongRenderSystem::_init() {
     _player_pad_ref = CURRENT_SCENE.getNode<PlayerPaddle>();
     _ai_pad_ref = CURRENT_SCENE.getNode<AIPaddle>();
     _ball_ref = CURRENT_SCENE.getNode<Ball>();
+
+    _over_observer = std::make_shared<Observer>([this]() {
+        _player_pad_ref = CURRENT_SCENE.getNode<PlayerPaddle>();
+        _ai_pad_ref = CURRENT_SCENE.getNode<AIPaddle>();
+        _ball_ref = CURRENT_SCENE.getNode<Ball>();
+    });
+
+    _over_observer->attachSignal("over");
 }
 
 void PongRenderSystem::_update() {

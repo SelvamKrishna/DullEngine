@@ -12,13 +12,13 @@
 #include <utility>
 
 namespace Debug {
-static std::mutex log_mutex;
+static std::mutex mutex;
 
 enum class Level : uint8_t { Info, Warn };
 
 template <typename... Args>
 void log(Level level, const char *file, int line, std::format_string<Args...> fmt, Args &&...args) {
-    std::lock_guard<std::mutex> lock(log_mutex);
+    std::lock_guard<std::mutex> lock(mutex);
 
     const char *prefix = [level] {
         switch (level) {
@@ -41,7 +41,6 @@ template <typename... Args>
 std::string traceMsg(const char *file, int line, std::format_string<Args...> fmt, Args &&...args) {
     return std::format("[{}:{}] {}", file, line, std::format(fmt, std::forward<Args>(args)...));
 }
-
 } // namespace Debug
 
 #ifdef DULL_MODE_DEBUG

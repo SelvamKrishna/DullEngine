@@ -10,7 +10,7 @@ private:
     virtual void _update();
 
 public:
-    RenderSystem() = default;
+    explicit RenderSystem() = default;
     virtual ~RenderSystem() = default;
 
     RenderSystem(const RenderSystem &) = delete;

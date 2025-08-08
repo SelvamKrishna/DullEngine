@@ -2,9 +2,9 @@
 
 #include "../plugins/audio_system.hpp"
 #include "../plugins/render_system.hpp"
+#include "../plugins/scene_system.hpp"
 #include "../plugins/signal_system.hpp"
 #include "../plugins/time_system.hpp"
-
 #include "../utils/debug.hpp"
 
 #include "scene.hpp"
@@ -15,16 +15,16 @@
 
 class App {
 private:
-    std::unique_ptr<Scene> _current_scene;
     float _accumulator = 0.0F;
     bool _is_running = false;
 
+    SceneSystem _scene_sys;
     TimeSystem _time_sys;
     AudioSystem _audio_sys;
-    std::unique_ptr<RenderSystem> _render_sys;
     SignalSystem _signal_sys;
+    std::unique_ptr<RenderSystem> _render_sys;
 
-    App() = default;
+    explicit App() = default;
     ~App();
 
     inline static void _processNull();
@@ -42,28 +42,20 @@ public:
         return instance;
     }
 
-    void init(int window_width, int window_height, const std::string &title);
+    void init();
     void run();
     constexpr void quit() noexcept { _is_running = false; }
 
-    void setCurrentScene(std::unique_ptr<Scene> scene) noexcept { _current_scene = std::move(scene); }
+    [[nodiscard]] constexpr bool isRunning() const noexcept { return _is_running; }
+
+    [[nodiscard]] constexpr SceneSystem &sceneSystem() noexcept { return _scene_sys; }
+    [[nodiscard]] constexpr TimeSystem &timeSystem() noexcept { return _time_sys; }
+    [[nodiscard]] constexpr AudioSystem &audioSystem() noexcept { return _audio_sys; }
+    [[nodiscard]] constexpr SignalSystem &signalSystem() noexcept { return _signal_sys; }
 
     void setRenderSystem(std::unique_ptr<RenderSystem> render_sys) noexcept {
         _render_sys = std::move(render_sys);
     }
-
-    [[nodiscard]] Scene &currentScene() const {
-        if (_current_scene) {
-            return *_current_scene;
-        }
-
-        ErrorCtx("Get current scene").failExit("Scene not yet set");
-    }
-
-    [[nodiscard]] constexpr bool isRunning() const noexcept { return _is_running; }
-
-    [[nodiscard]] constexpr TimeSystem &timeSystem() noexcept { return _time_sys; }
-    [[nodiscard]] constexpr AudioSystem &audioSystem() noexcept { return _audio_sys; }
 
     [[nodiscard]] RenderSystem &renderSystem() noexcept {
         if (_render_sys == nullptr) {
@@ -82,13 +74,13 @@ public:
 
         ErrorCtx("Get render system").failExit("Bad cast");
     }
-
-    [[nodiscard]] constexpr SignalSystem &signalSystem() noexcept { return _signal_sys; }
 };
 
-#define CURRENT_SCENE App::instance().currentScene()
+#define SCENE_SYS App::instance().sceneSystem()
 #define TIME_SYS App::instance().timeSystem()
 #define AUDIO_SYS App::instance().audioSystem()
 #define RENDER_SYS() App::instance().renderSystem()
 #define RENDER_SYS_AS(Type) App::instance().renderSystem<Type>()
 #define SIGNAL_SYS App::instance().signalSystem()
+
+#define CURRENT_SCENE SCENE_SYS.currentScene()

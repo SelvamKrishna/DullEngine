@@ -13,7 +13,7 @@ private:
     float _time_scale = 1.0F;
     bool _is_paused = false;
 
-    TimeSystem() = default;
+    explicit TimeSystem() = default;
     ~TimeSystem() = default;
 
     void _updateInfo(float delta_time) noexcept { _delta_time = delta_time * _time_scale; }

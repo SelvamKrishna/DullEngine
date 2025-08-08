@@ -19,7 +19,7 @@ private:
 
     Music *_music = nullptr;
 
-    AudioSystem() = default;
+    explicit AudioSystem() = default;
     ~AudioSystem();
 
     static void _init();

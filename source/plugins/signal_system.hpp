@@ -33,14 +33,16 @@ public:
 
 /// UNTESTED:
 class SignalSystem {
+    friend class App;
+
 private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<Observer>>> _signal_links;
     std::mutex _mutex;
 
+    explicit SignalSystem() = default;
     void _removeObserver(const Observer *observer_ptr, std::string_view signal, ErrorCtx &err);
 
 public:
-    SignalSystem() = default;
     ~SignalSystem() = default;
 
     SignalSystem(const SignalSystem &) = delete;
