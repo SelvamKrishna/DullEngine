@@ -14,9 +14,20 @@ class SceneSystem {
 private:
     mutable std::mutex _mutex;
     std::array<std::unique_ptr<Scene>, GameInfo::TOTAL_SCENE_COUNT> _scene_buffer;
-    size_t _current_scene_id = 0;
+    GameInfo::SceneID _current_scene_id;
 
     explicit SceneSystem() = default;
+
+    void _initCurrentScene() const {
+        currentScene()._init();
+
+#ifdef DULL_DBG_SCENES
+        DULL_INFO("[SCENE SYSTEM] Current scene SceneID '{}' initialized", (size_t)_current_scene_id);
+#endif
+    }
+
+    void _updateCurrentScene() const { currentScene()._update(); }
+    void _fixedUpdateCurrentScene() const { currentScene()._fixedUpdate(); }
 
 public:
     ~SceneSystem();
@@ -26,35 +37,34 @@ public:
     SceneSystem &operator=(const SceneSystem &) = delete;
     SceneSystem &operator=(SceneSystem &&) = delete;
 
-    void setCurrent(size_t new_scene_id) noexcept {
+    void setCurrent(GameInfo::SceneID new_scene_id) noexcept {
         std::lock_guard<std::mutex> lock(_mutex);
         ErrorCtx err("Set current scene");
 
-        if (new_scene_id >= _scene_buffer.size()) {
-            err.failFallback("Scene index out of range");
-            return;
-        }
-
         _current_scene_id = new_scene_id;
 
-        if (_scene_buffer.at(_current_scene_id) == nullptr) {
+        if (_scene_buffer.at(static_cast<size_t>(_current_scene_id)) == nullptr) {
             err.failExit("Current scene is unimplemented");
         }
+
+#ifdef DULL_DBG_SCENES
+        DULL_INFO("[SCENE SYSTEM] Current scene set to SceneID '{}'", (size_t)_current_scene_id);
+#endif
     }
 
-    void ChangeScene(size_t new_scene_id) noexcept {
+    void ChangeScene(GameInfo::SceneID new_scene_id) noexcept {
         setCurrent(new_scene_id);
-        _scene_buffer.at(_current_scene_id)->_init();
+        _initCurrentScene();
     }
 
     [[nodiscard]] Scene &currentScene() const {
-        if (const auto &current_scene = _scene_buffer.at(_current_scene_id)) {
+        if (const auto &current_scene = _scene_buffer.at(static_cast<size_t>(_current_scene_id))) {
             return *current_scene;
         }
 
         ErrorCtx("Get current scene").failExit("Current scene is unimplemented");
     }
 
-    void addScene(size_t scene_id, std::unique_ptr<Scene> new_scene);
-    void removeScene(size_t scene_id);
+    void addScene(GameInfo::SceneID scene_id, std::unique_ptr<Scene> new_scene);
+    void removeScene(GameInfo::SceneID scene_id);
 };

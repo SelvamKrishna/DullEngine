@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include "app.hpp"
 #include "node.hpp"
 
 #include <algorithm>
@@ -58,7 +59,7 @@ void Scene::_fixedUpdate() {
     }
 }
 
-void Scene::addNode(std::unique_ptr<Node> node) {
+void Scene::addNode(std::unique_ptr<Node> node) noexcept {
     std::lock_guard<std::mutex> lock(_mutex);
     ErrorCtx err(std::format("Add node '{}' to scene", node->_name));
 
@@ -78,7 +79,7 @@ void Scene::addNode(std::unique_ptr<Node> node) {
     _nodes.emplace_back(std::move(node));
 }
 
-void Scene::removeNodeByIndex(size_t index) {
+void Scene::removeNodeByIndex(size_t index) noexcept {
     std::lock_guard<std::mutex> lock(_mutex);
     if (index >= _nodes.size()) {
         ErrorCtx("Remove node by index").failFallback("Index out of range");
@@ -89,7 +90,7 @@ void Scene::removeNodeByIndex(size_t index) {
     _nodes.erase(_nodes.begin() + static_cast<long long>(index));
 }
 
-void Scene::removeNodeByName(std::string_view name) {
+void Scene::removeNodeByName(std::string_view name) noexcept {
     std::lock_guard<std::mutex> lock(_mutex);
     auto it = std::ranges::find_if(_nodes, [name](const auto &node) { return node->_name == name; });
 
@@ -101,7 +102,7 @@ void Scene::removeNodeByName(std::string_view name) {
     _nodes.erase(it);
 }
 
-[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByIndex(size_t index) {
+[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByIndex(size_t index) noexcept {
     std::lock_guard<std::mutex> lock(_mutex);
     if (index >= _nodes.size()) {
         ErrorCtx("Get node by index").failFallback("Index out of range");
@@ -111,7 +112,7 @@ void Scene::removeNodeByName(std::string_view name) {
     return _nodes[index];
 }
 
-[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByName(std::string_view name) {
+[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByName(std::string_view name) noexcept {
     std::lock_guard<std::mutex> lock(_mutex);
     auto it = std::ranges::find_if(_nodes, [name](const auto &node) { return node->_name == name; });
 
@@ -121,4 +122,12 @@ void Scene::removeNodeByName(std::string_view name) {
     }
 
     return *it;
+}
+
+void SceneBuilder::pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene) noexcept {
+    SCENE_SYS.addScene(scene_id, std::move(_scene));
+
+    if (is_startup_scene) {
+        SCENE_SYS.setCurrent(scene_id);
+    }
 }

@@ -31,12 +31,12 @@ public:
     AudioSystem &operator=(const AudioSystem &) = delete;
     AudioSystem &operator=(AudioSystem &&) = delete;
 
-    void loadSound(const std::string &sound_name, const std::string &file_path) noexcept;
-    void playSound(const std::string &sound_name) noexcept;
-    void unloadSound(const std::string &sound_name) noexcept;
+    void loadSound(std::string_view sound_name, std::string_view file_path) noexcept;
+    void playSound(std::string_view sound_name) noexcept;
+    void unloadSound(std::string_view sound_name) noexcept;
 
-    void loadMusic(const std::string &music_name, const std::string &file_path) noexcept;
-    void playMusic(const std::string &music_name) noexcept;
+    void loadMusic(std::string_view music_name, std::string_view file_path) noexcept;
+    void playMusic(std::string_view music_name) noexcept;
     void stopMusic() noexcept;
-    void unloadMusic(const std::string &music_name) noexcept;
+    void unloadMusic(std::string_view music_name) noexcept;
 };

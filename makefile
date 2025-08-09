@@ -1,11 +1,14 @@
-# Makefile for building a C++ project with Raylib
+# Compiler flags
 CXX := g++
 CXXFLAGS := -std=c++20 -Iinclude -Isource -Ivendor
 
-DEBUG_FLAGS := -Wall -Wextra -g -O2 -DDEBUG
-RELEASE_FLAGS := -Wall -Wextra -Werror -O3 -DNDEBUG -DDULL_MODE_DEBUG
-
+DEBUG_FLAGS   := -Wall -Wextra -g -O2 -DDEBUG -DDULL_MODE_DEBUG
+RELEASE_FLAGS := -Wall -Wextra -Werror -O3 -DNDEBUG
 LDFLAGS := vendor/libraylib.a -lwinmm -lgdi32 -lopengl32
+
+# (OPTIONAL)
+# DEBUG_FLAGS += -DDULL_DBG_SCENES
+# DEBUG_FLAGS += -DDULL_DBG_SIGNALS
 
 # Directories
 SOURCE_DIR := source
@@ -63,6 +66,7 @@ run: debug
 clean:
 	@if exist "$(BUILD_DIR)" rmdir /s /q "$(BUILD_DIR)"
 
+# Clean app output
 app:
 	@if exist "$(BUILD_DIR)/$(APP_DIR)" rmdir /s /q "$(BUILD_DIR)/$(APP_DIR)" 
 

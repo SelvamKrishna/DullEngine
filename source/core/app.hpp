@@ -13,6 +13,9 @@
 #include <string>
 #include <type_traits>
 
+/// TODO: Implement Global Manager class
+/// TODO: > GLOBALMANAGER: A node owned directly by app and remains static among all scenes.
+/// TODO: Move init logic to constructor
 class App {
 private:
     float _accumulator = 0.0F;
@@ -24,10 +27,10 @@ private:
     SignalSystem _signal_sys;
     std::unique_ptr<RenderSystem> _render_sys;
 
-    explicit App() = default;
+    explicit App();
     ~App();
 
-    inline static void _processNull();
+    inline static void _processNull() noexcept;
     inline void _processFixed();
     inline void _process();
 
@@ -42,7 +45,6 @@ public:
         return instance;
     }
 
-    void init();
     void run();
     constexpr void quit() noexcept { _is_running = false; }
 

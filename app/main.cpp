@@ -1,5 +1,4 @@
 #include "../source/core/app.hpp"
-#include "../source/core/node.hpp"
 
 #include "ball.hpp"
 #include "paddle.hpp"
@@ -8,24 +7,16 @@
 #include <memory>
 
 int main() {
-    App &app = App::instance();
-    app.init();
+    auto &app = App::instance();
 
-    auto game_scene = std::make_unique<Scene>();
-    auto menu_scene = std::make_unique<Scene>();
+    SceneBuilder(3)
+        .addNode(std::make_unique<PlayerPaddle>())
+        .addNode(std::make_unique<AIPaddle>())
+        .addNode(std::make_unique<Ball>())
+        .pushToSystem(GameInfo::SceneID::GAME, true);
 
-    game_scene->addNode(std::make_unique<PlayerPaddle>());
-    game_scene->addNode(std::make_unique<AIPaddle>());
-    game_scene->addNode(std::make_unique<Ball>());
-
-    menu_scene->addNode(std::make_unique<PlayerPaddle>());
-
-    SCENE_SYS.addScene(SceneID::GAME, std::move(game_scene));
-    SCENE_SYS.addScene(SceneID::MENU, std::move(menu_scene));
-
-    SCENE_SYS.setCurrent(SceneID::GAME);
+    SceneBuilder(1).addNode(std::make_unique<PlayerPaddle>()).pushToSystem(GameInfo::SceneID::MENU);
 
     app.setRenderSystem(std::make_unique<PongRenderSystem>());
-
     app.run();
 }

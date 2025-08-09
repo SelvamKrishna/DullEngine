@@ -10,9 +10,8 @@ static constexpr int WINDOW_WIDTH = 800;
 static constexpr int WINDOW_HEIGHT = 800;
 
 static constexpr size_t TOTAL_SCENE_COUNT = 2;
-}; // namespace GameInfo
-
-enum SceneID : uint8_t {
+enum class SceneID : uint8_t {
     GAME,
     MENU,
 };
+}; // namespace GameInfo

@@ -11,37 +11,37 @@ SceneSystem::~SceneSystem() {
     }
 }
 
-void SceneSystem::addScene(size_t scene_id, std::unique_ptr<Scene> new_scene) {
+void SceneSystem::addScene(GameInfo::SceneID scene_id, std::unique_ptr<Scene> new_scene) {
     std::lock_guard<std::mutex> lock(_mutex);
     ErrorCtx err("Add scene");
-
-    if (scene_id >= _scene_buffer.size()) {
-        err.failFallback("Scene ID out of range");
-        return;
-    }
 
     if (new_scene == nullptr) {
         err.failFallback("Null scene provided");
         return;
     }
 
-    _scene_buffer[scene_id].reset();
-    _scene_buffer[scene_id] = std::move(new_scene);
+    auto &scene = _scene_buffer.at(static_cast<size_t>(scene_id));
+    scene.reset();
+    scene = std::move(new_scene);
+
+#ifdef DULL_DBG_SCENES
+    DULL_INFO("[SCENE SYSTEM] Scene added with ID '{}'", (size_t)scene_id);
+#endif
 }
 
-void SceneSystem::removeScene(size_t scene_id) {
+void SceneSystem::removeScene(GameInfo::SceneID scene_id) {
     std::lock_guard<std::mutex> lock(_mutex);
-    ErrorCtx err("Remove scene");
 
-    if (scene_id >= _scene_buffer.size()) {
-        err.failFallback("Scene ID out of range");
+    auto &scene = _scene_buffer.at(static_cast<size_t>(scene_id));
+    if (scene == nullptr) {
+        ErrorCtx("Remove scene").failFallback("Trying to remove null scene");
         return;
     }
 
-    if (auto &scene = _scene_buffer.at(scene_id)) {
-        scene->clear();
-        scene.reset();
-    } else {
-        err.failFallback("Trying to remove null scene");
-    }
+    scene->clear();
+    scene.reset();
+
+#ifdef DULL_DBG_SCENES
+    DULL_INFO("[SCENE SYSTEM] Scene removed with ID '{}'", (size_t)scene_id);
+#endif
 }

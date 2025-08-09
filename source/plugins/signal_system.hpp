@@ -10,7 +10,6 @@
 #include <unordered_map>
 #include <vector>
 
-/// UNTESTED:
 class Observer : public std::enable_shared_from_this<Observer> {
     friend class SignalSystem;
 
@@ -26,12 +25,11 @@ public:
     Observer(Observer &&) = delete;
     Observer &operator=(Observer &&) = delete;
 
-    void attachSignal(std::string_view signal);
-    void detachSignal(std::string_view signal);
-    void detachAllSignal();
+    void attachSignal(std::string_view signal) noexcept;
+    void detachSignal(std::string_view signal) noexcept;
+    void detachAllSignal() noexcept;
 };
 
-/// UNTESTED:
 class SignalSystem {
     friend class App;
 
@@ -50,9 +48,9 @@ public:
     SignalSystem(SignalSystem &&) = delete;
     SignalSystem &operator=(SignalSystem &&) = delete;
 
-    void bindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal);
-    void unbindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal = "");
-    void emitSignal(std::string_view signal);
+    void bindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal) noexcept;
+    void unbindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal = "") noexcept;
+    void emitSignal(std::string_view signal) noexcept;
 
-    void cleanupExpiredObservers();
+    void cleanupExpiredObservers() noexcept;
 };

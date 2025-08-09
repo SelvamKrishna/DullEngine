@@ -5,28 +5,7 @@
 
 #include <memory>
 
-App::~App() { CloseWindow(); }
-
-void App::_processNull() { RenderSystem::_drawNull(); }
-
-void App::_processFixed() {
-    _accumulator += _time_sys.deltaTime();
-
-    while (_accumulator >= TimeSystem::FIXED_DELTA_TIME) [[unlikely]] {
-        _scene_sys.currentScene()._fixedUpdate();
-        _accumulator -= TimeSystem::FIXED_DELTA_TIME;
-    }
-}
-
-void App::_process() {
-    _processFixed();
-
-    _scene_sys.currentScene()._update();
-    _render_sys->_update();
-    _audio_sys._update();
-}
-
-void App::init() {
+App::App() {
     if (_is_running) [[unlikely]] {
         ErrorCtx("App initialization").failExit("Run flag set to true");
     }
@@ -37,18 +16,39 @@ void App::init() {
     AudioSystem::_init();
 }
 
+App::~App() { CloseWindow(); }
+
+void App::_processNull() noexcept { RenderSystem::_drawNull(); }
+
+void App::_processFixed() {
+    _accumulator += _time_sys.deltaTime();
+
+    while (_accumulator >= TimeSystem::FIXED_DELTA_TIME) [[unlikely]] {
+        _scene_sys._fixedUpdateCurrentScene();
+        _accumulator -= TimeSystem::FIXED_DELTA_TIME;
+    }
+}
+
+void App::_process() {
+    _processFixed();
+
+    _scene_sys._updateCurrentScene();
+    _render_sys->_update();
+    _audio_sys._update();
+}
+
 void App::run() {
     ErrorCtx err("App mainloop");
 
-    if (!_is_running) {
+    if (!_is_running) [[unlikely]] {
         err.failExit("Run flag set to false");
     }
 
-    if (!_render_sys) {
+    if (_render_sys == nullptr) {
         _render_sys = std::make_unique<RenderSystem>();
     }
 
-    _scene_sys.currentScene()._init();
+    _scene_sys._initCurrentScene();
     _render_sys->_init();
 
     while (_is_running) [[likely]] {
