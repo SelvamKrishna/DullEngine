@@ -58,8 +58,8 @@ public:
     }
 
     [[nodiscard]] Scene &currentScene() const {
-        if (const auto &current_scene = _scene_buffer.at(static_cast<size_t>(_current_scene_id))) {
-            return *current_scene;
+        if (const auto &CURRENT_SCENE = _scene_buffer.at(static_cast<size_t>(_current_scene_id))) {
+            return *CURRENT_SCENE;
         }
 
         ErrorCtx("Get current scene").failExit("Current scene is unimplemented");

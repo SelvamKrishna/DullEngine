@@ -86,8 +86,8 @@ void SignalSystem::unbindObserver(const std::weak_ptr<Observer> &observer, std::
     const Observer *const OBSERVER_PTR = observer.lock().get();
 
     if (signal.empty()) {
-        for (auto &[signal_it, _] : _signal_links) {
-            _removeObserver(OBSERVER_PTR, signal_it, err);
+        for (const auto &[SIGNAL_IT, _] : _signal_links) {
+            _removeObserver(OBSERVER_PTR, SIGNAL_IT, err);
         }
     } else {
         _removeObserver(OBSERVER_PTR, signal, err);

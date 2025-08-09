@@ -34,12 +34,3 @@ public:
     [[nodiscard]] constexpr bool isUpdating() const noexcept { return _is_updating; }
     [[nodiscard]] constexpr bool isFixedUpdating() const noexcept { return _is_fixed_updating; }
 };
-
-/// UNTESTED:
-/// TODO: Implement component class
-/// TODO: COMPONENT: Component is a class which is processed along with its parent node
-class ComponentNode : public Node {
-public:
-    explicit ComponentNode(std::string name) : Node(std::move(name)) {}
-    ~ComponentNode() override = default;
-};

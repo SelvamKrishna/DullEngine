@@ -1,0 +1,28 @@
+{
+    "Basic Node-derived Class": {
+        "prefix": "nodeclass",
+        "body": [
+            "class ${1:...Node} : public Node {",
+            "protected:",
+            "    void _init() final;",
+            "    void _update() final;",
+            "",
+            "public:",
+            "    explicit ${1}() : Node(\"${1}\") {}",
+            "    ~${1}() override = default;",
+            "};"
+        ],
+        "description": "Creates a basic Node-derived class with default methods"
+    },
+    "Render System Class": {
+        "prefix": "renderclass",
+        "body": [
+            "class ${1:...Render} : public RenderSystem {",
+            "private:",
+            "    void _init() final;",
+            "    void _update() final;",
+            "};"
+        ],
+        "description": "Create a RenderSystem-derived class"
+    }
+}

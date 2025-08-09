@@ -15,7 +15,6 @@
 
 /// TODO: Implement Global Manager class
 /// TODO: > GLOBALMANAGER: A node owned directly by app and remains static among all scenes.
-/// TODO: Move init logic to constructor
 class App {
 private:
     float _accumulator = 0.0F;

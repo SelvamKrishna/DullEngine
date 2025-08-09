@@ -1,12 +1,13 @@
 #pragma once
 
+#include "../core/constants.hpp"
 #include <cstdint>
 
 class TimeSystem {
     friend class App;
 
 private:
-    static constexpr float FIXED_FRAME_RATE = 60.0F;
+    static constexpr float FIXED_FRAME_RATE = GameInfo::FIXED_FRAME_RATE;
     static constexpr float FIXED_DELTA_TIME = 1.0F / FIXED_FRAME_RATE;
 
     float _delta_time = 0.0F;
