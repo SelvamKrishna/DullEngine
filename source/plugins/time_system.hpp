@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../core/constants.hpp"
+
 #include <cstdint>
 
 class TimeSystem {

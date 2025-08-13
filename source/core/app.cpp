@@ -1,17 +1,16 @@
 #include "app.hpp"
-
-#include "../../vendor/raylib.h"
 #include "constants.hpp"
 
+#include "../../vendor/raylib.h"
 #include <memory>
 
 App::App() {
-    if (_is_running) [[unlikely]] {
+    if (_is_running) [[unlikely]]
         ErrorCtx("App initialization").failExit("Run flag set to true");
-    }
 
-    InitWindow(GameInfo::WINDOW_WIDTH, GameInfo::WINDOW_HEIGHT, TITLE);
+    InitWindow(GameInfo::WINDOW_WIDTH, GameInfo::WINDOW_HEIGHT, GameInfo::TITLE);
     SetExitKey(KEY_NULL);
+
     _is_running = true;
     AudioSystem::_init();
 }
@@ -31,7 +30,6 @@ void App::_processFixed() {
 
 void App::_process() {
     _processFixed();
-
     _scene_sys._updateCurrentScene();
     _render_sys->_update();
     _audio_sys._update();
@@ -40,28 +38,23 @@ void App::_process() {
 void App::run() {
     ErrorCtx err("App mainloop");
 
-    if (!_is_running) [[unlikely]] {
-        err.failExit("Run flag set to false");
-    }
-
-    if (_render_sys == nullptr) {
-        _render_sys = std::make_unique<RenderSystem>();
-    }
+    if (!_is_running) err.failExit("Run flag set to false");
+    if (_render_sys == nullptr) _render_sys = std::make_unique<RenderSystem>();
 
     _scene_sys._initCurrentScene();
     _render_sys->_init();
 
     while (_is_running) [[likely]] {
         try {
-            if (WindowShouldClose()) [[unlikely]] {
-                _is_running = false;
-                break;
+            if (WindowShouldClose()) [[unlikely]] { 
+                _is_running = false; 
+                break; 
             }
 
             _time_sys._updateInfo(GetFrameTime());
             _time_sys.isPaused() ? _processNull() : _process();
 
-        } catch (const std::exception &RUNTIME_ERR) {
+        } catch (const std::exception& RUNTIME_ERR) {
             _is_running = false;
             ErrorCtx("Runtime").failExit(RUNTIME_ERR.what());
         }

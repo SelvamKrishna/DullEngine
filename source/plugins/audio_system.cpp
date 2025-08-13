@@ -1,6 +1,6 @@
 #include "audio_system.hpp"
-
 #include "../utils/debug.hpp"
+
 #include <format>
 #include <mutex>
 #include <string>
@@ -8,22 +8,16 @@
 AudioSystem::~AudioSystem() {
     stopMusic();
 
-    for (auto &[_, sound] : _sounds) {
-        UnloadSound(sound);
-    }
+    for (auto& [_, sound] : _sounds) UnloadSound(sound);
+    for (auto& [_, music] : _musics) UnloadMusicStream(music);
 
-    for (auto &[_, music] : _musics) {
-        UnloadMusicStream(music);
-    }
-
-    if (IsAudioDeviceReady()) {
-        CloseAudioDevice();
-    }
+    if (IsAudioDeviceReady()) CloseAudioDevice();
 }
 
 void AudioSystem::_init() {
     if (IsAudioDeviceReady()) {
-        ErrorCtx("Audio system initilalization").failFallback("Already initialized");
+        ErrorCtx("Audio system initilalization")
+            .failFallback("Already initialized");
         return;
     }
 
@@ -36,10 +30,7 @@ void AudioSystem::_update() {
         return;
     }
 
-    if (_music == nullptr) {
-        return;
-    }
-
+    if (_music == nullptr) return;
     UpdateMusicStream(*_music);
 }
 void AudioSystem::loadSound(std::string_view sound_name, std::string_view file_path) noexcept {
@@ -94,14 +85,12 @@ void AudioSystem::unloadSound(std::string_view sound_name) noexcept {
 
     auto it = _sounds.find(std::string(sound_name));
     if (it == _sounds.end()) {
-        ErrorCtx(std::format("Unload sound '{}'", sound_name)).failFallback("Not found");
+        ErrorCtx(std::format("Unload sound '{}'", sound_name))
+            .failFallback("Not found");
         return;
     }
 
-    if (IsSoundPlaying(it->second)) {
-        StopSound(it->second);
-    }
-
+    if (IsSoundPlaying(it->second)) StopSound(it->second);
     UnloadSound(it->second);
     _sounds.erase(it);
     DULL_INFO("Sound unloaded successfully: {}", sound_name);
@@ -122,7 +111,7 @@ void AudioSystem::loadMusic(std::string_view music_name, std::string_view file_p
     }
 
     Music music = LoadMusicStream(std::string(file_path).c_str());
-    if (!IsMusicValid(music)) { // fixed logic, was reversed in your original
+    if (!IsMusicValid(music)) {
         err.failFallback(std::format("File path '{}' invalid", file_path));
         return;
     }
@@ -152,20 +141,13 @@ void AudioSystem::playMusic(std::string_view music_name) noexcept {
     }
 
     _music = &it->second;
-
-    if (IsMusicStreamPlaying(*_music)) {
-        return;
-    }
-
-    PlayMusicStream(*_music);
+    if (!IsMusicStreamPlaying(*_music)) PlayMusicStream(*_music);
 }
 
 void AudioSystem::stopMusic() noexcept {
     std::lock_guard<std::mutex> lock(_mutex);
 
-    if (_music == nullptr || !IsMusicStreamPlaying(*_music)) {
-        return;
-    }
+    if (_music == nullptr || !IsMusicStreamPlaying(*_music)) return;
 
     StopMusicStream(*_music);
     _music = nullptr;
@@ -176,15 +158,13 @@ void AudioSystem::unloadMusic(std::string_view music_name) noexcept {
 
     auto it = _musics.find(std::string(music_name));
     if (it == _musics.end()) {
-        ErrorCtx(std::format("Unload music {}", music_name)).failFallback("Not found");
+        ErrorCtx(std::format("Unload music {}", music_name))
+            .failFallback("Not found");
         return;
     }
 
     if (_music == &it->second) {
-        if (IsMusicStreamPlaying(*_music)) {
-            StopMusicStream(*_music);
-        }
-
+        if (IsMusicStreamPlaying(*_music)) StopMusicStream(*_music);
         _music = nullptr;
     }
 

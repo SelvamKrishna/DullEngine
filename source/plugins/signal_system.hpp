@@ -20,10 +20,10 @@ public:
     explicit Observer(std::function<void()> callback) : _callback(std::move(callback)) {}
     ~Observer();
 
-    Observer(const Observer &) = delete;
-    Observer &operator=(const Observer &) = delete;
-    Observer(Observer &&) = delete;
-    Observer &operator=(Observer &&) = delete;
+    Observer(const Observer&) = delete;
+    Observer& operator=(const Observer&) = delete;
+    Observer(Observer&&) = delete;
+    Observer& operator=(Observer&&) = delete;
 
     void attachSignal(std::string_view signal) noexcept;
     void detachSignal(std::string_view signal) noexcept;
@@ -38,18 +38,18 @@ private:
     std::mutex _mutex;
 
     explicit SignalSystem() = default;
-    void _removeObserver(const Observer *observer_ptr, std::string_view signal, ErrorCtx &err);
+    void _removeObserver(const Observer* observer_ptr, std::string_view signal, ErrorCtx& err);
 
 public:
     ~SignalSystem() = default;
 
-    SignalSystem(const SignalSystem &) = delete;
-    SignalSystem &operator=(const SignalSystem &) = delete;
-    SignalSystem(SignalSystem &&) = delete;
-    SignalSystem &operator=(SignalSystem &&) = delete;
+    SignalSystem(const SignalSystem&) = delete;
+    SignalSystem& operator=(const SignalSystem&) = delete;
+    SignalSystem(SignalSystem&&) = delete;
+    SignalSystem& operator=(SignalSystem&&) = delete;
 
-    void bindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal) noexcept;
-    void unbindObserver(const std::weak_ptr<Observer> &observer, std::string_view signal = "") noexcept;
+    void bindObserver(const std::weak_ptr<Observer>& observer, std::string_view signal) noexcept;
+    void unbindObserver(const std::weak_ptr<Observer>& observer, std::string_view signal = "") noexcept;
     void emitSignal(std::string_view signal) noexcept;
 
     void cleanupExpiredObservers() noexcept;

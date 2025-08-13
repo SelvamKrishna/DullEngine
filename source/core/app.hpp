@@ -1,13 +1,12 @@
 #pragma once
 
+#include "scene.hpp"
 #include "../plugins/audio_system.hpp"
 #include "../plugins/render_system.hpp"
 #include "../plugins/scene_system.hpp"
 #include "../plugins/signal_system.hpp"
 #include "../plugins/time_system.hpp"
 #include "../utils/debug.hpp"
-
-#include "scene.hpp"
 
 #include <memory>
 #include <string>
@@ -29,17 +28,17 @@ private:
     explicit App();
     ~App();
 
-    inline static void _processNull() noexcept;
-    inline void _processFixed();
-    inline void _process();
+    static void _processNull() noexcept;
+    void _processFixed();
+    void _process();
 
 public:
-    App(App &&) = delete;
-    App &operator=(App &&) = delete;
-    App(const App &) = delete;
-    App &operator=(const App &) = delete;
+    App(App&&) = delete;
+    App& operator=(App&&) = delete;
+    App(const App&) = delete;
+    App& operator=(const App&) = delete;
 
-    static App &instance() noexcept {
+    static App& instance() noexcept {
         static App instance;
         return instance;
     }
@@ -49,39 +48,36 @@ public:
 
     [[nodiscard]] constexpr bool isRunning() const noexcept { return _is_running; }
 
-    [[nodiscard]] constexpr SceneSystem &sceneSystem() noexcept { return _scene_sys; }
-    [[nodiscard]] constexpr TimeSystem &timeSystem() noexcept { return _time_sys; }
-    [[nodiscard]] constexpr AudioSystem &audioSystem() noexcept { return _audio_sys; }
-    [[nodiscard]] constexpr SignalSystem &signalSystem() noexcept { return _signal_sys; }
+    [[nodiscard]] constexpr SceneSystem& sceneSystem() noexcept { return _scene_sys; }
+    [[nodiscard]] constexpr TimeSystem& timeSystem() noexcept { return _time_sys; }
+    [[nodiscard]] constexpr AudioSystem& audioSystem() noexcept { return _audio_sys; }
+    [[nodiscard]] constexpr SignalSystem& signalSystem() noexcept { return _signal_sys; }
 
     void setRenderSystem(std::unique_ptr<RenderSystem> render_sys) noexcept {
-        _render_sys = std::move(render_sys);
+        bool overwrite = _render_sys != nullptr;
+        _render_sys = std::move(render_sys); 
+        if (overwrite) _render_sys->_init();
     }
 
-    [[nodiscard]] RenderSystem &renderSystem() noexcept {
-        if (_render_sys == nullptr) {
-            _render_sys = std::make_unique<RenderSystem>();
-        }
-
+    [[nodiscard]] RenderSystem& renderSystem() noexcept {
+        if (_render_sys == nullptr) _render_sys = std::make_unique<RenderSystem>();
         return *_render_sys;
     }
 
     template <typename RenderSystemT>
-        requires std::is_base_of_v<RenderSystem, RenderSystemT>
-    [[nodiscard]] constexpr RenderSystemT &renderSystem() const {
-        if (auto *casted_sys = dynamic_cast<RenderSystemT *>(_render_sys.get())) {
+    requires std::is_base_of_v<RenderSystem, RenderSystemT>
+    [[nodiscard]] RenderSystemT& renderSystem() const {
+        if (auto* casted_sys = dynamic_cast<RenderSystemT*>(_render_sys.get()))
             return *casted_sys;
-        }
-
         ErrorCtx("Get render system").failExit("Bad cast");
     }
 };
 
-#define SCENE_SYS App::instance().sceneSystem()
-#define TIME_SYS App::instance().timeSystem()
-#define AUDIO_SYS App::instance().audioSystem()
-#define RENDER_SYS() App::instance().renderSystem()
-#define RENDER_SYS_AS(Type) App::instance().renderSystem<Type>()
-#define SIGNAL_SYS App::instance().signalSystem()
+#define SCENE_SYS         App::instance().sceneSystem()
+#define TIME_SYS          App::instance().timeSystem()
+#define AUDIO_SYS         App::instance().audioSystem()
+#define RENDER_SYS        App::instance().renderSystem()
+#define RENDER_SYS_AS(T)  App::instance().renderSystem<T>()
+#define SIGNAL_SYS        App::instance().signalSystem()
 
 #define CURRENT_SCENE SCENE_SYS.currentScene()

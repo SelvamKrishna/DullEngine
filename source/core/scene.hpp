@@ -11,6 +11,7 @@
 #include <string_view>
 #include <type_traits>
 #include <vector>
+#include <format>
 
 class Scene {
     friend class App;
@@ -33,24 +34,23 @@ public:
 
     ~Scene() noexcept { clear(); }
 
-    Scene(const Scene &) = delete;
-    Scene(Scene &&) = delete;
-    Scene &operator=(const Scene &) = delete;
-    Scene &operator=(Scene &&) = delete;
+    Scene(const Scene&) = delete;
+    Scene(Scene&&) = delete;
+    Scene& operator=(const Scene&) = delete;
+    Scene& operator=(Scene&&) = delete;
 
     void addNode(std::unique_ptr<Node> node) noexcept;
-
     void removeNodeByIndex(size_t index) noexcept;
     void removeNodeByName(std::string_view name) noexcept;
 
     template <typename NodeT>
-        requires std::is_base_of_v<Node, NodeT>
+    requires std::is_base_of_v<Node, NodeT>
     void removeNode() noexcept {
         std::lock_guard<std::mutex> lock(_mutex);
 
-        auto it = std::ranges::find_if(_nodes, [](const auto &node) {
-            return dynamic_cast<NodeT *>(node.get()) != nullptr;
-        });
+        auto it = std::ranges::find_if(
+            _nodes, [](const auto &node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; }
+        );
 
         if (it == _nodes.end()) {
             ErrorCtx("Remove node by type")
@@ -62,18 +62,17 @@ public:
     }
 
     [[nodiscard]] size_t nodeCount() const noexcept { return _nodes.size(); }
-
     [[nodiscard]] std::weak_ptr<Node> getNodeByIndex(size_t index) noexcept;
     [[nodiscard]] std::weak_ptr<Node> getNodeByName(std::string_view name) noexcept;
 
     template <typename NodeT>
-        requires std::is_base_of_v<Node, NodeT>
+    requires std::is_base_of_v<Node, NodeT>
     [[nodiscard]] std::weak_ptr<NodeT> getNode() noexcept {
         std::lock_guard<std::mutex> lock(_mutex);
 
-        auto it = std::ranges::find_if(_nodes, [](const auto &node) {
-            return dynamic_cast<NodeT *>(node.get()) != nullptr;
-        });
+        auto it = std::ranges::find_if(
+            _nodes, [](const auto &node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; }
+        );
 
         if (it == _nodes.end()) {
             ErrorCtx("Get node by type")
@@ -85,10 +84,7 @@ public:
     }
 
     void clear() noexcept {
-        for (auto &node : _nodes) {
-            node.reset();
-        }
-
+        for (auto &node : _nodes) node.reset();
         _nodes.clear();
     }
 };
@@ -100,22 +96,34 @@ private:
 
 public:
     explicit SceneBuilder(size_t scene_node_buffer_size = Scene::DEFAULT_NODE_BUFFER_SIZE)
-        : _scene(std::make_unique<Scene>(scene_node_buffer_size)),
-          _scene_node_buffer_size(scene_node_buffer_size) {}
+        : _scene(std::make_unique<Scene>(scene_node_buffer_size))
+        , _scene_node_buffer_size(scene_node_buffer_size) {}
 
     ~SceneBuilder() = default;
 
-    SceneBuilder(const SceneBuilder &) = delete;
-    SceneBuilder(SceneBuilder &&) = delete;
-    SceneBuilder &operator=(const SceneBuilder &) = delete;
-    SceneBuilder &operator=(SceneBuilder &&) = delete;
+    SceneBuilder(const SceneBuilder&) = delete;
+    SceneBuilder(SceneBuilder&&) = delete;
+    SceneBuilder& operator=(const SceneBuilder&) = delete;
+    SceneBuilder& operator=(SceneBuilder&&) = delete;
 
-    [[nodiscard]] SceneBuilder &addNode(std::unique_ptr<Node> node) noexcept {
-        if (_scene->nodeCount() == _scene_node_buffer_size) {
+    [[nodiscard]] SceneBuilder& addNode(std::unique_ptr<Node> node) noexcept {
+        if (_scene->nodeCount() == _scene_node_buffer_size)
             DULL_WARN("[SCENE BUILDER] Scene node buffer exceeded");
-        }
 
         _scene->addNode(std::move(node));
+        return *this;
+    }
+
+    [[nodiscard]] SceneBuilder& addNode(Node* node) noexcept {
+        if (_scene->nodeCount() == _scene_node_buffer_size)
+            DULL_WARN("[SCENE BUILDER] Scene node buffer exceeded");
+
+        if (node == nullptr) {
+            ErrorCtx("Add node via SceneBuilder").failFallback("Provided nullptr");
+            return *this;
+        }
+
+        _scene->addNode(std::unique_ptr<Node>(node));
         return *this;
     }
 

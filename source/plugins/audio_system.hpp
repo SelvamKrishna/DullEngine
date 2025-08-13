@@ -17,7 +17,7 @@ private:
     std::unordered_map<std::string, Sound> _sounds;
     std::unordered_map<std::string, Music> _musics;
 
-    Music *_music = nullptr;
+    Music* _music = nullptr;
 
     explicit AudioSystem() = default;
     ~AudioSystem();
@@ -26,10 +26,10 @@ private:
     void _update();
 
 public:
-    AudioSystem(const AudioSystem &) = delete;
-    AudioSystem(AudioSystem &&) = delete;
-    AudioSystem &operator=(const AudioSystem &) = delete;
-    AudioSystem &operator=(AudioSystem &&) = delete;
+    AudioSystem(const AudioSystem&) = delete;
+    AudioSystem(AudioSystem&&) = delete;
+    AudioSystem& operator=(const AudioSystem&) = delete;
+    AudioSystem& operator=(AudioSystem&&) = delete;
 
     void loadSound(std::string_view sound_name, std::string_view file_path) noexcept;
     void playSound(std::string_view sound_name) noexcept;

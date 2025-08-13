@@ -3,11 +3,10 @@
 #include <mutex>
 
 SceneSystem::~SceneSystem() {
-    for (auto &scene : _scene_buffer) {
-        if (scene != nullptr) {
-            scene->clear();
-            scene.reset();
-        }
+    for (auto& scene : _scene_buffer) {
+        if (scene == nullptr) continue;
+        scene->clear();
+        scene.reset();
     }
 }
 
@@ -20,7 +19,7 @@ void SceneSystem::addScene(GameInfo::SceneID scene_id, std::unique_ptr<Scene> ne
         return;
     }
 
-    auto &scene = _scene_buffer.at(static_cast<size_t>(scene_id));
+    auto& scene = _scene_buffer.at(static_cast<size_t>(scene_id));
     scene.reset();
     scene = std::move(new_scene);
 
@@ -32,7 +31,7 @@ void SceneSystem::addScene(GameInfo::SceneID scene_id, std::unique_ptr<Scene> ne
 void SceneSystem::removeScene(GameInfo::SceneID scene_id) {
     std::lock_guard<std::mutex> lock(_mutex);
 
-    auto &scene = _scene_buffer.at(static_cast<size_t>(scene_id));
+    auto& scene = _scene_buffer.at(static_cast<size_t>(scene_id));
     if (scene == nullptr) {
         ErrorCtx("Remove scene").failFallback("Trying to remove null scene");
         return;

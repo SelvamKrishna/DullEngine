@@ -8,7 +8,7 @@
             "    void _update() final;",
             "",
             "public:",
-            "    explicit ${1}() : Node(\"${1}\") {}",
+            "    explicit ${1}(std::string name) : Node(std::move(name)) {}",
             "    ~${1}() override = default;",
             "};"
         ],

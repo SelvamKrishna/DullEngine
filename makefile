@@ -1,73 +1,25 @@
-# Compiler flags
-CXX := g++
-CXXFLAGS := -std=c++20 -Iinclude -Isource -Ivendor
+PREMAKE_EXE := ./vendor/premake5.exe
+PREMAKE_CC  := gmake
+BUILD_DIR   := build
 
-DEBUG_FLAGS   := -Wall -Wextra -g -O2 -DDEBUG -DDULL_MODE_DEBUG
-RELEASE_FLAGS := -Wall -Wextra -Werror -O3 -DNDEBUG
-LDFLAGS := vendor/libraylib.a -lwinmm -lgdi32 -lopengl32
+.PHONY: all clean test final release debug
 
-# (OPTIONAL)
-# DEBUG_FLAGS += -DDULL_DBG_SCENES
-# DEBUG_FLAGS += -DDULL_DBG_SIGNALS
+all: _premake
 
-# Directories
-SOURCE_DIR := source
-APP_DIR := app
-BUILD_DIR := build
-
-# Compile engine sources
-ENGINE_SRC := $(wildcard $(SOURCE_DIR)/*/*.cpp) $(wildcard $(SOURCE_DIR)/*/*/*.cpp)
-ENGINE_OBJ := $(ENGINE_SRC:$(SOURCE_DIR)/%.cpp=$(BUILD_DIR)/$(SOURCE_DIR)/%.o)
-
-# Compile project sources
-PROJECT_SRC := $(wildcard $(APP_DIR)/*.cpp)
-PROJECT_OBJ := $(PROJECT_SRC:$(APP_DIR)/%.cpp=$(BUILD_DIR)/$(APP_DIR)/%.o)
-
-# Output targets
-ENGINE_LIB := $(BUILD_DIR)/libdullengine.a
-PROJECT_BIN := $(BUILD_DIR)/application.exe
-
-# Default target
-all: debug
-
-# Debug build
-debug: CXXFLAGS += $(DEBUG_FLAGS)
-debug: $(PROJECT_BIN)
-
-# Release build
-release: CXXFLAGS += $(RELEASE_FLAGS)
-release: $(PROJECT_BIN)
-
-# Build static engine library
-$(ENGINE_LIB): $(ENGINE_OBJ)
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
-	ar rcs $@ $^
-
-# Compile engine sources
-$(BUILD_DIR)/$(SOURCE_DIR)/%.o: $(SOURCE_DIR)/%.cpp
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Compile project sources
-$(BUILD_DIR)/$(APP_DIR)/%.o: $(APP_DIR)/%.cpp
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Link project binary
-$(PROJECT_BIN): $(PROJECT_OBJ) $(ENGINE_LIB)
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
-	$(CXX) $^ -o $@ $(LDFLAGS)
-
-# Run project
-run: debug
-	$(PROJECT_BIN)
-
-# Clean build output
 clean:
-	@if exist "$(BUILD_DIR)" rmdir /s /q "$(BUILD_DIR)"
+	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
 
-# Clean app output
-app:
-	@if exist "$(BUILD_DIR)/$(APP_DIR)" rmdir /s /q "$(BUILD_DIR)/$(APP_DIR)" 
+test: debug
+	$(BUILD_DIR)/debug/application.exe
 
-.PHONY: all debug release run clean app
+final: release
+	$(BUILD_DIR)/release/application.exe
+
+release: _premake
+	$(MAKE) -C $(BUILD_DIR) config=release
+
+debug: _premake
+	$(MAKE) -C $(BUILD_DIR) config=debug
+	
+_premake: premake5.lua
+	$(PREMAKE_EXE) $(PREMAKE_CC) --file=premake5.lua

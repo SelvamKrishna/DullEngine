@@ -32,10 +32,10 @@ private:
 public:
     ~SceneSystem();
 
-    SceneSystem(const SceneSystem &) = delete;
-    SceneSystem(SceneSystem &&) = delete;
-    SceneSystem &operator=(const SceneSystem &) = delete;
-    SceneSystem &operator=(SceneSystem &&) = delete;
+    SceneSystem(const SceneSystem&) = delete;
+    SceneSystem(SceneSystem&&) = delete;
+    SceneSystem& operator=(const SceneSystem&) = delete;
+    SceneSystem& operator=(SceneSystem&&) = delete;
 
     void setCurrent(GameInfo::SceneID new_scene_id) noexcept {
         std::lock_guard<std::mutex> lock(_mutex);
@@ -43,9 +43,8 @@ public:
 
         _current_scene_id = new_scene_id;
 
-        if (_scene_buffer.at(static_cast<size_t>(_current_scene_id)) == nullptr) {
+        if (_scene_buffer.at(static_cast<size_t>(_current_scene_id)) == nullptr)
             err.failExit("Current scene is unimplemented");
-        }
 
 #ifdef DULL_DBG_SCENES
         DULL_INFO("[SCENE SYSTEM] Current scene set to SceneID '{}'", (size_t)_current_scene_id);
@@ -57,12 +56,13 @@ public:
         _initCurrentScene();
     }
 
-    [[nodiscard]] Scene &currentScene() const {
-        if (const auto &CURRENT_SCENE = _scene_buffer.at(static_cast<size_t>(_current_scene_id))) {
-            return *CURRENT_SCENE;
-        }
+    [[nodiscard]] Scene& currentScene() const {
+        const std::unique_ptr<Scene>& CURRENT_SCENE = _scene_buffer.at(static_cast<size_t>(_current_scene_id));
 
-        ErrorCtx("Get current scene").failExit("Current scene is unimplemented");
+        if (CURRENT_SCENE == nullptr) 
+            ErrorCtx("Get current scene").failExit("Current scene is unimplemented");
+        
+        return *CURRENT_SCENE;
     }
 
     void addScene(GameInfo::SceneID scene_id, std::unique_ptr<Scene> new_scene);
