@@ -20,7 +20,7 @@ namespace GameInfo {
     namespace Custom {
         inline constexpr uint8_t PIXEL_SIZE = 8;
 
-        inline constexpr ColorRGBA ALIVE_COLOR = ColorRGBA::black();
-        inline constexpr ColorRGBA DEAD_COLOR  = ColorRGBA::white();
+        inline constexpr ColorRGBA ALIVE_COLOR = ColorRGBA::white();
+        inline constexpr ColorRGBA DEAD_COLOR  = ColorRGBA::black();
     }
 }

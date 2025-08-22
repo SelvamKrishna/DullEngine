@@ -114,18 +114,5 @@ public:
         return *this;
     }
 
-    [[nodiscard]] SceneBuilder& addNode(Node* node) noexcept {
-        if (_scene->nodeCount() == _scene_node_buffer_size)
-            DULL_WARN("[SCENE BUILDER] Scene node buffer exceeded");
-
-        if (node == nullptr) {
-            ErrorCtx("Add node via SceneBuilder").failFallback("Provided nullptr");
-            return *this;
-        }
-
-        _scene->addNode(std::unique_ptr<Node>(node));
-        return *this;
-    }
-
     void pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene = false) noexcept;
 };

@@ -5,7 +5,6 @@ workspace "dull_engine"
     architecture "x86_64"
     location "build"
 
--- Engine as a static library
 project "dull_engine"
     kind "StaticLib"
     language "C++"
@@ -13,14 +12,12 @@ project "dull_engine"
     targetdir "%{wks.location}/%{cfg.buildcfg}"
     objdir "%{wks.location}/%{cfg.buildcfg}/obj/%{prj.name}"
 
-    -- Include directories for the engine
     includedirs {
         "include",
         "source",
         "vendor"
     }
 
-    -- Engine sources
     files {
         "source/**.cpp",
         "source/**.hpp"
@@ -30,7 +27,7 @@ project "dull_engine"
         defines { "DEBUG", "DULL_MODE_DEBUG" }
         symbols "On"
         optimize "Off"
-        buildoptions { "-Wall", "-Wextra", "-g", "-O2" }
+        buildoptions { "-Wall", "-Wextra", "-g", "-O0" }
         -- defines { "DULL_DBG_SCENES", "DULL_DBG_SIGNALS" } -- (OPTIONAL)
 
     filter "configurations:release"
@@ -41,9 +38,8 @@ project "dull_engine"
     filter "system:windows"
         systemversion "latest"
 
--- Application executable
 project "application"
-    kind "ConsoleApp" -- Or "WindowedApp" if you want no console
+    kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
     targetdir "%{wks.location}/%{cfg.buildcfg}"
@@ -62,7 +58,7 @@ project "application"
 
     libdirs { "vendor" }
     links {
-        "dull_engine", -- Links against the static lib
+        "dull_engine",
         "raylib",
         "winmm",
         "gdi32",

@@ -8,7 +8,7 @@ int main(void) {
     auto& app = App::instance();
 
     SceneBuilder(1)
-        .addNode(new CellGrid("cell_grid"))
+        .addNode(std::make_unique<CellGrid>("cell_grid-01"))
         .pushToSystem(GameInfo::SceneID::Game, true);
 
     app.setRenderSystem(std::make_unique<CellRenderSystem>());
