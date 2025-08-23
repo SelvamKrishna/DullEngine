@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../utils/color.hpp"
-
 #include <cstdint>
+#include "../utils/vec2.hpp"
 
 namespace GameInfo {
     inline constexpr const char* TITLE = "Game Of Life - Sandbox";
@@ -14,13 +13,22 @@ namespace GameInfo {
 
     inline constexpr uint8_t TOTAL_SCENE_COUNT = 1;
     enum class SceneID : uint8_t {
-        Game,
+        MainScene,
     };
 
     namespace Custom {
-        inline constexpr uint8_t PIXEL_SIZE = 8;
+        inline constexpr uint8_t INPUT_PANEL_ROWS = 4;
+        inline constexpr uint8_t INPUT_PANEL_COLS = 4;
+        inline constexpr uint8_t TOTAL_INPUT = INPUT_PANEL_ROWS * INPUT_PANEL_COLS;
 
-        inline constexpr ColorRGBA ALIVE_COLOR = ColorRGBA::white();
-        inline constexpr ColorRGBA DEAD_COLOR  = ColorRGBA::black();
+        constexpr int SWITCH_SPACING = 48;
+        constexpr int SWITCH_SIZE = 24;
+        constexpr Vec2i SWITCH_OFFSET = {50, 50};
+
+        constexpr int PANEL_SPACING = 48;
+        constexpr int PANEL_SIZE = 24;
+        constexpr Vec2i PANEL_OFFSET = {300, 50};
+
+        constexpr Vec2i BIAS_COORD = {4, 4};
     }
 }
