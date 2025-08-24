@@ -1,17 +1,11 @@
 #include "../source/core/app.hpp"
-#include "input_handler.hpp"
-#include "perceptron.hpp"
-#include "perceptron_renderer.hpp"
-#include <memory>
+#include "../source/core/constants.hpp"
+
+/// UPDATE: source/core/constants.hpp; GameInfo::*
 
 int main(void) {
-    auto& app = App::instance();
+	auto& app = APP;
+	SceneBuilder().pushToSystem(GameInfo::SceneID::Level0, true);
 
-    SceneBuilder()
-        .addNode(std::make_unique<Perceptron>("perceptron"))
-        .addNode(std::make_unique<InputHandler>("input-handler"))
-        .pushToSystem(GameInfo::SceneID::MainScene, true);
-
-    app.setRenderSystem(std::make_unique<PerceptronRenderer>());
-    app.run();
+	app.run();
 }

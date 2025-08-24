@@ -3,13 +3,13 @@
 #include "../../vendor/raylib.h"
 
 void RenderSystem::_drawNull() noexcept {
-    BeginDrawing();
-    EndDrawing();
+	BeginDrawing();
+	EndDrawing();
 }
 
 void RenderSystem::_update() {
-    BeginDrawing();
-    ClearBackground(BLACK);
-    DrawFPS(10, 10);
-    EndDrawing();
+	BeginDrawing();
+	ClearBackground(BLACK);
+	DrawFPS(10, 10);
+	EndDrawing();
 }

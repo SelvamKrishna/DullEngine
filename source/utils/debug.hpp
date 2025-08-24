@@ -12,39 +12,39 @@
 #include <utility>
 
 namespace Debug {
-    static std::mutex mutex;
+	static std::mutex mutex;
 
-    enum class Level : uint8_t { Info, Warn, Log };
+	enum class Level : uint8_t { Info, Warn, Log };
 
-    template <typename... Args>
-    void log(Level level, std::format_string<Args...> fmt, Args&& ...args) {
-        std::lock_guard<std::mutex> lock(mutex);
+	template <typename... Args>
+	void log(Level level, std::format_string<Args...> fmt, Args&& ...args) {
+		std::lock_guard<std::mutex> lock(mutex);
 
-        const char* PREFIX = [level] {
-            switch (level) {
-                case Level::Info: return "[INFO] ";
-                case Level::Warn: return "[WARN] ";
-                case Level::Log:  return "[LOG] ";
-                default:          return "[UNKNOWN]";
-            }
-        }();
+		const char* PREFIX = [level] {
+			switch (level) {
+				case Level::Info: return "[INFO] ";
+				case Level::Warn: return "[WARN] ";
+				case Level::Log:  return "[LOG] ";
+				default:          return "[UNKNOWN]";
+			}
+		} ();
 
-        std::ostream& out = level == Level::Info ? std::cout : std::cerr;
-        out << "[DULL] " << PREFIX << std::format(fmt, std::forward<Args>(args)...) << '\n';
-    }
+		std::ostream& out = level == Level::Info ? std::cout : std::cerr;
+		out << "[DULL] " << PREFIX << std::format(fmt, std::forward<Args>(args)...) << '\n';
+	}
 
-    template <typename... Args>
-    std::string traceMsg(const char* file, int line, std::format_string<Args...> fmt, Args&& ...args) {
-        return std::format("[{}:{}] {}", file, line, std::format(fmt, std::forward<Args>(args)...));
-    }
+	template <typename... Args>
+	std::string traceMsg(const char* file, int line, std::format_string<Args...> fmt, Args&& ...args) {
+		return std::format("[{}:{}] {}", file, line, std::format(fmt, std::forward<Args>(args)...));
+	}
 }
 
 #ifdef DULL_MODE_DEBUG
-    #define DULL_INFO(fmt, ...) Debug::log(Debug::Level::Info, fmt __VA_OPT__(, ) __VA_ARGS__)
-    #define DULL_WARN(fmt, ...) Debug::log(Debug::Level::Warn, fmt __VA_OPT__(, ) __VA_ARGS__)
+#define DULL_INFO(fmt, ...) Debug::log(Debug::Level::Info, fmt __VA_OPT__(, ) __VA_ARGS__)
+#define DULL_WARN(fmt, ...) Debug::log(Debug::Level::Warn, fmt __VA_OPT__(, ) __VA_ARGS__)
 #else
-    #define DULL_INFO(fmt, ...) ((void)0)
-    #define DULL_WARN(fmt, ...) ((void)0)
+#define DULL_INFO(fmt, ...) ((void)0)
+#define DULL_WARN(fmt, ...) ((void)0)
 #endif
 
 #define DULL_LOG(fmt, ...)   Debug::log(Debug::Level::Log, fmt __VA_OPT__(, ) __VA_ARGS__)
@@ -52,38 +52,38 @@ namespace Debug {
 
 struct ErrorCtx {
 private:
-    std::string _operation;
-    std::source_location _location;
+	std::string _operation;
+	std::source_location _location;
 
-    enum class FailType : uint8_t { Failure, Critikal };
+	enum class FailType : uint8_t { Failure, Critikal };
 
-    void _loggingHelper(FailType fail_type, std::string_view fail_reason) const noexcept {
-        std::cerr << std::format(
-            "[DULL] [{}] {}:{} - {}: {}\n",
-            fail_type == FailType::Failure ? "FAILURE" : "CRITIKAL",
-            _location.file_name(),
-            _location.line(),
-            _operation,
-            fail_reason
-        );
-    }
+	void _loggingHelper(FailType fail_type, std::string_view fail_reason) const noexcept {
+		std::cerr << std::format(
+			"[DULL] [{}] {}:{} - {}: {}\n",
+			fail_type == FailType::Failure ? "FAILURE" : "CRITIKAL",
+			_location.file_name(),
+			_location.line(),
+			_operation,
+			fail_reason
+		);
+	}
 
 public:
-    explicit ErrorCtx(std::string operation)
-        : _operation(std::move(operation))
-        , _location(std::source_location::current()) {}
+	explicit ErrorCtx(std::string operation)
+	: _operation(std::move(operation))
+	, _location(std::source_location::current()) {}
 
-    ErrorCtx(const ErrorCtx&) = delete;
-    ErrorCtx(ErrorCtx&&) = delete;
-    ErrorCtx& operator=(const ErrorCtx&) = delete;
-    ErrorCtx& operator=(ErrorCtx&&) = delete;
+	ErrorCtx(const ErrorCtx&) = delete;
+	ErrorCtx(ErrorCtx&&) = delete;
+	ErrorCtx& operator=(const ErrorCtx&) = delete;
+	ErrorCtx& operator=(ErrorCtx&&) = delete;
 
-    void failFallback(std::string_view fail_reason) const noexcept {
-        _loggingHelper(FailType::Failure, fail_reason);
-    }
+	void failFallback(std::string_view fail_reason) const noexcept {
+		_loggingHelper(FailType::Failure, fail_reason);
+	}
 
-    [[noreturn]] void failExit(std::string_view fail_reason) const noexcept {
-        _loggingHelper(FailType::Critikal, fail_reason);
-        std::abort();
-    }
+	[[noreturn]] void failExit(std::string_view fail_reason) const noexcept {
+		_loggingHelper(FailType::Critikal, fail_reason);
+		std::abort();
+	}
 };

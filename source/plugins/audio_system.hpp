@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../utils/misc.hpp"
 #include "../../vendor/raylib.h"
 
 #include <mutex>
@@ -9,34 +10,45 @@
 /// UNTESTED:
 /// TODO: Volume handling
 class AudioSystem {
-    friend class App;
+	friend class App;
 
 private:
-    mutable std::mutex _mutex;
+	mutable std::mutex _mutex;
 
-    std::unordered_map<std::string, Sound> _sounds;
-    std::unordered_map<std::string, Music> _musics;
+	std::unordered_map<
+		std::string, 
+		Sound,
+		Misc::TransparentStringHash,
+		Misc::TransparentStringEqualTo
+	> _sounds;
 
-    Music* _music = nullptr;
+	std::unordered_map<
+		std::string, 
+		Music,
+		Misc::TransparentStringHash,
+		Misc::TransparentStringEqualTo
+	> _musics;
 
-    explicit AudioSystem() = default;
-    ~AudioSystem();
+	Music* _music = nullptr;
 
-    static void _init();
-    void _update();
+	explicit AudioSystem() = default;
+	~AudioSystem();
+
+	static void _init();
+	void _update();
 
 public:
-    AudioSystem(const AudioSystem&) = delete;
-    AudioSystem(AudioSystem&&) = delete;
-    AudioSystem& operator=(const AudioSystem&) = delete;
-    AudioSystem& operator=(AudioSystem&&) = delete;
+	AudioSystem(const AudioSystem&) = delete;
+	AudioSystem(AudioSystem&&) = delete;
+	AudioSystem& operator=(const AudioSystem&) = delete;
+	AudioSystem& operator=(AudioSystem&&) = delete;
 
-    void loadSound(std::string_view sound_name, std::string_view file_path) noexcept;
-    void playSound(std::string_view sound_name) noexcept;
-    void unloadSound(std::string_view sound_name) noexcept;
+	void loadSound(std::string_view sound_name, std::string_view file_path) noexcept;
+	void playSound(std::string_view sound_name) noexcept;
+	void unloadSound(std::string_view sound_name) noexcept;
 
-    void loadMusic(std::string_view music_name, std::string_view file_path) noexcept;
-    void playMusic(std::string_view music_name) noexcept;
-    void stopMusic() noexcept;
-    void unloadMusic(std::string_view music_name) noexcept;
+	void loadMusic(std::string_view music_name, std::string_view file_path) noexcept;
+	void playMusic(std::string_view music_name) noexcept;
+	void stopMusic() noexcept;
+	void unloadMusic(std::string_view music_name) noexcept;
 };
