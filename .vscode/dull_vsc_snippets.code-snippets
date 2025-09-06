@@ -1,0 +1,42 @@
+{
+    "Basic Node-derived Class": {
+        "prefix": "nodeclass",
+        "body": [
+            "class ${1:...Node} : public Node {",
+            "protected:",
+            "    void _init() final;",
+            "    void _update() final;",
+            "",
+            "public:",
+            "    explicit ${1}(std::string name) : Node(std::move(name)) {}",
+            "    ~${1}() override = default;",
+            "};"
+        ],
+        "description": "Creates a basic Node-derived class with default methods"
+    },
+
+    "Render System Class": {
+        "prefix": "renderclass",
+        "body": [
+            "class ${1:...Renderer} : public RenderSystem {",
+            "private:",
+            "\tvoid _init() final;",
+            "\tvoid _update() final;",
+            "};"
+        ],
+        "description": "Create a RenderSystem-derived class"
+    },
+
+	"Global System class": {
+		"prefix": "globalclass",
+		"body": [
+			"class ${1:...Global} : public GlobalSystem {",
+			"private:",
+			"\tvoid _init() override {}",
+			"\tvoid _update() override {}",
+			"\tvoid _fixedUpdate() override {}",
+			"};"
+		],
+		"description": "Create a GlobalSystem-derived class"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"files.associations": {
+		"*.hpp": "cpp",
+		"format": "cpp",
+		"vector": "cpp",
+		"xstring": "cpp"
+	},
+	
+	"editor.tabSize": 4,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+
+	"editor.formatOnSave": false,
+	"Lua.diagnostics.disable": [
+		"undefined-global"
+	]
+}
