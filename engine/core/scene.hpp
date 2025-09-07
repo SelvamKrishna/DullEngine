@@ -13,6 +13,7 @@
 #include <vector>
 #include <format>
 
+
 /// Collection of nodes which are processed together;
 /// Provides an API to handle nodes;
 class Scene {
@@ -41,9 +42,12 @@ public:
 	Scene& operator=(const Scene&) = delete;
 	Scene& operator=(Scene&&) = delete;
 
+	[[nodiscard]] size_t nodeCount() const noexcept { return _nodes.size(); }
+	[[nodiscard]] size_t nodeIDFromName(std::string_view node_name);
+	
 	void addNode(std::unique_ptr<Node> node) noexcept;
-	void removeNodeByIndex(size_t index) noexcept;
-	void removeNodeByName(std::string_view name) noexcept;
+	void removeNode(size_t node_id);
+	std::weak_ptr<Node> getNode(size_t node_id);
 
 	template <typename NodeT>
 		requires std::is_base_of_v<Node, NodeT>
@@ -64,10 +68,6 @@ public:
 		_nodes.erase(it);
 	}
 
-	[[nodiscard]] size_t nodeCount() const noexcept { return _nodes.size(); }
-	[[nodiscard]] std::weak_ptr<Node> getNodeByIndex(size_t index) noexcept;
-	[[nodiscard]] std::weak_ptr<Node> getNodeByName(std::string_view name) noexcept;
-
 	template <typename NodeT>
 		requires std::is_base_of_v<Node, NodeT>
 	[[nodiscard]] std::weak_ptr<NodeT> getNode() noexcept {
@@ -87,10 +87,22 @@ public:
 		return std::static_pointer_cast<NodeT>(*it);
 	}
 
-	void clear() noexcept {
-		for (auto& node : _nodes) node.reset();
-		_nodes.clear();
+	template <typename NodeT>
+		requires std::is_base_of_v<Node, NodeT>
+	[[nodiscard]] std::vector<std::weak_ptr<NodeT>> getNodes() noexcept {
+		std::lock_guard<std::mutex> lock(_mutex);
+		std::vector<std::weak_ptr<NodeT>> node_list;
+
+		for (auto& node : _nodes) {
+			if (dynamic_cast<NodeT*>(node.get()) != nullptr) {
+				node_list.push_back(std::static_pointer_cast<NodeT>(node));
+			}
+		}
+
+		return node_list;
 	}
+
+	void clear() noexcept { _nodes.clear(); }
 };
 
 /// Builder pattern for scenes;
@@ -111,14 +123,6 @@ public:
 	SceneBuilder& operator=(const SceneBuilder&) = delete;
 	SceneBuilder& operator=(SceneBuilder&&) = delete;
 
-	[[nodiscard]] SceneBuilder& addNode(std::unique_ptr<Node> node) noexcept {
-		// Warn when the node buffer is reallocated; In-efficient
-		if (_scene->nodeCount() == _scene_node_buffer_size)
-			DULL_WARN("[SCENE BUILDER] Scene node buffer exceeded");
-
-		_scene->addNode(std::move(node));
-		return *this;
-	}
-
+	[[nodiscard]] SceneBuilder& addNode(std::unique_ptr<Node> node) noexcept;
 	void pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene = false) noexcept;
 };

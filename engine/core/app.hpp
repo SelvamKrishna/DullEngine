@@ -17,14 +17,13 @@
 class App {
 private:
 	float _accumulator = 0.0F;
-	bool _is_running = false;
 
 	SceneSystem _scene_sys;
 	TimeSystem _time_sys;
 	AudioSystem _audio_sys;
 	SignalSystem _signal_sys;
-	std::unique_ptr<RenderSystem> _render_sys; // (MODIFIABLE)
-	std::unique_ptr<GlobalSystem> _global_sys; // (MODIFIABLE)
+	std::unique_ptr<RenderSystem> _render_sys; /// (MODIFIABLE)
+	std::unique_ptr<GlobalSystem> _global_sys; /// (MODIFIABLE)
 
 	explicit App();
 	~App();
@@ -45,9 +44,6 @@ public:
 	}
 
 	void run();
-	constexpr void quit() noexcept { _is_running = false; }
-
-	[[nodiscard]] constexpr bool isRunning() const noexcept { return _is_running; }
 
 	[[nodiscard]] constexpr SceneSystem& sceneSystem() noexcept { return _scene_sys; }
 	[[nodiscard]] constexpr TimeSystem& timeSystem() noexcept { return _time_sys; }
@@ -62,10 +58,10 @@ public:
 		if (overwrite) _render_sys->_init();
 	}
 
-	[[nodiscard]] std::unique_ptr<RenderSystem>& renderSystem() noexcept {
-		if (_render_sys == nullptr)
-			ErrorCtx{"Get render system"}.failExit("Not set");
-		return _render_sys;
+	[[nodiscard]] RenderSystem& renderSystem() noexcept {
+		if (_render_sys == nullptr) 
+			_TODO("Set render system before accessing; APP.setRenderSystem(unique_ptr to render system)");
+		return *_render_sys;
 	}
 
 	template <typename RenderSystemT>
@@ -77,19 +73,18 @@ public:
 	}
 
 	void setGlobalSystem(std::unique_ptr<GlobalSystem> global_sys) noexcept {
-		// Global system can't be overwritten
 		if (_global_sys != nullptr) {
-			ErrorCtx{"Set global system"}.failFallback("Trying to overwrite");
+			ErrorCtx{"Set global system"}.failFallback("Can't be overwritten");
 			return;
 		}
 
 		_global_sys = std::move(global_sys);
 	}
 
-	[[nodiscard]] std::unique_ptr<GlobalSystem>& globalSystem() noexcept {
+	[[nodiscard]] GlobalSystem& globalSystem() noexcept {
 		if (_global_sys == nullptr)
-			ErrorCtx{"Get global system"}.failExit("Not set");
-		return _global_sys;
+			_TODO("Set global system before accessing; APP.setGlobalSystem(unique_ptr to global system)");
+		return *_global_sys;
 	}
 
 	template <typename GlobalSystemT>

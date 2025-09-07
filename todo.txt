@@ -1,0 +1,9 @@
+APP: Implement window sizing support
+- Fullscreen, Minimize, Maximize
+- Custom window sizeing during runtime
+
+SOUND_SYSTEM: Test
+- Implement volume management
+
+INPUT_MANAGER: Provide API support
+- Cross-platform input handling

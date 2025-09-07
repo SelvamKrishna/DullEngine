@@ -3,7 +3,11 @@
 #include <cstdint>
 
 namespace GameInfo {
+	/// UPDATE: Standard Game Information
 	inline constexpr const char* TITLE = "Sandbox";
+
+	inline constexpr uint8_t VERSION_MAJOR = 0;
+	inline constexpr uint8_t VERSION_MINOR = 1;
 
 	inline constexpr int WINDOW_WIDTH  = 800;
 	inline constexpr int WINDOW_HEIGHT = 800;
@@ -25,4 +29,5 @@ namespace GameInfo {
 namespace EngineInfo {
 	inline constexpr uint8_t VERSION_MAJOR = 0;
 	inline constexpr uint8_t VERSION_MINOR = 1;
+	inline constexpr uint8_t COMMIT = 1;
 }

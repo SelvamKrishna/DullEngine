@@ -11,6 +11,14 @@
 #include <string_view>
 #include <utility>
 
+[[noreturn]] static inline void _UNREACHABLE() { std::abort(); }
+
+template<typename... Args>
+[[noreturn]] static inline void _TODO(std::format_string<Args...> fmt, Args&&... args) {
+    std::cerr << "[TODO] " << std::format(fmt, std::forward<Args>(args)...) << std::endl;
+    std::abort();
+}
+
 namespace Debug {
 	static std::mutex mutex;
 
@@ -25,6 +33,7 @@ namespace Debug {
 				case Level::Info: return "[INFO] ";
 				case Level::Warn: return "[WARN] ";
 				case Level::Log:  return "[LOG] ";
+				default: _UNREACHABLE();
 			}
 		} ();
 

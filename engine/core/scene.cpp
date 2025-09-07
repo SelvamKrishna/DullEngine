@@ -1,8 +1,8 @@
 #include "engine/core/scene.hpp"
 #include "engine/core/app.hpp"
 #include "engine/core/node.hpp"
+#include "engine/utils/debug.hpp"
 
-#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <format>
@@ -60,6 +60,16 @@ void Scene::_fixedUpdate() {
 	}
 }
 
+[[nodiscard]] size_t Scene::nodeIDFromName(std::string_view name) {
+	std::lock_guard<std::mutex> lock(_mutex);
+
+	for (size_t i = 0; i < _nodes.size(); i++) {
+		if (_nodes[i]->name() == name) return i;
+	}
+
+	ErrorCtx{"Get node id from name"}.failExit("Name not found");
+}
+
 void Scene::addNode(std::unique_ptr<Node> node) noexcept {
 	std::lock_guard<std::mutex> lock(_mutex);
 	ErrorCtx err{std::format("Add node '{}' to scene", node->_name)};
@@ -76,63 +86,40 @@ void Scene::addNode(std::unique_ptr<Node> node) noexcept {
 		}
 	}
 
+	// Takes ownership of node and converts it to shared_ptr
 	DULL_INFO("Added node '{}' to scene.", node->_name);
-	_nodes.emplace_back(std::move(node));
+	_nodes.emplace_back(std::shared_ptr<Node>(std::move(node)));
 }
 
-void Scene::removeNodeByIndex(size_t index) noexcept {
+void Scene::removeNode(size_t node_id) {
 	std::lock_guard<std::mutex> lock(_mutex);
 
-	if (index >= _nodes.size()) {
-		ErrorCtx{"Remove node by index"}.failFallback("Index out of range");
+	if (node_id > _nodes.size()) {
+		ErrorCtx{"Remove node"}.failFallback("Index out of range");
 		return;
 	}
 
-	_nodes[index].reset();
-	_nodes.erase(_nodes.begin() + static_cast<int64_t>(index));
+	DULL_INFO("Added node '{}' to scene.", _nodes[node_id]->name());
+	_nodes.erase(_nodes.begin() + node_id);
 }
 
-void Scene::removeNodeByName(std::string_view name) noexcept {
+std::weak_ptr<Node> Scene::getNode(size_t node_id) {
 	std::lock_guard<std::mutex> lock(_mutex);
 
-	auto it = std::ranges::find_if(
-		_nodes,
-		[name](const auto& node) { return node->_name == name; }
-	);
-
-	if (it == _nodes.end()) {
-		ErrorCtx{"Remove node by name"}.failFallback("Not found");
-		return;
+	if (node_id > _nodes.size()) {
+		ErrorCtx{"Get node"}.failExit("Index out of range");
 	}
 
-	_nodes.erase(it);
+	return _nodes[node_id];
 }
 
-[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByIndex(size_t index) noexcept {
-	std::lock_guard<std::mutex> lock(_mutex);
+[[nodiscard]] SceneBuilder& SceneBuilder::addNode(std::unique_ptr<Node> node) noexcept {
+	// Warn when the node buffer is reallocated; Inefficient
+	if (_scene->nodeCount() == _scene_node_buffer_size)
+		DULL_WARN("[SCENE BUILDER] Scene node buffer exceeded");
 
-	if (index >= _nodes.size()) {
-		ErrorCtx{"Get node by index"}.failFallback("Index out of range");
-		return {};
-	}
-
-	return _nodes[index];
-}
-
-[[nodiscard]] std::weak_ptr<Node> Scene::getNodeByName(std::string_view name) noexcept {
-	std::lock_guard<std::mutex> lock(_mutex);
-
-	auto it = std::ranges::find_if(
-		_nodes,
-		[name](const auto &node) { return node->_name == name; }
-	);
-
-	if (it == _nodes.end()) {
-		ErrorCtx{"Get node by name"}.failFallback("Not found");
-		return {};
-	}
-
-	return *it;
+	_scene->addNode(std::move(node));
+	return *this;
 }
 
 void SceneBuilder::pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene) noexcept {
