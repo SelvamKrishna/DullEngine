@@ -24,7 +24,7 @@ void Observer::detachSignal(std::string_view signal) noexcept {
 void Observer::detachAllSignal() noexcept { SIGNAL_SYS.unbindObserver(weak_from_this(), ""); }
 
 void SignalSystem::_removeObserver(const Observer* observer_ptr, std::string_view signal, ErrorCtx& err) {
-	auto signal_map = _signal_links.find(signal);
+	auto signal_map { _signal_links.find(signal) };
 
 	if (signal_map == _signal_links.end()) {
 		err.failFallback("Signal not found");
@@ -35,7 +35,7 @@ void SignalSystem::_removeObserver(const Observer* observer_ptr, std::string_vie
 	auto it = std::ranges::find_if(
 		observers_vec,
 		[observer_ptr](const std::weak_ptr<Observer>& weak_observer) {
-			auto shared_observer = weak_observer.lock();
+			auto shared_observer { weak_observer.lock() };
 			return shared_observer.get() == observer_ptr;
 		}
 	);
@@ -71,7 +71,7 @@ void SignalSystem::unbindObserver(const std::weak_ptr<Observer>& observer, std::
 
 	ErrorCtx err(std::format("Unbinding observer from signal '{}'", signal));
 
-	const Observer* const OBSERVER_PTR = observer.lock().get();
+	const Observer* const OBSERVER_PTR { observer.lock().get() };
 
 	if (!signal.empty()) {
 		_removeObserver(OBSERVER_PTR, signal, err);
@@ -89,7 +89,7 @@ void SignalSystem::emitSignal(std::string_view signal) noexcept {
     [this, &signal, &to_call] {
         std::lock_guard lock(_mutex);
 
-        auto it = _signal_links.find(signal);
+        auto it { _signal_links.find(signal) };
         if (it == _signal_links.end()) return;
 
         to_call.reserve(it->second.size());
@@ -119,7 +119,7 @@ void SignalSystem::cleanupExpiredObservers() noexcept {
 	#endif
 
 	for (auto& [_, observers_vec] : _signal_links) {
-		for (auto it = observers_vec.begin(); it != observers_vec.end(); it++) {
+		for (auto it { observers_vec.begin() }; it != observers_vec.end(); it++) {
 			if (!it->expired()) continue;
 			observers_vec.erase(it);
 		}

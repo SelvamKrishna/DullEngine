@@ -187,9 +187,9 @@ public:
 	}
 
 	[[nodiscard]] constexpr uint32_t toHex() const noexcept {
-		uint32_t r_hex = static_cast<uint32_t>(r) << 24;
-		uint32_t g_hex = static_cast<uint32_t>(g) << 16;
-		uint32_t b_hex = static_cast<uint32_t>(b) << 8;
+		uint32_t r_hex { static_cast<uint32_t>(r) << 24 };
+		uint32_t g_hex { static_cast<uint32_t>(g) << 16 };
+		uint32_t b_hex { static_cast<uint32_t>(b) << 8 };
 
 		return r_hex | g_hex | b_hex | static_cast<uint32_t>(a);
 	}
@@ -204,17 +204,17 @@ public:
 	}
 
 	[[nodiscard]] constexpr ColorRGBA grayscale() const noexcept {
-		constexpr float LUMINOSITY_R = 0.3F;
-		constexpr float LUMINOSITY_G = 0.59F;
-		constexpr float LUMINOSITY_B = 0.11F;
+		constexpr float LUMINOSITY_R { 0.3F };
+		constexpr float LUMINOSITY_G { 0.59F };
+		constexpr float LUMINOSITY_B { 0.11F };
 
-		float weighted_luminosity = 0.0F;
+		float weighted_luminosity { 0.0F };
 
 		weighted_luminosity += static_cast<float>(r) * LUMINOSITY_R;
 		weighted_luminosity += static_cast<float>(g) * LUMINOSITY_G;
 		weighted_luminosity += static_cast<float>(b) * LUMINOSITY_B;
 
-		const auto GRAYSCALED = static_cast<uint8_t>(weighted_luminosity);
+		const auto GRAYSCALED { static_cast<uint8_t>(weighted_luminosity) };
 
 		return {GRAYSCALED, GRAYSCALED, GRAYSCALED, a};
 	}

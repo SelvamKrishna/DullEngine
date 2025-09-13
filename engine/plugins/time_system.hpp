@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/core/constants.hpp"
+#include "app/constants.hpp"
 
 #include <cstdint>
 
@@ -9,9 +9,9 @@ class TimeSystem {
 	friend class App;
 
 private:
-	float _delta_time = 0.0F;
-	float _time_scale = 1.0F;
-	bool _is_paused = false;
+	float _delta_time { 0.0F };
+	float _time_scale { 1.0F };
+	bool _is_paused { false };
 
 	explicit TimeSystem() = default;
 	~TimeSystem() = default;
@@ -24,8 +24,8 @@ public:
 	TimeSystem &operator=(const TimeSystem &) = delete;
 	TimeSystem &operator=(TimeSystem &&) = delete;
 
-	static constexpr float FIXED_FRAME_RATE = GameInfo::FIXED_FRAME_RATE;
-	static constexpr float FIXED_DELTA_TIME = 1.0F / FIXED_FRAME_RATE;
+	static constexpr float FIXED_FRAME_RATE { GameInfo::FIXED_FRAME_RATE };
+	static constexpr float FIXED_DELTA_TIME { 1.0F / FIXED_FRAME_RATE };
 
 	constexpr void setTimeScale(float scale) noexcept { _time_scale = scale > 0.0F ? scale : 0.0F; }
 

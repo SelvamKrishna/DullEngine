@@ -47,7 +47,7 @@ void AudioSystem::loadSound(std::string_view sound_name, std::string_view file_p
 		return;
 	}
 
-	Sound sound = LoadSound(std::string(file_path).c_str());
+	Sound sound { LoadSound(std::string(file_path).c_str()) };
 	if (!IsSoundValid(sound)) {
 		err.failFallback(std::format("File path '{}' invalid", file_path));
 		return;
@@ -66,7 +66,7 @@ void AudioSystem::playSound(std::string_view sound_name) noexcept {
 		return;
 	}
 
-	auto it = _sounds.find(sound_name);
+	auto it { _sounds.find(sound_name) };
 	if (it == _sounds.end()) {
 		err.failFallback("Not found");
 		return;
@@ -83,7 +83,7 @@ void AudioSystem::playSound(std::string_view sound_name) noexcept {
 void AudioSystem::unloadSound(std::string_view sound_name) noexcept {
 	std::lock_guard<std::mutex> lock(_mutex);
 
-	auto it = _sounds.find(sound_name);
+	auto it { _sounds.find(sound_name) };
 	if (it == _sounds.end()) {
 		ErrorCtx{std::format("Unload sound '{}'", sound_name)}
 			.failFallback("Not found");
@@ -110,7 +110,7 @@ void AudioSystem::loadMusic(std::string_view music_name, std::string_view file_p
 		return;
 	}
 
-	Music music = LoadMusicStream(std::string(file_path).c_str());
+	Music music { LoadMusicStream(std::string(file_path).c_str()) };
 	if (!IsMusicValid(music)) {
 		err.failFallback(std::format("File path '{}' invalid", file_path));
 		return;
@@ -129,7 +129,7 @@ void AudioSystem::playMusic(std::string_view music_name) noexcept {
 		return;
 	}
 
-	auto it = _musics.find(music_name);
+	auto it { _musics.find(music_name) };
 	if (it == _musics.end()) {
 		err.failFallback("Not found");
 		return;
@@ -156,7 +156,7 @@ void AudioSystem::stopMusic() noexcept {
 void AudioSystem::unloadMusic(std::string_view music_name) noexcept {
 	std::lock_guard<std::mutex> lock(_mutex);
 
-	auto it = _musics.find(music_name);
+	auto it { _musics.find(music_name) };
 	if (it == _musics.end()) {
 		ErrorCtx(std::format("Unload music {}", music_name))
 			.failFallback("Not found");

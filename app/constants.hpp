@@ -6,16 +6,16 @@ namespace GameInfo {
 	/// UPDATE: Standard Game Information
 	inline constexpr const char* TITLE = "Sandbox";
 
-	inline constexpr uint8_t VERSION_MAJOR = 0;
-	inline constexpr uint8_t VERSION_MINOR = 1;
+	inline constexpr uint8_t VERSION_MAJOR { 0 };
+	inline constexpr uint8_t VERSION_MINOR { 1 };
 
-	inline constexpr int WINDOW_WIDTH  = 800;
-	inline constexpr int WINDOW_HEIGHT = 800;
+	inline constexpr int WINDOW_WIDTH { 800 };
+	inline constexpr int WINDOW_HEIGHT { 800 };
 
-	inline constexpr float FIXED_FRAME_RATE = 60.0F;
+	inline constexpr float FIXED_FRAME_RATE { 60.0F };
 
 	/// UPDATE: All availble scenes of the application
-	inline constexpr uint8_t TOTAL_SCENE_COUNT = 1;
+	inline constexpr uint8_t TOTAL_SCENE_COUNT { 1 };
 	enum class SceneID : uint8_t {
 		Level0,
 	};

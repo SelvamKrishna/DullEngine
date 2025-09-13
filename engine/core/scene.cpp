@@ -12,7 +12,7 @@
 #include <utility>
 
 void Scene::_init() {
-	size_t index = 0;
+	size_t index { 0 };
 
 	for (auto& node : _nodes) {
 		if (node == nullptr) [[unlikely]] {
@@ -27,7 +27,7 @@ void Scene::_init() {
 }
 
 void Scene::_update() {
-	size_t index = 0;
+	size_t index { 0 };
 
 	for (auto& node : _nodes) {
 		try {
@@ -64,7 +64,7 @@ void Scene::_fixedUpdate() {
 [[nodiscard]] size_t Scene::nodeIDFromName(std::string_view name) {
 	std::lock_guard<std::mutex> lock(_mutex);
 
-	for (size_t i = 0; i < _nodes.size(); i++) {
+	for (size_t i { 0 }; i < _nodes.size(); i++) {
 		if (_nodes[i]->name() == name) return i;
 	}
 

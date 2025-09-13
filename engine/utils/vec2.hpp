@@ -45,12 +45,12 @@ public:
 	[[nodiscard]] float length_squared() const noexcept { return x * x + y * y; }
 
 	[[nodiscard]] Vec2 normalized() const noexcept {
-		const float LEN = length();
+		const float LEN { length() };
 		return LEN > 0.0F ? *this / LEN : zero();
 	}
 
 	void normalize() noexcept {
-		const float LEN = length();
+		const float LEN { length() };
 		if (LEN > 0.0F) { x /= LEN; y /= LEN; }
 	}
 
@@ -109,12 +109,12 @@ public:
 	[[nodiscard]] int32_t length_squared() const noexcept { return x * x + y * y; }
 
 	[[nodiscard]] Vec2i normalized() const noexcept {
-		const float LEN = length();
+		const float LEN { length() };
 		return LEN > 0.0F ? *this / static_cast<int32_t>(LEN) : zero();
 	}
 
 	void normalize() noexcept {
-		const float LEN = length();
+		const float LEN { length() };
 		if (LEN > 0.0F) { x = static_cast<int32_t>(x / LEN); y = static_cast<int32_t>(y / LEN); }
 	}
 
@@ -131,4 +131,3 @@ public:
 };
 
 constexpr Vec2i operator+(int32_t scalar, const Vec2i &vec) noexcept { return vec + scalar; }
-constexpr Vec2i operator*(int32_t scalar, const Vec2i &vec) noexcept { return vec * scalar; }

@@ -12,7 +12,7 @@
 /// TODO: Implement window sizing support
 /// TODO: Implement window fullscreen support
 App::App() {
-	const std::string TITLE =
+	const std::string TITLE { 
 		#ifdef DULL_MODE_DEBUG
 		std::string("Dull Engine ") +
 		std::to_string(EngineInfo::VERSION_MAJOR) + "." +
@@ -24,7 +24,7 @@ App::App() {
 		std::to_string(GameInfo::VERSION_MAJOR) + "." +
 		std::to_string(GameInfo::VERSION_MINOR)
 		#endif
-		;
+	};
 
 	InitWindow(GameInfo::WINDOW_WIDTH, GameInfo::WINDOW_HEIGHT, TITLE.c_str());
 	SetExitKey(KEY_NULL);

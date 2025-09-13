@@ -18,9 +18,9 @@ protected:
 	std::string _name;
 
 public:
-	bool is_active = false;
-	bool is_updating = true;
-	bool is_fixed_updating = true;
+	bool is_active { false };
+	bool is_updating { true };
+	bool is_fixed_updating { true };
 
 	explicit Node(std::string name);
 	virtual ~Node() = default;

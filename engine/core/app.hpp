@@ -16,7 +16,7 @@
 /// Main handle for all nodes and systems;
 class App {
 private:
-	float _accumulator = 0.0F;
+	float _accumulator { 0.0F };
 
 	SceneSystem _scene_sys;
 	TimeSystem _time_sys;
@@ -51,7 +51,7 @@ public:
 	[[nodiscard]] constexpr SignalSystem& signalSystem() noexcept { return _signal_sys; }
 
 	void setRenderSystem(std::unique_ptr<RenderSystem> render_sys) noexcept {
-		bool overwrite = _render_sys != nullptr;
+		bool overwrite { _render_sys != nullptr };
 		_render_sys = std::move(render_sys);
 
 		// Re-initialize render system if changed while application running
@@ -73,7 +73,7 @@ public:
 	}
 
 	void setPhysicsSystem(std::unique_ptr<PhysicsSystem> physics_sys) noexcept {
-		bool is_overwrite = _physics_sys != nullptr;
+		bool is_overwrite { _physics_sys != nullptr };
 		_physics_sys = std::move(physics_sys);
 
 		// Re-initialize physics system if changed while application running

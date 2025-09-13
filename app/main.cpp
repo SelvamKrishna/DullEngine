@@ -7,7 +7,7 @@
 /// D: Implement your own nodes
 
 int main(void) {
-	auto &app = APP;
+	App &app { APP };
 
 	SceneBuilder{}
 		.newScene()

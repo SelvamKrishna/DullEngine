@@ -29,7 +29,7 @@ private:
 	void _fixedUpdate();
 
 public:
-	static constexpr size_t DEFAULT_NODE_BUFFER_SIZE = 16;
+	static constexpr size_t DEFAULT_NODE_BUFFER_SIZE { 16 };
 
 	explicit Scene(size_t node_buffer_size = DEFAULT_NODE_BUFFER_SIZE) noexcept {
 		_nodes.reserve(node_buffer_size);
