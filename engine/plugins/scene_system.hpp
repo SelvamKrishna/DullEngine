@@ -1,6 +1,5 @@
 #pragma once
 
-#include "engine/core/constants.hpp"
 #include "engine/core/scene.hpp"
 
 #include <array>
@@ -54,7 +53,7 @@ public:
 		#endif
 	}
 
-	void ChangeScene(GameInfo::SceneID new_scene_id) noexcept {
+	void changeScene(GameInfo::SceneID new_scene_id) noexcept {
 		setCurrent(new_scene_id);
 		_initCurrentScene();
 	}

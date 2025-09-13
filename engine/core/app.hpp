@@ -2,7 +2,7 @@
 
 #include "engine/core/scene.hpp"
 #include "engine/plugins/audio_system.hpp"
-#include "engine/plugins/global_system.hpp"
+#include "engine/plugins/physics_system.hpp"
 #include "engine/plugins/render_system.hpp"
 #include "engine/plugins/scene_system.hpp"
 #include "engine/plugins/signal_system.hpp"
@@ -23,7 +23,7 @@ private:
 	AudioSystem _audio_sys;
 	SignalSystem _signal_sys;
 	std::unique_ptr<RenderSystem> _render_sys; /// (MODIFIABLE)
-	std::unique_ptr<GlobalSystem> _global_sys; /// (MODIFIABLE)
+	std::unique_ptr<PhysicsSystem> _physics_sys; /// (MODIFIABLE)
 
 	explicit App();
 	~App();
@@ -72,27 +72,26 @@ public:
 		ErrorCtx{"Get render system"}.failExit("Bad cast");
 	}
 
-	void setGlobalSystem(std::unique_ptr<GlobalSystem> global_sys) noexcept {
-		if (_global_sys != nullptr) {
-			ErrorCtx{"Set global system"}.failFallback("Can't be overwritten");
-			return;
-		}
+	void setPhysicsSystem(std::unique_ptr<PhysicsSystem> physics_sys) noexcept {
+		bool is_overwrite = _physics_sys != nullptr;
+		_physics_sys = std::move(physics_sys);
 
-		_global_sys = std::move(global_sys);
+		// Re-initialize physics system if changed while application running
+		if (is_overwrite) _physics_sys->_init();
 	}
 
-	[[nodiscard]] GlobalSystem& globalSystem() noexcept {
-		if (_global_sys == nullptr)
-			_TODO("Set global system before accessing; APP.setGlobalSystem(unique_ptr to global system)");
-		return *_global_sys;
+	[[nodiscard]] PhysicsSystem& physicsSystem() noexcept {
+		if (_physics_sys == nullptr)
+			_TODO("Set physics system before accessing; APP.setPhysicsSystem(unique_ptr to physics system)");
+		return *_physics_sys;
 	}
 
-	template <typename GlobalSystemT>
-		requires std::is_base_of_v<GlobalSystem, GlobalSystemT>
-	[[nodiscard]] GlobalSystemT& globalSystem() {
-		if (auto* casted_sys = dynamic_cast<GlobalSystemT*>(_global_sys.get()))
+	template <typename PhysicsSystemT>
+		requires std::is_base_of_v<PhysicsSystem, PhysicsSystemT>
+	[[nodiscard]] PhysicsSystemT& physicsSystem() {
+		if (auto* casted_sys = dynamic_cast<PhysicsSystemT*>(_physics_sys.get()))
 			return *casted_sys;
-		ErrorCtx{"Get global system"}.failExit("Bad cast");
+		ErrorCtx{"Get physics system"}.failExit("Bad cast");
 	}
 };
 
@@ -103,8 +102,8 @@ public:
 #define SIGNAL_SYS			APP.signalSystem()
 #define RENDER_SYS			APP.renderSystem()
 #define RENDER_SYS_AS(T)	APP.renderSystem<T>()
-#define GLOBAL_SYS			APP.globalSystem()
-#define GLOBAL_SYS_AS(T)	APP.globalSystem<T>()
+#define PHYSICS_SYS			APP.physicsSystem()
+#define PHYSICS_SYS_AS(T)	APP.physicsSystem<T>()
 
 #define CURRENT_SCENE		SCENE_SYS.currentScene()
 #define D_TIME				TIME_SYS.deltaTime()

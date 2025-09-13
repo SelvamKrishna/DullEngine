@@ -1,8 +1,8 @@
 #pragma once
 
 #include "engine/core/node.hpp"
-#include "engine/core/constants.hpp"
 #include "engine/utils/debug.hpp"
+#include "app/constants.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -112,10 +112,7 @@ private:
 	size_t _scene_node_buffer_size;
 
 public:
-	explicit SceneBuilder(size_t scene_node_buffer_size = Scene::DEFAULT_NODE_BUFFER_SIZE)
-	: _scene(std::make_unique<Scene>(scene_node_buffer_size))
-	, _scene_node_buffer_size(scene_node_buffer_size) {}
-
+	explicit SceneBuilder() {}
 	~SceneBuilder() = default;
 
 	SceneBuilder(const SceneBuilder&) = delete;
@@ -123,6 +120,25 @@ public:
 	SceneBuilder& operator=(const SceneBuilder&) = delete;
 	SceneBuilder& operator=(SceneBuilder&&) = delete;
 
-	[[nodiscard]] SceneBuilder& addNode(std::unique_ptr<Node> node) noexcept;
-	void pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene = false) noexcept;
+
+	[[nodiscard]] SceneBuilder& newScene(size_t node_buffer_size = Scene::DEFAULT_NODE_BUFFER_SIZE) noexcept;
+
+	template <typename NodeT, typename... Args>
+		requires std::is_base_of_v<Node, NodeT>
+	[[nodiscard]] SceneBuilder& addNode(Args&&... args) noexcept {
+		if (_scene == nullptr) {
+			ErrorCtx{"Add node to scene via builder"}
+				.failFallback("Scene not yet initialized");
+			return *this; 
+		}
+
+		// Warn when the node buffer is reallocated; Inefficient
+		if (_scene->nodeCount() == _scene_node_buffer_size)
+			DULL_WARN("[SCENE BUILDER] Scene node buffer exceeded");
+
+		_scene->addNode(std::make_unique<NodeT>(std::forward<Args>(args)...));
+		return *this;
+	}
+
+	GameInfo::SceneID pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene = false) noexcept;
 };

@@ -27,16 +27,15 @@
         "description": "Create a RenderSystem-derived class"
     },
 
-	"Global System class": {
-		"prefix": "globalclass",
+	"Physics System class": {
+		"prefix": "physicsclass",
 		"body": [
-			"class ${1:...Global} : public GlobalSystem {",
+			"class ${1:...Physics} : public PhysicsSystem {",
 			"private:",
-			"\tvoid _init() override {}",
-			"\tvoid _update() override {}",
-			"\tvoid _fixedUpdate() override {}",
+			"\tvoid _init() final;",
+			"\tvoid _update() final;",
 			"};"
 		],
-		"description": "Create a GlobalSystem-derived class"
+		"description": "Create a PhysicsSystem-derived class"
 	}
 }

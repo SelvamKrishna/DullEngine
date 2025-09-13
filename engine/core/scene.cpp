@@ -1,4 +1,5 @@
 #include "engine/core/scene.hpp"
+#include "app/constants.hpp"
 #include "engine/core/app.hpp"
 #include "engine/core/node.hpp"
 #include "engine/utils/debug.hpp"
@@ -113,16 +114,22 @@ std::weak_ptr<Node> Scene::getNode(size_t node_id) {
 	return _nodes[node_id];
 }
 
-[[nodiscard]] SceneBuilder& SceneBuilder::addNode(std::unique_ptr<Node> node) noexcept {
-	// Warn when the node buffer is reallocated; Inefficient
-	if (_scene->nodeCount() == _scene_node_buffer_size)
-		DULL_WARN("[SCENE BUILDER] Scene node buffer exceeded");
+[[nodiscard]] SceneBuilder& SceneBuilder::newScene(size_t node_buffer_size) noexcept {
+	_scene = std::make_unique<Scene>(node_buffer_size);
+	_scene_node_buffer_size = node_buffer_size;
 
-	_scene->addNode(std::move(node));
 	return *this;
 }
 
-void SceneBuilder::pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene) noexcept {
+GameInfo::SceneID SceneBuilder::pushToSystem(GameInfo::SceneID scene_id, bool is_startup_scene) noexcept {
+	if (_scene == nullptr)
+		ErrorCtx{"Push scene to system"}.failExit("Scene not yet initialized");
+
 	SCENE_SYS.addScene(scene_id, std::move(_scene));
 	if (is_startup_scene) SCENE_SYS.setCurrent(scene_id);
+
+	_scene = nullptr;
+	_scene_node_buffer_size = 0;
+
+	return scene_id;
 }

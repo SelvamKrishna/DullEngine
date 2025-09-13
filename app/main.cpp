@@ -1,16 +1,17 @@
 #include "engine/core/app.hpp"
-#include "engine/core/constants.hpp"
-#include "engine/utils/input.hpp"
+#include "app/constants.hpp"
 
-/// A: UPDATE: engine/core/constants.hpp; GameInfo::*
+/// A: UPDATE: app/constants.hpp; GameInfo::*
 /// B: Implement your own render system
-/// C: Implement your own global system
+/// C: Implement your own physics system
+/// D: Implement your own nodes
 
 int main(void) {
-  auto &app = APP;
-  SceneBuilder().pushToSystem(GameInfo::SceneID::Level0, true);
+	auto &app = APP;
 
-  Key(KeyCode::W).isDown();
+	SceneBuilder{}
+		.newScene()
+		.pushToSystem(GameInfo::SceneID::Level0, true);
 
-  app.run();
+	app.run();
 }

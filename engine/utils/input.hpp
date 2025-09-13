@@ -128,7 +128,6 @@ private:
 	
 public:
 	explicit Key(KeyCode key) noexcept : key(key) {}
-
 	explicit Key(KeyboardKey key) noexcept : key(static_cast<KeyCode>(key)) {}
 	
 	bool isUp() noexcept { return IsKeyUp(static_cast<int32_t>(key)); }
@@ -140,4 +139,7 @@ public:
 
 /// Wrapper for raylibs input management
 namespace Input {
+	inline float calcAxis(float input_max, float input_min) noexcept {
+		return input_max - input_min;
+	}
 }
