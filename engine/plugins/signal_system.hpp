@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utils/debug.hpp"
-#include "../utils/misc.hpp"
+#include "engine/utils/debug.hpp"
+#include "engine/utils/misc.hpp"
 
 #include <functional>
 #include <memory>

@@ -7,8 +7,11 @@ class RenderSystem {
 
 private:
 	static void _drawNull() noexcept;
+
 	virtual void _init() {}
-	virtual void _update();
+	virtual void _draw() {}
+
+	void _update();
 
 public:
 	explicit RenderSystem() = default;

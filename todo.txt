@@ -1,9 +1,20 @@
-APP: Implement window sizing support
+. Window controls
 - Fullscreen, Minimize, Maximize
 - Custom window sizeing during runtime
 
-SOUND_SYSTEM: Test
-- Implement volume management
+. SOUND_SYS: Test
+- Implement volume control
 
-INPUT_MANAGER: Provide API support
+. INPUT: more features
 - Cross-platform input handling
+- Axis calculation (1D, 2D)
+- Modular control system
+
+. RENDER_SYS
+- Camera2D based render system templates
+- UI supported render system templates
+
+. PHYSICS_SYS
+- Grid based physics system template
+- (Dynamic & Static) physics system templates
+- Rigid body templates

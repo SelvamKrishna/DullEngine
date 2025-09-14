@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
-
 #include "vendor/raylib.h"
+
+#include <cstdint>
 
 enum class KeyCode : uint16_t {
 	Null = 0,
@@ -122,19 +122,19 @@ enum class KeyCode : uint16_t {
 };
 
 /// Wrapper for raylibs key handling
-struct Key {
+struct key {
 private:
-	KeyCode key;
+	KeyCode _key_code;
 	
 public:
-	explicit Key(KeyCode key) noexcept : key(key) {}
-	explicit Key(KeyboardKey key) noexcept : key(static_cast<KeyCode>(key)) {}
+	explicit key(KeyCode key) noexcept : _key_code(key) {}
+	explicit key(KeyboardKey key) noexcept : _key_code(static_cast<KeyCode>(key)) {}
 	
-	bool isUp() noexcept { return IsKeyUp(static_cast<int32_t>(key)); }
-	bool isDown() noexcept { return IsKeyDown(static_cast<int32_t>(key)); }
-	bool isPressed() noexcept { return IsKeyPressed(static_cast<int32_t>(key)); }
-	bool isPressedRepeat() noexcept { return IsKeyUp(static_cast<int32_t>(key)); }
-	bool isReleased() noexcept { return IsKeyUp(static_cast<int32_t>(key)); }
+	bool isUp() noexcept { return IsKeyUp(static_cast<int32_t>(_key_code)); }
+	bool isDown() noexcept { return IsKeyDown(static_cast<int32_t>(_key_code)); }
+	bool isPressed() noexcept { return IsKeyPressed(static_cast<int32_t>(_key_code)); }
+	bool isPressedRepeat() noexcept { return IsKeyUp(static_cast<int32_t>(_key_code)); }
+	bool isReleased() noexcept { return IsKeyUp(static_cast<int32_t>(_key_code)); }
 };
 
 /// Wrapper for raylibs input management

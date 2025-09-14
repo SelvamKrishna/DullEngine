@@ -1,5 +1,5 @@
-#include "engine/plugins/signal_system.hpp"
 #include "engine/core/app.hpp"
+#include "engine/plugins/signal_system.hpp"
 
 #include <algorithm>
 #include <format>

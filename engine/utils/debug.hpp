@@ -58,7 +58,7 @@ namespace Debug {
 #define DULL_LOG(fmt, ...)   Debug::log(Debug::Level::Log, fmt __VA_OPT__(, ) __VA_ARGS__)
 #define TRACE_MSG(fmt, ...)  Debug::traceMsg(__FILE__, __LINE__, fmt __VA_OPT__(, ) __VA_ARGS__)
 
-struct ErrorCtx {
+class ErrorCtx {
 private:
 	std::string _operation_desc;
 	std::source_location _location;

@@ -1,5 +1,6 @@
-#include "engine/core/scene.hpp"
 #include "app/constants.hpp"
+
+#include "engine/core/scene.hpp"
 #include "engine/core/app.hpp"
 #include "engine/core/node.hpp"
 #include "engine/utils/debug.hpp"

@@ -1,8 +1,9 @@
 #pragma once
 
+#include "app/constants.hpp"
+
 #include "engine/core/node.hpp"
 #include "engine/utils/debug.hpp"
-#include "app/constants.hpp"
 
 #include <algorithm>
 #include <cstddef>
