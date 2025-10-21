@@ -6,16 +6,17 @@
 
 namespace dull::core {
 
-struct AppContext final {
+struct AppConfig final {
   std::string title;
   util::Vec2i window_size {1280, 720};
-  int target_fps {0}; // 0 disables frame_limiting
+  int target_fps {0}; // 0 disables frame limiting
   bool is_vsync {true};
   bool is_resizeable {true};
 };
 
 class App final {
 private:
+  static inline App* s_instance = nullptr;
   bool _is_running {false};
 
 public:
@@ -23,8 +24,10 @@ public:
   App(const App&) = delete;
   App& operator=(const App&) = delete;
 
-  explicit App(const AppContext& ctx);
+  explicit App(const AppConfig& config);
   ~App() noexcept;
+
+  [[nodiscard]] App& instance() noexcept { return *s_instance; }
 
   void run();
 };

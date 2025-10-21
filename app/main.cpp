@@ -6,13 +6,7 @@
 int main(void) {
 	std::cout << dull::config::getVerString();
 
-	dull::core::App app {
-		{
-			.title {"Sample"},
-		}
-	};
-
-	app.run();
+	dull::core::App {{ .title {"Unknown"} }}.run();
 
 	return 0;
 }
