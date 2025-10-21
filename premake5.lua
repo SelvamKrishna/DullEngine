@@ -3,11 +3,11 @@ workspace "dull_engine"
     architecture "x86_64"
     location "build"
 
---- Dull Engine Shared Library ---
+-- === Dull Engine Static Library ===
 project "dull_engine"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
-    cppdialect "C++23"
+    cppdialect "C++20"
     targetdir "%{wks.location}/%{cfg.buildcfg}"
     objdir "%{wks.location}/%{cfg.buildcfg}/obj/%{prj.name}"
 
@@ -28,15 +28,12 @@ project "dull_engine"
 
     filter "system:windows"
         systemversion "latest"
-        -- Optional: set dll output name explicitly
-        -- targetname "dull_engine"
-        -- defines { "DULL_ENGINE_DLL" }
 
---- Application Executable ---
+-- === Application Executable ===
 project "application"
     kind "ConsoleApp"
     language "C++"
-    cppdialect "C++23"
+    cppdialect "C++20"
     targetdir "%{wks.location}/%{cfg.buildcfg}"
     objdir "%{wks.location}/%{cfg.buildcfg}/obj/%{prj.name}"
 
@@ -44,7 +41,7 @@ project "application"
 
     files { "app/**.cpp", "app/**.hpp" }
 
-    libdirs { "%{wks.location}/%{cfg.buildcfg}" , "vendor" } -- include engine shared lib output dir
+    libdirs { "vendor" }
     links { "dull_engine", "raylib", "winmm", "gdi32", "opengl32" }
 
     filter "configurations:Debug"

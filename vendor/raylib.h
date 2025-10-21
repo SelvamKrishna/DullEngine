@@ -9,7 +9,19 @@
 *       - Written in plain C code (C99) in PascalCase/camelCase notation
 *       - Hardware accelerated with OpenGL (1.1, 2.1, 3.3, 4.3, ES2, ES3 - choose at compile)
 *       - Unique OpenGL abstraction layer (usable as standalone module): [rlgl]
-*       - Multiple Fonts formats supported (()->LoadFontDefault() [core, text]
+*       - Multiple Fonts formats supported (TTF, OTF, FNT, BDF, Sprite fonts)
+*       - Outstanding texture formats support, including compressed formats (DXT, ETC, ASTC)
+*       - Full 3d support for 3d Shapes, Models, Billboards, Heightmaps and more!
+*       - Flexible Materials system, supporting classic maps and PBR maps
+*       - Animated 3D models supported (skeletal bones animation) (IQM, M3D, GLTF)
+*       - Shaders support, including Model shaders and Postprocessing shaders
+*       - Powerful math module for Vector, Matrix and Quaternion operations: [raymath]
+*       - Audio loading and playing with streaming support (WAV, OGG, MP3, FLAC, QOA, XM, MOD)
+*       - VR stereo rendering with configurable HMD device parameters
+*       - Bindings to multiple programming languages available!
+*
+*   NOTES:
+*       - One default Font is loaded on InitWindow()->LoadFontDefault() [core, text]
 *       - One default Texture2D is loaded on rlglInit(), 1x1 white pixel R8G8B8A8 [rlgl] (OpenGL 3.3 or ES2)
 *       - One default Shader is loaded on rlglInit()->rlLoadShaderDefault() [rlgl] (OpenGL 3.3 or ES2)
 *       - One default RenderBatch is loaded on rlglInit()->rlLoadRenderBatch() [rlgl] (OpenGL 3.3 or ES2)
@@ -60,19 +72,7 @@
 *   applications, and to alter it and redistribute it freely, subject to the following restrictions:
 *
 *     1. The origin of this software must not be misrepresented; you must not claim that you
-*     wrote the original software. If you use thiTTF, OTF, FNT, BDF, Sprite fonts)
-*       - Outstanding texture formats support, including compressed formats (DXT, ETC, ASTC)
-*       - Full 3d support for 3d Shapes, Models, Billboards, Heightmaps and more!
-*       - Flexible Materials system, supporting classic maps and PBR maps
-*       - Animated 3D models supported (skeletal bones animation) (IQM, M3D, GLTF)
-*       - Shaders support, including Model shaders and Postprocessing shaders
-*       - Powerful math module for Vector, Matrix and Quaternion operations: [raymath]
-*       - Audio loading and playing with streaming support (WAV, OGG, MP3, FLAC, QOA, XM, MOD)
-*       - VR stereo rendering with configurable HMD device parameters
-*       - Bindings to multiple programming languages available!
-*
-*   NOTES:
-*       - One default Font is loaded on InitWindows software in a product, an acknowledgment
+*     wrote the original software. If you use this software in a product, an acknowledgment
 *     in the product documentation would be appreciated but is not required.
 *
 *     2. Altered source versions must be plainly marked as such, and must not be misrepresented
