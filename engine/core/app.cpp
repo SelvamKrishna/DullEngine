@@ -1,5 +1,4 @@
 #include "engine/core/app.hpp"
-
 #include "engine/config.hpp"
 #include "engine/util/vec2.hpp"
 
@@ -11,26 +10,28 @@
 
 namespace dull::core {
 
-App::App(const AppConfig& ctx) {
+static inline App* s_instance {nullptr};
+
+App::App(const misc::AppConfig& config) {
   assert(s_instance == nullptr);
 
-  const std::string TITLE {
-    #ifdef DULL_MODE_DEBUG
-    std::format("Dull Engine v{} - {}", config::getVerString(), ctx.title)
-    #else
-    ctx.title
-    #endif
-  };
+#ifdef NDEBUG
+  const std::string& TITLE = config.title;
+#else
+  const std::string TITLE = std::format(
+    "Dull Engine v{} - {}", config::getVerString(), config.title
+  );
+#endif
 
   int flags {
-    (ctx.is_vsync ? FLAG_VSYNC_HINT : 0) |
-    (ctx.is_resizeable ? FLAG_WINDOW_RESIZABLE : 0)
+    (config.is_vsync ? FLAG_VSYNC_HINT : 0) |
+    (config.is_resizeable ? FLAG_WINDOW_RESIZABLE : 0)
   };
 
   SetConfigFlags(flags);
-  InitWindow(ctx.window_size.x, ctx.window_size.y, TITLE.c_str());
-  SetTargetFPS(ctx.target_fps);
+  InitWindow(config.window_size.x, config.window_size.y, TITLE.c_str());
   SetExitKey(KEY_NULL);
+  SetTargetFPS(config.target_fps);
 
   _is_running = true;
   s_instance = this;
@@ -38,11 +39,14 @@ App::App(const AppConfig& ctx) {
 
 App::~App() noexcept { if (_is_running) CloseWindow(); }
 
+[[nodiscard]] App& App::instance() noexcept { return *s_instance; }
+
 void App::run() {
   while (!WindowShouldClose()) [[likely]] {
     /// TODO: Should be replaced with RenderSystem
     ClearBackground(BLACK);
     BeginDrawing();
+    DrawFPS(10, 10);
     EndDrawing();
   }
 }

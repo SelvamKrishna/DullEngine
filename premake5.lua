@@ -16,7 +16,7 @@ project "dull_engine"
     files { "engine/**.cpp", "engine/**.hpp" }
 
     filter "configurations:Debug"
-        defines { "DEBUG", "DULL_MODE_DEBUG" }
+        defines { "DEBUG" }
         symbols "On"
         optimize "Off"
         buildoptions { "-Wall", "-Wextra", "-g", "-O0" }
@@ -45,7 +45,7 @@ project "application"
     links { "dull_engine", "raylib", "winmm", "gdi32", "opengl32" }
 
     filter "configurations:Debug"
-        defines { "DEBUG", "DULL_MODE_DEBUG" }
+        defines { "DEBUG" }
         symbols "On"
         optimize "Off"
         buildoptions { "-Wall", "-Wextra", "-g", "-O2" }
