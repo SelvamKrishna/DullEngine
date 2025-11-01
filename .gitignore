@@ -1,10 +1,11 @@
 # Build Artifacts
 build/
+premake5.exe
 
 # IDE Settings
 .vscode/
 compile_flags.txt
 
 # Tests
-
+*.log
 test/
