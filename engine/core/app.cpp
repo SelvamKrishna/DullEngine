@@ -3,6 +3,7 @@
 #include "engine/util/vec2.hpp"
 
 #include <vendor/raylib.h>
+#include <vendor/warp_mini.hpp>
 
 #include <format>
 #include <string>
@@ -15,13 +16,9 @@ static inline App* s_instance {nullptr};
 App::App(const misc::AppConfig& config) {
   assert(s_instance == nullptr);
 
-#ifdef NDEBUG
-  const std::string& TITLE = config.title;
-#else
-  const std::string TITLE = std::format(
-    "Dull Engine v{} - {}", config::getVerString(), config.title
-  );
-#endif
+  const std::string TITLE = (config::IS_DEBUG_BUILD)
+  ? std::format("Dull Engine v{} - {}", config::getVerString(), config.title)
+  : config.title;
 
   int flags {
     (config.is_vsync ? FLAG_VSYNC_HINT : 0) |
@@ -43,11 +40,7 @@ App::~App() noexcept { if (_is_running) CloseWindow(); }
 
 void App::run() {
   while (!WindowShouldClose()) [[likely]] {
-    /// TODO: Should be replaced with RenderSystem
-    ClearBackground(BLACK);
-    BeginDrawing();
-    DrawFPS(10, 10);
-    EndDrawing();
+    WTODO("Rendering and Update logic goes here");
   }
 }
 

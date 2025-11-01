@@ -3,6 +3,8 @@
 #include "engine/core/app.hpp"
 #include "engine/misc/app_config.hpp"
 
+#include <vendor/warp_mini.hpp>
+
 namespace dull::misc {
 
 class AppBuilder {
@@ -13,9 +15,7 @@ public:
   explicit constexpr AppBuilder() = default;
 
   [[nodiscard]] constexpr AppBuilder& loadConfig(std::string file_path) noexcept {
-    /// TODO:
-    (void)file_path;
-    return *this;
+    WTODO("YAML config loading not implemented yet");
   }
 
   [[nodiscard]] constexpr AppBuilder& setTitle(std::string new_title) noexcept {
@@ -23,18 +23,18 @@ public:
     return *this;
   }
 
-  [[nodiscard]] constexpr AppBuilder& setWindowDimension(util::Vec2i new_dimension) noexcept {
-    _app_config.window_size = new_dimension;
+  [[nodiscard]] constexpr AppBuilder& setWindowSize(util::Vec2i new_size) noexcept {
+    _app_config.window_size = new_size;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppBuilder& setWindowWidth(float new_value) noexcept {
-    _app_config.window_size.x = new_value;
+  [[nodiscard]] constexpr AppBuilder& setWindowWidth(float new_width) noexcept {
+    _app_config.window_size.x = new_width;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppBuilder& setWindowHeight(float new_value) noexcept {
-    _app_config.window_size.y = new_value;
+  [[nodiscard]] constexpr AppBuilder& setWindowHeight(float new_height) noexcept {
+    _app_config.window_size.y = new_height;
     return *this;
   }
 
@@ -69,13 +69,12 @@ public:
   }
 
   [[nodiscard]] core::App& build() const noexcept {
-    core::App _ {_app_config};
+    core::App app {_app_config};
     return core::App::instance();
   }
 
   void buildAndRun() const noexcept {
-    core::App app {_app_config};
-    app.run();
+    core::App{_app_config}.run();
   }
 };
 

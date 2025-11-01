@@ -6,6 +6,12 @@
 
 namespace dull::config {
 
+#ifdef NDEBUG
+constexpr bool IS_DEBUG_BUILD = false;
+#else
+constexpr bool IS_DEBUG_BUILD = true;
+#endif
+
 constexpr uint32_t VER_MAJOR = 0;
 constexpr uint32_t VER_MINOR = 1;
 
