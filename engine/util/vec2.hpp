@@ -18,7 +18,7 @@ struct Vec2 {
 	constexpr Vec2() noexcept = default;
 	constexpr Vec2(T x, T y) noexcept : x{x}, y{y} {}
 
-	explicit constexpr Vec2(const Vector2& rl_vec) noexcept
+	explicit constexpr Vec2(const rl::Vector2& rl_vec) noexcept
   : x{static_cast<T>(rl_vec.x)}, y{static_cast<T>(rl_vec.y)} {}
 
 /// --- Constants / Factory methods ---
@@ -98,7 +98,7 @@ struct Vec2 {
 
 /// --- Conversion ---
 
-	[[nodiscard]] constexpr operator Vector2() const noexcept {
+	[[nodiscard]] constexpr operator rl::Vector2() const noexcept {
 		return {static_cast<float>(x), static_cast<float>(y)};
 	}
 

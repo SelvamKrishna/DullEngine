@@ -211,6 +211,10 @@
     #define RL_BOOL_TYPE
 #endif
 
+#ifdef __cplusplus
+namespace rl {
+#endif
+
 // Vector2, 2 components
 typedef struct Vector2 {
     float x;                // Vector x component
@@ -1703,6 +1707,7 @@ RLAPI void DetachAudioMixedProcessor(AudioCallback processor); // Detach audio s
 
 #if defined(__cplusplus)
 }
+} // namespace rl
 #endif
 
 #endif // RAYLIB_H

@@ -41,7 +41,7 @@ project "application"
 
     files { "app/**.cpp", "app/**.hpp" }
 
-    libdirs { "vendor" }
+    libdirs { "vendor", "C:\\raylib\\raylib\\src" }
     links { "dull_engine", "raylib", "winmm", "gdi32", "opengl32" }
 
     filter "configurations:Debug"
