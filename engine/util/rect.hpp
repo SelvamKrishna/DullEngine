@@ -22,7 +22,7 @@ struct Rect {
 	explicit constexpr Rect(const Vec2f& position, const Vec2f& dimension) noexcept
 	: x{position.x}, y{position.y}, w{dimension.x}, h{dimension.y} {}
 
-	[[nodiscard]] constexpr Rect(const Rectangle& rl_rect) noexcept
+	[[nodiscard]] constexpr Rect(const rl::Rectangle& rl_rect) noexcept
 	: x{rl_rect.x}, y{rl_rect.y}, w{rl_rect.width}, h{rl_rect.height} {}
 
 /// --- Accessors ---
@@ -45,16 +45,16 @@ struct Rect {
 /// --- Collision ---
 
   [[nodiscard]] bool containsPoint(const Vec2f& point) const noexcept {
-    return CheckCollisionPointRec(point, *this);
+    return rl::CheckCollisionPointRec(point, *this);
   }
 
   [[nodiscard]] bool intersectsRec(const Rect& other) const noexcept {
-    return CheckCollisionRecs(*this, other);
+    return rl::CheckCollisionRecs(*this, other);
   }
 
 /// --- Conversion ---
 
-	[[nodiscard]] constexpr operator Rectangle() const noexcept { return Rect { x, y, w, h }; }
+	[[nodiscard]] constexpr operator rl::Rectangle() const noexcept { return Rect { x, y, w, h }; }
 
 };
 

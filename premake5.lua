@@ -2,6 +2,7 @@ workspace "dull_engine"
     configurations { "Debug", "Release" }
     architecture "x86_64"
     location "build"
+    toolset "clang"
 
 -- === Dull Engine Static Library ===
 project "dull_engine"

@@ -14,10 +14,6 @@ private:
 public:
   explicit constexpr AppBuilder() = default;
 
-  [[nodiscard]] constexpr AppBuilder& loadConfig(std::string file_path) noexcept {
-    WTODO("YAML config loading not implemented yet");
-  }
-
   [[nodiscard]] constexpr AppBuilder& setTitle(std::string new_title) noexcept {
     _app_config.title = std::move(new_title);
     return *this;
