@@ -16,7 +16,12 @@ namespace dull::core {
 struct Event {
 private:
   std::string _name;
-  std::unordered_map<std::string, std::any, misc::StringHash, misc::StringEq> _data;
+  std::unordered_map<
+    std::string,
+    std::any,
+    misc::StringHash,
+    misc::StringEq
+  > _data;
 
 public:
   void* sender = nullptr;
@@ -49,7 +54,12 @@ using EventCallback = std::function<void(const Event&)>;
 
 class EventBus {
 private:
-  std::unordered_map<std::string, std::vector<EventCallback>, misc::StringHash, misc::StringEq> _listeners;
+  std::unordered_map<
+    std::string,
+    std::vector<EventCallback>,
+    misc::StringHash,
+    misc::StringEq
+  > _listeners;
 
   explicit EventBus() = default;
   ~EventBus() = default;
