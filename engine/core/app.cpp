@@ -33,7 +33,7 @@ App::App(const misc::AppConfig& config) {
   s_instance = this;
 }
 
-App::~App() noexcept { if (_is_running) rl::CloseWindow(); }
+App::~App() noexcept { if (_is_running) [[likely]] rl::CloseWindow(); }
 
 [[nodiscard]] App& App::instance() noexcept { return *s_instance; }
 

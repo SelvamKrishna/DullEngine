@@ -1,16 +1,18 @@
+BUILD_DIR := build
+
 # --- Detect OS ---
 ifeq ($(OS),Windows_NT)
-    SHELL := cmd
-    PREMAKE_EXE := vendor/premake5.exe
-    RM := if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
-    MKDIR = if not exist "$(1)" mkdir "$(1)"
-    EXE := .exe
+SHELL := cmd
+PREMAKE_EXE := premake5.exe
+RM := if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
+MKDIR = if not exist "$(1)" mkdir "$(1)"
+EXE := .exe
 else
-    SHELL := bash
-    PREMAKE_EXE := ./vendor/premake5
-    RM := rm -rf $(BUILD_DIR)
-    MKDIR = mkdir -p $(1)
-    EXE :=
+SHELL := bash
+PREMAKE_EXE := premake5
+RM := rm -rf $(BUILD_DIR)
+MKDIR = mkdir -p $(1)
+EXE :=
 endif
 
 PREMAKE_CC  := gmake
@@ -27,7 +29,7 @@ all: help
 
 clean:
 	@echo Cleaning build directory...
-	@$(RM)
+	$(RM)
 
 # --- Debug target ---
 debug: _premake
