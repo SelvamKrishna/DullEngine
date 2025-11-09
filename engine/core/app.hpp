@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/core/event.hpp"
-#include "engine/misc/app_config.hpp"
+#include "engine/core/event_sys.hpp"
+#include "engine/misc/app_context.hpp"
 
 namespace dull::core {
 
@@ -9,19 +9,19 @@ class App final {
 private:
   bool _is_running {false};
 
-  EventSystem _event_sys {};
+  EventSystem _event_sys;
 
 public:
   App() = delete;
   App(const App&) = delete;
   App& operator=(const App&) = delete;
 
-  explicit App(const misc::AppConfig& config);
+  explicit App(const misc::AppContext& context);
   ~App() noexcept;
 
   [[nodiscard]] static App& instance() noexcept;
 
-  void run();
+  int run();
 
   [[nodiscard]] EventSystem& getEventSystem() noexcept;
 };

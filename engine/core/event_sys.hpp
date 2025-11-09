@@ -1,6 +1,9 @@
 #pragma once
 
+#include "engine/config.hpp"
 #include "engine/misc/string_view_hashing.hpp"
+
+#include <vendor/warp_mini.hpp>
 
 #include <any>
 #include <string>
@@ -13,7 +16,7 @@
 
 namespace dull::core {
 
-struct Event {
+struct Event final {
 private:
   std::string _name;
   std::unordered_map<
@@ -40,19 +43,21 @@ public:
   template <typename T>
   [[nodiscard]] std::optional<T> tryGetData(std::string_view key) const noexcept {
     if (auto it = _data.find(key); it != _data.end()) {
-      if (auto val = std::any_cast<T>(&it->second)) return *val;
+      if (T val = std::any_cast<T>(&it->second)) return *val;
     }
 
     return std::nullopt;
   }
 
   template <typename T>
-  void setData(std::string_view key, T&& value) { _data[std::string{key}] = std::forward<T>(value); }
+  void setData(std::string_view key, T&& value) {
+    _data[std::string{key}] = std::forward<T>(value);
+  }
 };
 
 using EventCallback = std::function<void(const Event&)>;
 
-class EventSystem {
+class EventSystem final {
   friend class App;
 
 private:
@@ -78,13 +83,15 @@ public:
     if (auto it = _listeners.find(std::string(event.getName())); it != _listeners.end()) {
       for (const auto& FN : it->second) FN(event);
     }
+
+    WLOGI_IF(config::SHOULD_LOG_EVENT_SYS) << "Event emit : " << event.getName();
   }
 
   template <typename... Args>
   void emit(std::string_view name, Args&&... args) const {
-    Event e {name};
-    (e.setData(std::forward<Args>(args).first, std::forward<Args>(args).second), ...);
-    emit(e);
+    Event event {name};
+    (event.setData(std::forward<Args>(args).first, std::forward<Args>(args).second), ...);
+    emit(event);
   }
 };
 
