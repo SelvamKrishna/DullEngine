@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/core/event.hpp"
 #include "engine/misc/app_config.hpp"
 
 namespace dull::core {
@@ -7,6 +8,8 @@ namespace dull::core {
 class App final {
 private:
   bool _is_running {false};
+
+  EventBus _event_bus {};
 
 public:
   App() = delete;
@@ -19,6 +22,8 @@ public:
   [[nodiscard]] static App& instance() noexcept;
 
   void run();
+
+  [[nodiscard]] EventBus& getEventBus() noexcept { return _event_bus; }
 };
 
 } // namespace dull::core

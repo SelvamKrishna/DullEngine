@@ -41,6 +41,8 @@ public:
 using EventCallback = std::function<void(const Event&)>;
 
 class EventBus {
+  friend class App;
+
 private:
   std::unordered_map<std::string, std::vector<EventCallback>> _listeners;
 
