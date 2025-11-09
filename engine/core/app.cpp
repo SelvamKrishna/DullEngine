@@ -43,4 +43,6 @@ void App::run() {
   }
 }
 
+[[nodiscard]] EventSystem& App::getEventSystem() noexcept { return _event_sys; }
+
 } // namespace dull::core

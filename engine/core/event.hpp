@@ -52,7 +52,9 @@ public:
 
 using EventCallback = std::function<void(const Event&)>;
 
-class EventBus {
+class EventSystem {
+  friend class App;
+
 private:
   std::unordered_map<
     std::string,
@@ -61,10 +63,8 @@ private:
     misc::StringEq
   > _listeners;
 
-  explicit EventBus() = default;
-  ~EventBus() = default;
-
-  friend class App;
+  explicit EventSystem() = default;
+  ~EventSystem() = default;
 
 public:
   void subscribe(std::string_view event_name, EventCallback callback) {
