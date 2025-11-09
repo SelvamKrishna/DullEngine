@@ -2,10 +2,11 @@ workspace "dull_engine"
     configurations { "Debug", "Release" }
     architecture "x86_64"
     location "build"
+    toolset "clang"
 
---- Dull Engine Shared Library ---
+-- === Dull Engine Static Library ===
 project "dull_engine"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++23"
     targetdir "%{wks.location}/%{cfg.buildcfg}"
@@ -16,7 +17,7 @@ project "dull_engine"
     files { "engine/**.cpp", "engine/**.hpp" }
 
     filter "configurations:Debug"
-        defines { "DEBUG", "DULL_MODE_DEBUG" }
+        defines { "DEBUG" }
         symbols "On"
         optimize "Off"
         buildoptions { "-Wall", "-Wextra", "-g", "-O0" }
@@ -28,11 +29,8 @@ project "dull_engine"
 
     filter "system:windows"
         systemversion "latest"
-        -- Optional: set dll output name explicitly
-        -- targetname "dull_engine"
-        -- defines { "DULL_ENGINE_DLL" }
 
---- Application Executable ---
+-- === Application Executable ===
 project "application"
     kind "ConsoleApp"
     language "C++"
@@ -44,11 +42,11 @@ project "application"
 
     files { "app/**.cpp", "app/**.hpp" }
 
-    libdirs { "%{wks.location}/%{cfg.buildcfg}" , "vendor" } -- include engine shared lib output dir
+    libdirs { "vendor", "C:\\raylib\\raylib\\src" }
     links { "dull_engine", "raylib", "winmm", "gdi32", "opengl32" }
 
     filter "configurations:Debug"
-        defines { "DEBUG", "DULL_MODE_DEBUG" }
+        defines { "DEBUG" }
         symbols "On"
         optimize "Off"
         buildoptions { "-Wall", "-Wextra", "-g", "-O2" }
