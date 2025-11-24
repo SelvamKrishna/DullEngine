@@ -48,20 +48,8 @@ App::~App() noexcept {
 [[nodiscard]] App& App::instance() noexcept { return *s_instance; }
 
 int App::run() noexcept {
-  dull::core::Event e {"Hello, Event"};
-  auto listerner_id = e.bind([](const dull::core::Event& event){
-    ZLOG_V(event.getName());
-  });
-
   try {
     while (!rl::WindowShouldClose()) [[likely]] {
-      if (rl::IsKeyPressed(rl::KEY_A)) {
-        e.emit();
-      }
-      if (rl::IsKeyPressed(rl::KEY_W)) {
-        e.unbind(listerner_id);
-      }
-
       rl::BeginDrawing();
       rl::ClearBackground(rl::BLACK);
       rl::DrawFPS(10, 10);
