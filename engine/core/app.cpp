@@ -3,7 +3,7 @@
 #include "engine/util/vec2.hpp"
 
 #include <vendor/raylib.h>
-#include <vendor/warp_mini.hpp>
+#include <vendor/zutils/zutils.hpp>
 
 #include <format>
 #include <string>
@@ -13,7 +13,7 @@ namespace dull::core {
 static inline App* s_instance {nullptr};
 
 App::App(const misc::AppContext& context) {
-  WASSERT_EQ(s_instance, nullptr);
+  ZASSERT_EQ(s_instance, nullptr);
 
   const std::string TITLE = (config::IS_DEBUG_BUILD)
   ? std::format("Dull Engine v{} - {}", config::getVerString(), context.title)
@@ -32,17 +32,17 @@ App::App(const misc::AppContext& context) {
   _is_running = true;
   s_instance = this;
 
-  WLOGI_IF(config::SHOULD_LOG_APP) << "App initialized: " << TITLE;
+  ZLOGI_IF(config::SHOULD_LOG_APP) << "App initialized: " << TITLE;
 }
 
 App::~App() noexcept {
   if (_is_running) [[likely]] rl::CloseWindow();
-  WLOGI_IF(config::SHOULD_LOG_APP) << "App shutdown";
+  ZLOGI_IF(config::SHOULD_LOG_APP) << "App shutdown";
 }
 
 [[nodiscard]] App& App::instance() noexcept { return *s_instance; }
 
-int App::run() {
+int App::run() noexcept {
   try {
     while (!rl::WindowShouldClose()) [[likely]] {
       rl::BeginDrawing();
@@ -52,13 +52,13 @@ int App::run() {
     }
 
   } catch (const std::exception& ERR) {
-    WLOGE << "Unhandled exception in App::run(): " << ERR.what();
+    ZLOGE << "Unhandled exception in App::run(): " << ERR.what();
     return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;
 }
 
-[[nodiscard]] EventSystem& App::getEventSystem() noexcept { return _event_sys; }
+[[nodiscard]] EventBus& App::getEventBus() noexcept { return _event_bus; }
 
 } // namespace dull::core

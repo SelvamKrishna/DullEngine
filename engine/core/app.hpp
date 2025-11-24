@@ -9,7 +9,7 @@ class App final {
 private:
   bool _is_running {false};
 
-  EventSystem _event_sys;
+  EventBus _event_bus;
 
 public:
   App() = delete;
@@ -21,9 +21,9 @@ public:
 
   [[nodiscard]] static App& instance() noexcept;
 
-  int run();
+  int run() noexcept;
 
-  [[nodiscard]] EventSystem& getEventSystem() noexcept;
+  [[nodiscard]] EventBus& getEventBus() noexcept;
 };
 
 } // namespace dull::core

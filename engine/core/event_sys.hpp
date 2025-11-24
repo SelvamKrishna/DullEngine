@@ -1,9 +1,8 @@
 #pragma once
 
-#include "engine/config.hpp"
 #include "engine/misc/string_view_hashing.hpp"
 
-#include <vendor/warp_mini.hpp>
+#include <vendor/zutils/zutils.hpp>
 
 #include <any>
 #include <string>
@@ -27,8 +26,6 @@ private:
   > _data;
 
 public:
-  void* sender = nullptr;
-
   Event() = delete;
   explicit Event(std::string_view name) noexcept : _name{name} {}
 
@@ -37,60 +34,53 @@ public:
   template <typename T>
   [[nodiscard]] T getData(std::string_view key) const {
     auto it = _data.find(key);
+    ZASSERT(it != _data.end());
     return std::any_cast<T>(it->second);
   }
 
   template <typename T>
   [[nodiscard]] std::optional<T> tryGetData(std::string_view key) const noexcept {
     if (auto it = _data.find(key); it != _data.end()) {
-      if (T val = std::any_cast<T>(&it->second)) return *val;
+      if (const T* VALUE = std::any_cast<T>(&it->second)) return *VALUE;
     }
 
     return std::nullopt;
   }
 
   template <typename T>
-  void setData(std::string_view key, T&& value) {
-    _data[std::string{key}] = std::forward<T>(value);
-  }
+  void setData(std::string_view key, T&& value) { _data.emplace(key, std::forward<T>(value)); }
 };
 
-using EventCallback = std::function<void(const Event&)>;
-
-class EventSystem final {
+class EventBus final {
   friend class App;
+  using EventCallback = std::function<void(const Event&)>;
 
 private:
+  struct Listener final {
+    uint64_t id;
+    EventCallback callback;
+  };
+
   std::unordered_map<
     std::string,
-    std::vector<EventCallback>,
+    std::vector<Listener>,
     misc::StringHash,
     misc::StringEq
   > _listeners;
 
-  explicit EventSystem() = default;
-  ~EventSystem() = default;
+  explicit EventBus() = default;
+  ~EventBus() = default;
 
 public:
-  void subscribe(std::string_view event_name, EventCallback callback) {
-    if (auto it = _listeners.find(event_name); it != _listeners.end())
-      it->second.push_back(std::move(callback));
-    else
-      _listeners.emplace(std::string(event_name), std::vector<EventCallback>{std::move(callback)});
-  }
+  uint64_t bind(std::string_view event_name, EventCallback callback);
+  void unbind(std::string_view event_name, uint64_t callback_id);
 
-  void emit(const Event& event) const noexcept {
-    if (auto it = _listeners.find(std::string(event.getName())); it != _listeners.end()) {
-      for (const auto& FN : it->second) FN(event);
-    }
+  void emit(const Event& event) const noexcept;
 
-    WLOGI_IF(config::SHOULD_LOG_EVENT_SYS) << "Event emit : " << event.getName();
-  }
-
-  template <typename... Args>
-  void emit(std::string_view name, Args&&... args) const {
+  template <typename... KVPairs>
+  void emit(std::string_view name, KVPairs&&... pairs) const {
     Event event {name};
-    (event.setData(std::forward<Args>(args).first, std::forward<Args>(args).second), ...);
+    (event.setData(pairs.first, pairs.second), ...);
     emit(event);
   }
 };
