@@ -1,8 +1,12 @@
-#include "engine/misc/app_builder.hpp"
+#include "engine/core/app.hpp"
 
 int main(void) {
-	dull::misc::AppBuilder{}
-    .setTitle("Example")
-    .setWindowSize({500, 500})
-    .buildAndRun();
+  dull::core::App app {
+    dull::misc::AppContextBuilder{}
+      .setTitle("Hello World")
+      .setWindowSize({500, 500})
+      .build()
+  };
+
+  return app.run();
 }

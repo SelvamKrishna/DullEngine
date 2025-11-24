@@ -19,4 +19,7 @@ constexpr uint32_t VER_MINOR = 1;
   return std::format("{}.{}", VER_MAJOR, VER_MINOR);
 }
 
+constexpr bool SHOULD_LOG_APP       = true;
+constexpr bool SHOULD_LOG_EVENT_SYS = true;
+
 } // namespace dull::config
