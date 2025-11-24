@@ -32,19 +32,36 @@ App::App(const misc::AppContext& context) {
   _is_running = true;
   s_instance = this;
 
-  ZLOGI_IF(config::SHOULD_LOG_APP) << "App initialized: " << TITLE;
+  if constexpr (config::SHOULD_LOG_APP) {
+    ZLOGI_IF(context.is_vsync)      << "App Init: V-Sync On";
+    ZLOGI_IF(context.is_resizeable) << "App Init: Window made resizeable";
+
+    ZLOGI << "App Initialized: " << TITLE << "\n";
+  }
 }
 
 App::~App() noexcept {
   if (_is_running) [[likely]] rl::CloseWindow();
-  ZLOGI_IF(config::SHOULD_LOG_APP) << "App shutdown";
+  ZLOGI_IF(config::SHOULD_LOG_APP) << "App Shutdown";
 }
 
 [[nodiscard]] App& App::instance() noexcept { return *s_instance; }
 
 int App::run() noexcept {
+  dull::core::Event e {"Hello, Event"};
+  auto listerner_id = e.bind([](const dull::core::Event& event){
+    ZLOG_V(event.getName());
+  });
+
   try {
     while (!rl::WindowShouldClose()) [[likely]] {
+      if (rl::IsKeyPressed(rl::KEY_A)) {
+        e.emit();
+      }
+      if (rl::IsKeyPressed(rl::KEY_W)) {
+        e.unbind(listerner_id);
+      }
+
       rl::BeginDrawing();
       rl::ClearBackground(rl::BLACK);
       rl::DrawFPS(10, 10);
@@ -52,7 +69,7 @@ int App::run() noexcept {
     }
 
   } catch (const std::exception& ERR) {
-    ZLOGE << "Unhandled exception in App::run(): " << ERR.what();
+    ZLOGE << "App Run (UNHANDLED): " << ERR.what();
     return EXIT_FAILURE;
   }
 

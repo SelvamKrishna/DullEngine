@@ -7,6 +7,7 @@
 #include <any>
 #include <string>
 #include <string_view>
+#include <shared_mutex>
 #include <optional>
 #include <functional>
 #include <unordered_map>
@@ -15,7 +16,9 @@
 
 namespace dull::core {
 
-struct Event final {
+using EventCallback = std::function<void(const class Event&)>;
+
+class Event final {
 private:
   std::string _name;
   std::unordered_map<
@@ -35,7 +38,13 @@ public:
   [[nodiscard]] T getData(std::string_view key) const {
     auto it = _data.find(key);
     ZASSERT(it != _data.end());
-    return std::any_cast<T>(it->second);
+
+    try {
+      return std::any_cast<T>(it->second);
+    } catch (const std::bad_any_cast&) {
+      ZLOGE << "Event Data (BAD_CAST): Get data '" << key << "'";
+      return T{};
+    }
   }
 
   template <typename T>
@@ -49,13 +58,19 @@ public:
 
   template <typename T>
   void setData(std::string_view key, T&& value) { _data.emplace(key, std::forward<T>(value)); }
+
+  uint64_t bind(EventCallback callback);
+  void unbind(uint64_t callback_id);
+
+  void emit() const noexcept;
 };
 
 class EventBus final {
   friend class App;
-  using EventCallback = std::function<void(const Event&)>;
 
 private:
+  mutable std::shared_mutex _mutex;
+
   struct Listener final {
     uint64_t id;
     EventCallback callback;
