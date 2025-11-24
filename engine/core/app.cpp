@@ -10,7 +10,7 @@
 
 namespace dull::core {
 
-static inline App* s_instance {nullptr};
+static inline App* s_instance = nullptr;
 
 App::App(const misc::AppContext& context) {
   ZASSERT_EQ(s_instance, nullptr);
@@ -41,8 +41,8 @@ App::App(const misc::AppContext& context) {
 }
 
 App::~App() noexcept {
-  if (_is_running) [[likely]] rl::CloseWindow();
   ZLOGI_IF(config::SHOULD_LOG_APP) << "App Shutdown";
+  if (_is_running) [[likely]] rl::CloseWindow();
 }
 
 [[nodiscard]] App& App::instance() noexcept { return *s_instance; }
@@ -63,7 +63,5 @@ int App::run() noexcept {
 
   return EXIT_SUCCESS;
 }
-
-[[nodiscard]] EventBus& App::getEventBus() noexcept { return _event_bus; }
 
 } // namespace dull::core

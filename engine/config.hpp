@@ -21,5 +21,6 @@ constexpr uint32_t VER_MINOR = 1;
 
 constexpr bool SHOULD_LOG_APP       = true;
 constexpr bool SHOULD_LOG_EVENT_SYS = true;
+constexpr bool SHOULD_LOG_SCENE_SYS = true;
 
 } // namespace dull::config

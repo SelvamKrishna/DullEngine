@@ -16,20 +16,23 @@
 
 namespace dull::core {
 
-using EventCallback = std::function<void(const class Event&)>;
-
 class Event final {
 private:
-  std::string _name;
-  std::unordered_map<
-    std::string,
-    std::any,
-    misc::StringHash,
-    misc::StringEq
-  > _data;
+  using DataMap = std::unordered_map<std::string, std::any, misc::StringHash, misc::StringEq>;
+
+  std::string    _name;
+  Event::DataMap _data;
 
 public:
+  using Callback = std::function<void(const class Event&)>;
+
   Event() = delete;
+
+  Event(Event&&)                 = default;
+  Event(const Event&)            = default;
+  Event& operator=(Event&&)      = default;
+  Event& operator=(const Event&) = default;
+
   explicit Event(std::string_view name) noexcept : _name{name} {}
 
   [[nodiscard]] std::string_view getName() const noexcept { return _name; }
@@ -59,7 +62,7 @@ public:
   template <typename T>
   void setData(std::string_view key, T&& value) { _data.emplace(key, std::forward<T>(value)); }
 
-  uint64_t bind(EventCallback callback);
+  uint64_t bind(Event::Callback callback);
   void unbind(uint64_t callback_id);
 
   void emit() const noexcept;
@@ -73,7 +76,7 @@ private:
 
   struct Listener final {
     uint64_t id;
-    EventCallback callback;
+    Event::Callback callback;
   };
 
   std::unordered_map<
@@ -87,7 +90,7 @@ private:
   ~EventBus() = default;
 
 public:
-  uint64_t bind(std::string_view event_name, EventCallback callback);
+  uint64_t bind(std::string_view event_name, Event::Callback callback);
   void unbind(std::string_view event_name, uint64_t callback_id);
 
   void emit(const Event& event) const noexcept;

@@ -1,50 +1,33 @@
 #pragma once
 
 #include "engine/core/node.hpp"
+
 #include <vendor/zutils/zutils.hpp>
 
 #include <string>
 #include <vector>
 #include <memory>
 #include <algorithm>
-#include <type_traits>
 
 namespace dull::core {
-/// TODO: Need to move function bodies to .cpp
 
 class Layer final {
 private:
+  using NodeIt = std::vector<std::unique_ptr<Node>>::iterator;
+  using NodeConstIt = std::vector<std::unique_ptr<Node>>::const_iterator;
+
   std::string _name;
   std::vector<std::unique_ptr<Node>> _nodes;
 
-  [[nodiscard]] auto _findIterator(std::string_view name) noexcept {
-    return std::find_if(
-      _nodes.begin(), _nodes.end(),
-      [&name](const auto& node) { return node->getName() == name; }
-    );
-  }
+  [[nodiscard]] Layer::NodeIt      _findIterator(std::string_view name) noexcept;
+  [[nodiscard]] Layer::NodeConstIt _findIterator(std::string_view name) const noexcept;
 
-  [[nodiscard]] auto _findIterator(std::string_view name) const noexcept {
-    return std::find_if(
-      _nodes.begin(), _nodes.end(),
-      [&name](const auto& node) { return node->getName() == name; }
-    );
-  }
+  #define NODE_TEMP(T) \
+    template <std::derived_from<Node> T>
 
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] auto _findIterator() noexcept {
+  NODE_TEMP(NodeT) [[nodiscard]] auto _findIterator(this auto& self) noexcept {
     return std::find_if(
-      _nodes.begin(), _nodes.end(),
-      [](const auto& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; }
-    );
-  }
-
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] auto _findIterator() const noexcept {
-    return std::find_if(
-      _nodes.begin(), _nodes.end(),
+      self._nodes.begin(), self._nodes.end(),
       [](const auto& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; }
     );
   }
@@ -53,119 +36,61 @@ public:
   static constexpr size_t DEFAULT_CAPACITY = 16;
 
   Layer() = delete;
-  explicit Layer(std::string_view name, size_t initial_capacity = DEFAULT_CAPACITY)
-  : _name{name} {
-    _nodes.reserve(initial_capacity);
-  }
 
-  Layer(const Layer&)            = delete;
   Layer(Layer&&)                 = delete;
-  Layer& operator=(const Layer&) = delete;
+  Layer(const Layer&)            = delete;
   Layer& operator=(Layer&&)      = delete;
+  Layer& operator=(const Layer&) = delete;
 
-  [[nodiscard]] std::string_view getName() const noexcept { return _name; }
-  void setName(std::string_view name) noexcept { _name = name; }
-
-  [[nodiscard]] constexpr size_t size() const noexcept { return _nodes.size(); }
-  [[nodiscard]] constexpr bool empty() const noexcept { return _nodes.empty(); }
-
-  void shrinkToFit() noexcept { _nodes.shrink_to_fit(); }
-
-  template <typename NodeType = Node, typename... Args>
-    requires std::is_base_of_v<Node, NodeType>
-  NodeType* createNode(std::string_view name, Args &&...args) {
-    auto node = std::make_unique<NodeType>(name, std::forward<Args>(args)...);
-    auto *raw_ptr = node.get();
-    _nodes.emplace_back(std::move(node));
-    return raw_ptr;
+  explicit Layer(std::string_view name, size_t initial_capacity = DEFAULT_CAPACITY) noexcept : _name{name}{
+    _nodes.reserve(initial_capacity);
+    /// TODO: push layer into layer buffer
   }
 
-  void addNode(std::unique_ptr<Node> node) noexcept { _nodes.emplace_back(std::move(node)); }
+  [[nodiscard]] std::string_view getName()      const noexcept { return _name; }
+  [[nodiscard]] constexpr size_t getNodeCount() const noexcept { return _nodes.size(); }
 
-  [[nodiscard]] Node* findNode(std::string_view name) noexcept {
-    auto it = _findIterator(name);
-    return it != _nodes.end() ? it->get() : nullptr;
-  }
+  constexpr void shrinkToFit() noexcept { _nodes.shrink_to_fit(); }
 
-  [[nodiscard]] const Node* findNode(std::string_view name) const noexcept {
-    auto it = _findIterator(name);
-    return it != _nodes.end() ? it->get() : nullptr;
-  }
+  void addNode(std::unique_ptr<Node> node) noexcept;
+  void removeNode(std::string_view name) noexcept;
+  void removeAllNodes() noexcept { _nodes.clear(); }
 
-  [[nodiscard]] Node* tryGetNode(std::string_view name) const noexcept {
-    return const_cast<Node*>(std::as_const(*this).findNode(name));
-  }
+  [[nodiscard]] Node* findNode(this auto& self, std::string_view name) noexcept;
+  [[nodiscard]] bool  hasNode(std::string_view name) const noexcept { return findNode(name) != nullptr; }
+  [[nodiscard]] Node& getNode(std::string_view name) const;
+  [[nodiscard]] Node* tryGetNode(std::string_view name) const noexcept;
+  [[nodiscard]] Node* getNodeByIndex(this auto& self, size_t index) noexcept;
+  [[nodiscard]] std::unique_ptr<Node> extractNode(std::string_view name) noexcept;
 
-  [[nodiscard]] Node& getNode(std::string_view name) const {
-    auto it = _findIterator(name);
-    ZASSERT_NE(it, _nodes.end());
-    return **it;
-  }
-
-  [[nodiscard]] bool hasNode(std::string_view name) const noexcept { return findNode(name) != nullptr; }
-
-  template <typename NodeT>
+  template <typename NodeT, typename... Args>
     requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] NodeT* findNode() noexcept {
-    auto it = _findIterator<NodeT>();
-    return it != _nodes.end() ? static_cast<NodeT*>(it->get()) : nullptr;
+  void createNode(std::string_view name, Args &&...args) noexcept {
+    _nodes.emplace_back(std::make_unique<NodeT>(name, std::forward<Args>(args)...));
   }
 
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] const NodeT* findNode() const noexcept {
-    auto it = _findIterator<NodeT>();
-    return it != _nodes.end() ? static_cast<const NodeT*>(it->get()) : nullptr;
+  NODE_TEMP(NodeT) void removeNode() noexcept {
+    std::erase_if(_nodes, [](const auto& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; });
   }
 
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] NodeT& getNode() const {
+  NODE_TEMP(NodeT) [[nodiscard]] NodeT* findNode(this auto& self) noexcept {
+    auto it = self.template _findIterator<NodeT>();
+    return it != self._nodes.end() ? static_cast<NodeT*>(it->get()) : nullptr;
+  }
+
+  NODE_TEMP(NodeT) [[nodiscard]] bool hasNode() const noexcept { return findNode<NodeT>() != nullptr; }
+
+  NODE_TEMP(NodeT) [[nodiscard]] NodeT& getNode() const {
     auto* node = findNode<NodeT>();
     ZASSERT_NE(node, nullptr);
     return *node;
   }
 
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] bool hasNode() const noexcept { return findNode<NodeT>() != nullptr; }
-
-  [[nodiscard]] Node* getNodeByIndex(size_t index) noexcept {
-    return index < _nodes.size() ? _nodes[index].get() : nullptr;
+  NODE_TEMP(NodeT) [[nodiscard]] Node* tryGetNode() const noexcept {
+    return const_cast<Node*>(std::as_const(*this).findNode<NodeT>());
   }
 
-  [[nodiscard]] const Node* getNodeByIndex(size_t index) const noexcept {
-    return index < _nodes.size() ? _nodes[index].get() : nullptr;
-  }
-
-  void removeNode(std::string_view name) noexcept {
-    std::erase_if(_nodes, [&name](const auto& node) { return node->getName() == name; });
-  }
-
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  void removeNode() noexcept {
-    std::erase_if(_nodes, [](const auto& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; });
-  }
-
-  void removeAllNodes() noexcept { _nodes.clear(); }
-
-  [[nodiscard]] std::unique_ptr<Node>
-  extractNode(std::string_view name) noexcept {
-    auto it = _findIterator(name);
-    std::unique_ptr<Node> node {};
-
-    if (it != _nodes.end()) {
-      node = std::move(*it);
-      _nodes.erase(it);
-    }
-
-    return node;
-  }
-
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] std::unique_ptr<NodeT> extractNode() noexcept {
+  NODE_TEMP(NodeT) [[nodiscard]] std::unique_ptr<NodeT> extractNode() noexcept {
     auto it = _findIterator<NodeT>();
     std::unique_ptr<Node> node {};
 
@@ -181,16 +106,7 @@ public:
     for (const auto& NODE : _nodes) std::invoke(func, *NODE);
   }
 
-  template <typename NodeT, typename Func>
-    requires std::is_base_of_v<Node, NodeT>
-  void forEachOfType(Func&& func) const {
-    for (const auto& NODE : _nodes)
-      if (auto* casted = dynamic_cast<NodeT*>(NODE.get())) std::invoke(func, *casted);
-  }
-
-  template <typename NodeT>
-    requires std::is_base_of_v<Node, NodeT>
-  [[nodiscard]] std::vector<NodeT*> getAllNodesOfType() const {
+  NODE_TEMP(NodeT) [[nodiscard]] std::vector<NodeT*> getAllNodesOfType() const {
     std::vector<NodeT*> result;
 
     for (const auto& NODE : _nodes)
@@ -199,6 +115,8 @@ public:
     result.shrink_to_fit();
     return result;
   }
+
+  #undef NODE_TEMP
 };
 
 } // namespace dull::core
