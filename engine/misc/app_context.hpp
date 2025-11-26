@@ -7,11 +7,11 @@
 namespace dull::misc {
 
 struct AppContext final {
-  std::string title;
-  util::Vec2i window_size {1280, 720};
-  int target_fps {0}; // 0 disables frame limiting
-  bool is_vsync {false}; // limits frame to monitor cap
-  bool is_resizeable {false};
+  std::string title         = "Application";
+  util::Vec2i window_size   = {800, 800};
+  int         target_fps    = 0;
+  bool        is_vsync      = false;
+  bool        is_resizeable = false;
 };
 
 class AppContextBuilder final {
@@ -21,52 +21,55 @@ private:
 public:
   explicit constexpr AppContextBuilder() = default;
 
-  [[nodiscard]] constexpr AppContextBuilder& setTitle(std::string new_title) noexcept {
+  #define BUILDER_FN(FN_INIT) \
+    [[nodiscard]] constexpr AppContextBuilder& FN_INIT noexcept
+
+  BUILDER_FN(setTitle(std::string new_title)) {
     _app_ctx.title = std::move(new_title);
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& setWindowSize(util::Vec2i new_size) noexcept {
+  BUILDER_FN(setWindowSize(util::Vec2i new_size)) {
     _app_ctx.window_size = new_size;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& setWindowWidth(float new_width) noexcept {
+  BUILDER_FN(setWindowWidth(float new_width)) {
     _app_ctx.window_size.x = new_width;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& setWindowHeight(float new_height) noexcept {
+  BUILDER_FN(setWindowHeight(float new_height)) {
     _app_ctx.window_size.y = new_height;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& setTargetFPS(int new_fps) noexcept {
+  BUILDER_FN(setTargetFPS(int new_fps)) {
     _app_ctx.target_fps = new_fps;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& maxTargetFPS() noexcept {
+  BUILDER_FN(maxTargetFPS()) {
     _app_ctx.target_fps = 0;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& enableVsync() noexcept {
+  BUILDER_FN(enableVsync()) {
     _app_ctx.is_vsync = true;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& enableWindowResizing() noexcept {
+  BUILDER_FN(enableWindowResizing()) {
     _app_ctx.is_resizeable = true;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& disableVsync() noexcept {
+  BUILDER_FN(disableVsync()) {
     _app_ctx.is_vsync = false;
     return *this;
   }
 
-  [[nodiscard]] constexpr AppContextBuilder& disableWindowResizing() noexcept {
+  BUILDER_FN(disableWindowResizing()) {
     _app_ctx.is_resizeable = false;
     return *this;
   }
@@ -74,6 +77,9 @@ public:
   [[nodiscard]] constexpr AppContext build() const noexcept {
     return _app_ctx;
   }
+
+  #undef BUILDER_FN
+
 };
 
 } // namespace dull::misc

@@ -7,9 +7,9 @@ namespace dull::core {
 
 class App final {
 private:
-  bool _is_running = false;
-
   EventBus _event_bus;
+
+  bool _is_running = false;
 
 public:
   App() = delete;
@@ -23,9 +23,14 @@ public:
   ~App() noexcept;
 
   [[nodiscard]] static App& instance() noexcept;
-  [[nodiscard]] EventBus&   getEventBus() noexcept { return _event_bus; }
 
-  int run() noexcept;
+  [[nodiscard]] constexpr bool isRunning() const noexcept { return _is_running; }
+  [[nodiscard]] EventBus&      getEventBus() noexcept { return _event_bus; }
+
+  int  run() noexcept;
+  void quit() noexcept { _is_running = false; }
+
+  void debug() const noexcept;
 
 };
 

@@ -1,3 +1,4 @@
+#include "engine/config.hpp"
 #include "engine/core/layer.hpp"
 
 namespace dull::core {
@@ -16,10 +17,25 @@ namespace dull::core {
   );
 }
 
-void Layer::addNode(std::unique_ptr<Node> node) noexcept { _nodes.emplace_back(std::move(node)); }
+void Layer::addNode(std::unique_ptr<Node> node) noexcept {
+  _nodes.emplace_back(std::move(node));
+
+  ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS)
+    << "Add Node : Node (" << _nodes[_nodes.size() - 1]->getName() << ") -> Layer (" << _name << ")";
+}
 
 void Layer::removeNode(std::string_view name) noexcept {
   std::erase_if(_nodes, [&name](const auto& node) { return node->getName() == name; });
+
+  ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS)
+    << "Remove Node : Node (" << name << ") -> Layer (" << _name << ")";
+}
+
+void Layer::removeAllNodes() noexcept {
+  _nodes.clear();
+
+  ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS)
+    << "Remove All Nodes : Layer (" << _name << ")";
 }
 
 [[nodiscard]] Node* Layer::findNode(this auto& self, std::string_view name) noexcept {
@@ -34,7 +50,7 @@ void Layer::removeNode(std::string_view name) noexcept {
 }
 
 [[nodiscard]] Node* Layer::tryGetNode(std::string_view name) const noexcept {
-  return const_cast<Node*>(std::as_const(*this).findNode(name));
+  return const_cast<Node*>(this->findNode(name));
 }
 
 [[nodiscard]] Node* Layer::getNodeByIndex(this auto& self, size_t index) noexcept {
@@ -46,9 +62,14 @@ void Layer::removeNode(std::string_view name) noexcept {
   std::unique_ptr<Node> node {};
 
   if (it != _nodes.end()) {
+    ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS) << "Extract Nodes :";
+
     node = std::move(*it);
     _nodes.erase(it);
-  }
+  } else ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS) << "Extract Nodes (NOT FOUND):";
+
+  ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS)
+    << "Node (" << name << ") -> Layer (" << _name << ")";
 
   return node;
 }

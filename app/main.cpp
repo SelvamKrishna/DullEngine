@@ -8,5 +8,6 @@ int main(void) {
       .build()
   };
 
-  return app.run();
+  // return app.run();
+  app.debug();
 }

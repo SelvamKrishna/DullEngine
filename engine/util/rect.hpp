@@ -54,7 +54,7 @@ struct Rect {
 
 /// --- Conversion ---
 
-  [[nodiscard]] constexpr operator rl::Rectangle() const noexcept { return Rect { x, y, w, h }; }
+  [[nodiscard]] constexpr operator rl::Rectangle() const noexcept { return { x, y, w, h }; }
 
 };
 

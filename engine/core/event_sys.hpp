@@ -34,38 +34,38 @@ public:
   Event& operator=(const Event&) = default;
 
   explicit Event(std::string_view name) noexcept : _name{name} {}
+  ~Event() = default;
 
   [[nodiscard]] std::string_view getName() const noexcept { return _name; }
 
-  template <typename T>
-  [[nodiscard]] T getData(std::string_view key) const {
+  template <typename DataT>
+  [[nodiscard]] DataT& getData(std::string_view key) const {
     auto it = _data.find(key);
-    ZASSERT(it != _data.end());
+    ZASSERT_NE(it, _data.end());
 
-    try {
-      return std::any_cast<T>(it->second);
-    } catch (const std::bad_any_cast&) {
-      ZLOGE << "Event Data (BAD_CAST): Get data '" << key << "'";
-      return T{};
-    }
+    const DataT* VALUE = std::any_cast<DataT>(&it->second);
+    ZASSERT_NE(VALUE, nullptr);
+
+    return *VALUE;
   }
 
-  template <typename T>
-  [[nodiscard]] std::optional<T> tryGetData(std::string_view key) const noexcept {
+  template <typename DataT>
+  [[nodiscard]] std::optional<DataT> tryGetData(std::string_view key) const noexcept {
     if (auto it = _data.find(key); it != _data.end()) {
-      if (const T* VALUE = std::any_cast<T>(&it->second)) return *VALUE;
+      if (const DataT* VALUE = std::any_cast<DataT>(&it->second)) return *VALUE;
     }
 
+    ZLOGE << "Event Data (BAD_CAST): Try get data '" << key << "'";
     return std::nullopt;
   }
 
-  template <typename T>
-  void setData(std::string_view key, T&& value) { _data.emplace(key, std::forward<T>(value)); }
+  template <typename DataT>
+  void setData(std::string_view key, DataT&& value) { _data.emplace(key, std::forward<DataT>(value)); }
 
   uint64_t bind(Event::Callback callback);
-  void unbind(uint64_t callback_id);
+  void     unbind(uint64_t callback_id);
+  void     emit() const noexcept;
 
-  void emit() const noexcept;
 };
 
 class EventBus final {
@@ -79,28 +79,30 @@ private:
     Event::Callback callback;
   };
 
-  std::unordered_map<
+  using ListenerMap = std::unordered_map<
     std::string,
     std::vector<Listener>,
     misc::StringHash,
     misc::StringEq
-  > _listeners;
+  >;
+
+  EventBus::ListenerMap _listeners;
 
   explicit EventBus() = default;
   ~EventBus() = default;
 
 public:
   uint64_t bind(std::string_view event_name, Event::Callback callback);
-  void unbind(std::string_view event_name, uint64_t callback_id);
-
-  void emit(const Event& event) const noexcept;
+  void     unbind(std::string_view event_name, uint64_t callback_id);
+  void     emit(const Event& event) const noexcept;
 
   template <typename... KVPairs>
   void emit(std::string_view name, KVPairs&&... pairs) const {
-    Event event {name};
+    Event event = Event{name};
     (event.setData(pairs.first, pairs.second), ...);
     emit(event);
   }
+
 };
 
 } // namespace dull::core

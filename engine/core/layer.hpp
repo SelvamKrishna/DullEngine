@@ -16,7 +16,7 @@ private:
   using NodeIt = std::vector<std::unique_ptr<Node>>::iterator;
   using NodeConstIt = std::vector<std::unique_ptr<Node>>::const_iterator;
 
-  std::string _name;
+  std::string                        _name;
   std::vector<std::unique_ptr<Node>> _nodes;
 
   [[nodiscard]] Layer::NodeIt      _findIterator(std::string_view name) noexcept;
@@ -28,7 +28,7 @@ private:
   NODE_TEMP(NodeT) [[nodiscard]] auto _findIterator(this auto& self) noexcept {
     return std::find_if(
       self._nodes.begin(), self._nodes.end(),
-      [](const auto& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; }
+      [](const std::unique_ptr<Node>& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; }
     );
   }
 
@@ -42,10 +42,13 @@ public:
   Layer& operator=(Layer&&)      = delete;
   Layer& operator=(const Layer&) = delete;
 
-  explicit Layer(std::string_view name, size_t initial_capacity = DEFAULT_CAPACITY) noexcept : _name{name}{
+  explicit Layer(std::string_view name, size_t initial_capacity = DEFAULT_CAPACITY) noexcept
+  : _name{name} {
     _nodes.reserve(initial_capacity);
     /// TODO: push layer into layer buffer
   }
+
+  ~Layer() = default;
 
   [[nodiscard]] std::string_view getName()      const noexcept { return _name; }
   [[nodiscard]] constexpr size_t getNodeCount() const noexcept { return _nodes.size(); }
@@ -54,7 +57,7 @@ public:
 
   void addNode(std::unique_ptr<Node> node) noexcept;
   void removeNode(std::string_view name) noexcept;
-  void removeAllNodes() noexcept { _nodes.clear(); }
+  void removeAllNodes() noexcept;
 
   [[nodiscard]] Node* findNode(this auto& self, std::string_view name) noexcept;
   [[nodiscard]] bool  hasNode(std::string_view name) const noexcept { return findNode(name) != nullptr; }
@@ -70,7 +73,10 @@ public:
   }
 
   NODE_TEMP(NodeT) void removeNode() noexcept {
-    std::erase_if(_nodes, [](const auto& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; });
+    std::erase_if(
+      _nodes,
+      [](const auto& node) { return dynamic_cast<NodeT*>(node.get()) != nullptr; }
+    );
   }
 
   NODE_TEMP(NodeT) [[nodiscard]] NodeT* findNode(this auto& self) noexcept {
@@ -80,14 +86,14 @@ public:
 
   NODE_TEMP(NodeT) [[nodiscard]] bool hasNode() const noexcept { return findNode<NodeT>() != nullptr; }
 
-  NODE_TEMP(NodeT) [[nodiscard]] NodeT& getNode() const {
+  NODE_TEMP(NodeT) [[nodiscard]] NodeT& getNode() const noexcept {
     auto* node = findNode<NodeT>();
     ZASSERT_NE(node, nullptr);
     return *node;
   }
 
   NODE_TEMP(NodeT) [[nodiscard]] Node* tryGetNode() const noexcept {
-    return const_cast<Node*>(std::as_const(*this).findNode<NodeT>());
+    return const_cast<Node*>(this->findNode<NodeT>());
   }
 
   NODE_TEMP(NodeT) [[nodiscard]] std::unique_ptr<NodeT> extractNode() noexcept {
@@ -100,10 +106,6 @@ public:
     }
 
     return node;
-  }
-
-  template <typename Func> void forEach(Func&& func) const {
-    for (const auto& NODE : _nodes) std::invoke(func, *NODE);
   }
 
   NODE_TEMP(NodeT) [[nodiscard]] std::vector<NodeT*> getAllNodesOfType() const {

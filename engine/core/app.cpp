@@ -14,12 +14,13 @@ static inline App* s_instance = nullptr;
 
 App::App(const misc::AppContext& context) {
   ZASSERT_EQ(s_instance, nullptr);
+  s_instance = this;
 
   const std::string TITLE = (config::IS_DEBUG_BUILD)
   ? std::format("Dull Engine v{} - {}", config::getVerString(), context.title)
   : context.title;
 
-  int flags {
+  int flags = {
     (context.is_vsync      ? rl::FLAG_VSYNC_HINT       : 0) |
     (context.is_resizeable ? rl::FLAG_WINDOW_RESIZABLE : 0)
   };
@@ -30,12 +31,10 @@ App::App(const misc::AppContext& context) {
   rl::SetTargetFPS(context.target_fps);
 
   _is_running = true;
-  s_instance = this;
 
   if constexpr (config::SHOULD_LOG_APP) {
     ZLOGI_IF(context.is_vsync)      << "App Init: V-Sync On";
     ZLOGI_IF(context.is_resizeable) << "App Init: Window made resizeable";
-
     ZLOGI << "App Initialized: " << TITLE << "\n";
   }
 }
@@ -49,7 +48,7 @@ App::~App() noexcept {
 
 int App::run() noexcept {
   try {
-    while (!rl::WindowShouldClose()) [[likely]] {
+    while (!rl::WindowShouldClose() && _is_running) [[likely]] {
       rl::BeginDrawing();
       rl::ClearBackground(rl::BLACK);
       rl::DrawFPS(10, 10);
@@ -62,6 +61,13 @@ int App::run() noexcept {
   }
 
   return EXIT_SUCCESS;
+}
+
+void App::debug() const noexcept {
+  if constexpr (!config::IS_DEBUG_BUILD) return;
+
+  ZLOGD << std::format("Debugging App (%p)", (void*)s_instance);
+  /// TODO:
 }
 
 } // namespace dull::core

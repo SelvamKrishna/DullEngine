@@ -13,7 +13,7 @@ struct Vec2 {
   T x {0};
   T y {0};
 
-  /// --- Constructors ---
+/// --- Constructors ---
 
   constexpr Vec2() noexcept = default;
   constexpr Vec2(T x, T y) noexcept : x{x}, y{y} {}
@@ -21,7 +21,7 @@ struct Vec2 {
   explicit constexpr Vec2(const rl::Vector2& rl_vec) noexcept
   : x{static_cast<T>(rl_vec.x)}, y{static_cast<T>(rl_vec.y)} {}
 
-  /// --- Constants / Factory methods ---
+/// --- Constants / Factory methods ---
 
   #define FACTORY(NAME, X, Y) \
   static constexpr Vec2 NAME() noexcept { return Vec2{X, Y}; }
@@ -36,7 +36,7 @@ struct Vec2 {
 
   static constexpr Vec2 kUnit(T val = 1) noexcept { return {val, val}; }
 
-  /// --- Vector math ---
+/// --- Vector math ---
 
   [[nodiscard]] constexpr T dot(const Vec2& other) const noexcept { return x * other.x + y * other.y; }
   [[nodiscard]] constexpr T cross(const Vec2& other) const noexcept { return x * other.y - y * other.x; }
@@ -66,7 +66,7 @@ struct Vec2 {
     return std::fabs(x - other.x) < epsilon && std::fabs(y - other.y) < epsilon;
   }
 
-  /// --- Operators ---
+/// --- Operators ---
 
   [[nodiscard]] constexpr Vec2 operator-() const noexcept { return {-x, -y}; }
 
@@ -95,7 +95,7 @@ struct Vec2 {
   constexpr bool operator==(const Vec2& other) const noexcept = default;
   constexpr bool operator!=(const Vec2& other) const noexcept = default;
 
-  /// --- Conversion ---
+/// --- Conversion ---
 
   [[nodiscard]] constexpr operator rl::Vector2() const noexcept {
     return {static_cast<float>(x), static_cast<float>(y)};
