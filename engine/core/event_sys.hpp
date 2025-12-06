@@ -2,7 +2,8 @@
 
 #include "engine/misc/string_view_hashing.hpp"
 
-#include <vendor/zutils/zutils.hpp>
+#include <vendor/zutils/log.hpp>
+#include <vendor/zutils/test.hpp>
 
 #include <any>
 #include <string>
@@ -69,7 +70,7 @@ public:
             VALUE != nullptr
         ) return *VALUE;
 
-        ZLOGE << "Event Data (BAD_CAST): Try get data '" << key << "'";
+        ZERR("Event Data (BAD_CAST): Try get data '{}'", key);
         return std::nullopt;
     }
 

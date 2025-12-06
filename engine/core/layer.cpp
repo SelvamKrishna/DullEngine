@@ -1,6 +1,10 @@
 #include "engine/config.hpp"
 #include "engine/core/layer.hpp"
 
+#include <vendor/zutils/log.hpp>
+#include <vendor/zutils/test.hpp>
+#include <vendor/zutils/tools.hpp>
+
 namespace dull::core {
 
 [[nodiscard]]
@@ -25,25 +29,33 @@ void Layer::addNode(std::unique_ptr<Node> node) noexcept
 {
     _nodes.emplace_back(std::move(node));
 
-    ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS)
-        << "Add Node : Node (" << _nodes[_nodes.size() - 1]->getName()
-        << ") -> Layer (" << _name << ")";
+    ZINFO_IF(
+        config::SHOULD_LOG_SCENE_SYS,
+        "Add Node : '{}' -> Layer ('{}')",
+        _nodes[_nodes.size() - 1]->getName(), _name
+    );
 }
 
 void Layer::removeNode(std::string_view name) noexcept
 {
     std::erase_if(_nodes, [&name](const auto& node) { return node->getName() == name; });
 
-    ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS)
-        << "Remove Node : Node (" << name << ") -> Layer (" << _name << ")";
+    ZINFO_IF(
+        config::SHOULD_LOG_SCENE_SYS,
+        "Remove Node : Node ('{}') -> Layer ('{}')",
+        name, _name
+    );
 }
 
 void Layer::removeAllNodes() noexcept
 {
     _nodes.clear();
 
-    ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS)
-        << "Remove All Nodes : Layer (" << _name << ")";
+    ZINFO_IF(
+        config::SHOULD_LOG_SCENE_SYS,
+        "Remove All Nodes : Layer ('{}')",
+        _name
+    );
 }
 
 [[nodiscard]]
@@ -81,29 +93,39 @@ std::unique_ptr<Node> Layer::extractNode(std::string_view name) noexcept
 
     if (it != _nodes.end())
     {
-        ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS) << "Extract Nodes :";
+        ZINFO_IF(
+            config::SHOULD_LOG_SCENE_SYS,
+            "Extract Nodes :"
+        );
 
         node = std::move(*it);
         _nodes.erase(it);
     }
     else
     {
-        ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS) << "Extract Nodes (NOT FOUND):";
+        ZINFO_IF(
+            config::SHOULD_LOG_SCENE_SYS,
+            "Extract Nodes (NOT FOUND):"
+        );
     }
 
-    ZLOGI_IF(config::SHOULD_LOG_SCENE_SYS) << "Node (" << name << ") -> Layer (" << _name << ")";
+    ZINFO_IF(
+        config::SHOULD_LOG_SCENE_SYS,
+        "Node ('{}') -> Layer ('{}')",
+        name, _name
+    );
     return node;
 }
 
 void Layer::logStats() const noexcept
 {
-    if constexpr (!config::IS_DEBUG_BUILD) return;
+    ZON_RELEASE return;
 
-    ZLOGD << "Status -> Layer (" << (void*)this << ")";
-    ZLOG_V(_name);
-    ZLOG_V(_nodes.size());
+    ZINFO_IF(config::SHOULD_LOG_SCENE_SYS, "Status -> Layer ({})", (void*)this);
+    ZVAR(_name);
+    ZVAR(_nodes.size());
 
-    for (const auto& NODE : _nodes) ZLOG_V(NODE->getName());
+    for (const auto& NODE : _nodes) ZVAR(NODE->getName());
 }
 
 } // namespace dull::core

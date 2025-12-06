@@ -2,6 +2,9 @@
 #include "engine/core/app.hpp"
 #include "engine/core/event_sys.hpp"
 
+#include <vendor/zutils/log.hpp>
+#include <vendor/zutils/tools.hpp>
+
 #include <atomic>
 
 namespace dull::core {
@@ -28,14 +31,14 @@ void Event::emit() const noexcept
 
 void Event::logStats() const noexcept
 {
-    if constexpr (!config::IS_DEBUG_BUILD) return;
+    ZON_RELEASE return;
 
-    ZLOGD << "Status -> Event (" << (void*)this << ")";
-    ZLOG_V(_name);
-    ZLOG_V(_data_map.size());
+    ZDBG("Status -> Event ({})", (void*)this);
+    ZVAR(_name);
+    ZVAR(_data_map.size());
 
     for (const auto& DATA : _data_map)
-        ZLOGD << DATA.first << " -> " << &DATA.second;
+        ZDBG("{}{} -> {}", zutils::config::TAB_TAG, DATA.first, (void*)&DATA.second);
 }
 
 uint64_t EventBus::bind(std::string_view event_name, Event::Callback callback)
@@ -46,8 +49,7 @@ uint64_t EventBus::bind(std::string_view event_name, Event::Callback callback)
     uint64_t id = s_next++;
 
     _listeners[std::string{event_name}].emplace_back(Listener{id, std::move(callback)});
-    ZLOGI_IF(config::SHOULD_LOG_EVENT_SYS)
-        << "Event bind: " << event_name << " <-> Listener (" << id << ")";
+    ZINFO_IF(config::SHOULD_LOG_EVENT_SYS, "Event bind: {} <-> Listener ({})", event_name, id);
 
     return id;
 }
@@ -59,50 +61,53 @@ void EventBus::unbind(std::string_view event_name, uint64_t id)
     auto it = _listeners.find(event_name);
     if (it == _listeners.end())
     {
-        ZLOGW_IF(config::SHOULD_LOG_EVENT_SYS)
-            << "Event unbind (NOT FOUND): " << event_name
-            << " <-> Listener (ID: "        << id << ")";
+        ZWARN_IF(
+            config::SHOULD_LOG_EVENT_SYS,
+            "Event unbind (NOT FOUND): {} <-> Listener (ID: {})",
+            event_name, id
+        );
+
         return;
     }
 
     std::erase_if(it->second, [&id](const Listener &listener) { return listener.id == id; });
-    ZLOGI_IF(config::SHOULD_LOG_EVENT_SYS)
-        << "Event unbind: " << event_name << " <-> Listener (ID: " << id << ")";
+    ZINFO_IF(config::SHOULD_LOG_EVENT_SYS, "Event unbind: {} <-> Listener (ID: {})", event_name, id);
 
     if (!it->second.empty()) return;
 
     _listeners.erase(it);
-    ZLOGI_IF(config::SHOULD_LOG_EVENT_SYS)
-        << "Event erase: " << event_name << ", has no binded listerners";
+    ZINFO_IF(config::SHOULD_LOG_EVENT_SYS, "Event erase: {} has no binded listerners", event_name);
 }
 
 void EventBus::emit(const Event &event) const noexcept
 {
     if (auto it = _listeners.find(event.getName()); it != _listeners.end())
     {
-        ZLOGI_IF(config::SHOULD_LOG_EVENT_SYS) << "Event emit : " << event.getName();
+        ZINFO_IF(config::SHOULD_LOG_EVENT_SYS, "Event emit : {}", event.getName());
         for (const auto &LISTENER : it->second) LISTENER.callback(event);
         return;
     }
 
-    ZLOGW_IF(config::SHOULD_LOG_EVENT_SYS) << "Event emit (NOT FOUND) : " << event.getName();
+    ZWARN_IF(config::SHOULD_LOG_EVENT_SYS, "Event emit (NOT FOUND) : {}", event.getName());
 }
 
 void EventBus::logStats() const noexcept
 {
-    if constexpr (!config::IS_DEBUG_BUILD) return;
+    ZON_RELEASE return;
 
-    ZLOGD << "Status -> EventBus (" << (void*)this << ")";
-    ZLOG_V(_listeners.size());
+    ZINFO("Status -> EventBus ({})", (void*)this);
+    ZVAR(_listeners.size());
 
     for (const auto& PAIR : _listeners)
     {
-        ZLOGD
-            << zutils::internal::ColorText{35, PAIR.first.c_str()} << " : "
-            << PAIR.second.size() << " Listeners -> ";
+        ZDBG(
+            "{} : {} Listeners",
+            zutils::ColorText{PAIR.first.c_str(), zutils::ANSI::Magenta},
+            PAIR.second.size()
+        );
 
         for (const auto& LISTENER : PAIR.second)
-            ZLOG_RAW << "ID(" << LISTENER.id << "), ";
+            ZDBG("{}ID({}),", zutils::config::TAB_TAG, LISTENER.id);
     }
 }
 

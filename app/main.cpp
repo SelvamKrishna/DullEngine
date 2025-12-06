@@ -2,11 +2,11 @@
 
 int main(void)
 {
-    dull::core::App app {
-        dull::misc::AppContextBuilder{}
-            .setTitle("Hello World")
-            .setWindowSize({500, 500})
-            .build()
+    dull::core::App app = {
+        {
+            .title = "Hello World",
+            .window_size = {500, 500},
+        }
     };
 
     app.run();

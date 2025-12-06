@@ -1,9 +1,20 @@
 #pragma once
 
 #include "engine/core/event_sys.hpp"
-#include "engine/misc/app_context.hpp"
+#include "engine/util/vec2.hpp"
 
 namespace dull::core {
+
+struct AppContext final {
+    std::string title         = "Application";
+    util::Vec2i window_size   = {800, 800};
+    int         target_fps    = 0;
+    bool        is_vsync      = false;
+    bool        is_resizeable = false;
+
+    [[nodiscard]]
+    static AppContext load() { return {/*TODO*/}; }
+};
 
 class App final {
 private:
@@ -18,7 +29,7 @@ public:
     App& operator=(App&&)      = delete;
     App& operator=(const App&) = delete;
 
-    explicit App(const misc::AppContext& context);
+    App(const AppContext& context);
     ~App() noexcept;
 
     [[nodiscard]]

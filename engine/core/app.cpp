@@ -3,7 +3,9 @@
 #include "engine/util/vec2.hpp"
 
 #include <vendor/raylib.h>
-#include <vendor/zutils/zutils.hpp>
+#include <vendor/zutils/log.hpp>
+#include <vendor/zutils/test.hpp>
+#include <vendor/zutils/tools.hpp>
 
 #include <format>
 #include <string>
@@ -12,12 +14,12 @@ namespace dull::core {
 
 static inline App* s_instance = nullptr;
 
-App::App(const misc::AppContext& context)
+App::App(const AppContext& context)
 {
     ZASSERT_EQ(s_instance, nullptr);
     s_instance = this;
 
-    const std::string TITLE = (config::IS_DEBUG_BUILD)
+    const std::string TITLE = zutils::config::IS_MODE_DEBUG
     ? std::format("Dull Engine v{} - {}", config::getVerString(), context.title)
     : context.title;
 
@@ -35,41 +37,41 @@ App::App(const misc::AppContext& context)
 
     if constexpr (config::SHOULD_LOG_APP)
     {
-        ZLOGI_IF(context.is_vsync)      << "App Init: V-Sync On";
-        ZLOGI_IF(context.is_resizeable) << "App Init: Window made resizeable";
-        ZLOGI << "App Initialized: " << TITLE << "\n";
+        ZINFO_IF(context.is_vsync, "App Init: V-Sync On");
+        ZINFO_IF(context.is_resizeable, "App Init: Window made resizeable");
+        ZINFO("App Initialized: {}\n", TITLE);
     }
 }
 
 App::~App() noexcept
 {
-    ZLOGI_IF(config::SHOULD_LOG_APP) << "App Shutdown\n";
+    ZINFO_IF(config::SHOULD_LOG_APP, "App Shutdown\n");
     if (_is_running) [[likely]] rl::CloseWindow();
 }
 
-[[nodiscard]] App& App::instance() noexcept { return *s_instance; }
+[[nodiscard]]
+App& App::instance() noexcept { return *s_instance; }
 
 void App::run() noexcept
 {
     try {
         while (!rl::WindowShouldClose() && _is_running) [[likely]] {
-        rl::BeginDrawing();
-        rl::ClearBackground(rl::BLACK);
-        rl::DrawFPS(10, 10);
-        rl::EndDrawing();
+            rl::BeginDrawing();
+            rl::ClearBackground(rl::BLACK);
+            rl::DrawFPS(10, 10);
+            rl::EndDrawing();
         }
     }
     catch (const std::exception& ERR) {
-        ZLOGE << "App Run (UNHANDLED): " << ERR.what();
+        ZERR("App Run (UNHANDLED): {}", ERR.what());
     }
 }
 
 void App::logStats() const noexcept
 {
-    if constexpr (!config::IS_DEBUG_BUILD) return;
-
-    ZLOGD << "Status -> App (" << (void*)s_instance << ")";
-    ZLOG_V(_is_running);
+    ZON_RELEASE return;
+    ZDBG("Status -> App ({})", (void*)s_instance);
+    ZVAR(_is_running);
 }
 
 } // namespace dull::core
