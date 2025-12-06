@@ -12,6 +12,8 @@ enum LogLevel : uint8_t {
   L_FATAL,
 };
 
+#define ZTAB "  "
+
 namespace zutils::internal {
 
 struct ColorText {

@@ -142,4 +142,4 @@ inline LogGaurd logStream(LogLevel level) {
 #define ZLOGF_IF(CONDITION)  ZLOG_IF(L_FATAL, CONDITION)
 
 #define ZLOG_RAW \
-  std::cout << "\n\033[0m"
+  std::cout << "\033[0m"

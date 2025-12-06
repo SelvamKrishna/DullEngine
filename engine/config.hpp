@@ -25,8 +25,10 @@ constexpr bool SHOULD_LOG_SCENE_SYS = true;
 
 /// --- Utilities ---
 
-[[nodiscard]] inline std::string getVerString() noexcept {
-  return std::format("{}.{}", VER_MAJOR, VER_MINOR);
+[[nodiscard]]
+inline std::string getVerString() noexcept
+{
+    return std::format("{}.{}", VER_MAJOR, VER_MINOR);
 }
 
 } // namespace dull::config

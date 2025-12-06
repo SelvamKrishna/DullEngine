@@ -5,24 +5,27 @@
 namespace dull::core {
 
 class Node {
-  friend class Layer;
+    friend class Layer;
 
 private:
-  std::string _name;
-  bool _is_active {true};
+    std::string _name;
+    bool _is_active {true};
 
-  void _start() { }
-  void _update() { }
-  void _fixed_update() { }
+    void _start() {}
+    void _update() {}
+    void _fixed_update() {}
 
 public:
-  Node() = delete;
-  explicit Node(std::string_view name) : _name{name} {}
+    Node() = delete;
+    explicit Node(std::string_view name) : _name{name} {}
 
-  [[nodiscard]] constexpr std::string& getName() noexcept { return _name; }
-  [[nodiscard]] constexpr bool isActive() const noexcept { return _is_active; }
+    [[nodiscard]]
+    constexpr std::string& getName() noexcept { return _name; }
 
-  constexpr void setActive(bool value) noexcept { _is_active = value; }
+    [[nodiscard]]
+    constexpr bool isActive() const noexcept { return _is_active; }
+
+    constexpr void setActive(bool value) noexcept { _is_active = value; }
 };
 
 } // namespace dull::core

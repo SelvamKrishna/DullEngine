@@ -10,107 +10,135 @@ namespace dull::util {
 template <typename T>
 requires std::is_arithmetic_v<T>
 struct Vec2 {
-  T x {0};
-  T y {0};
+    T x {0};
+    T y {0};
 
 /// --- Constructors ---
 
-  constexpr Vec2() noexcept = default;
-  constexpr Vec2(T x, T y) noexcept : x{x}, y{y} {}
+    constexpr Vec2() noexcept = default;
+    constexpr Vec2(T x, T y) noexcept : x{x}, y{y} {}
 
-  explicit constexpr Vec2(const rl::Vector2& rl_vec) noexcept
-  : x{static_cast<T>(rl_vec.x)}, y{static_cast<T>(rl_vec.y)} {}
+    explicit constexpr Vec2(const rl::Vector2& rl_vec) noexcept
+    : x{static_cast<T>(rl_vec.x)}, y{static_cast<T>(rl_vec.y)} {}
 
 /// --- Constants / Factory methods ---
 
-  #define FACTORY(NAME, X, Y) \
-  static constexpr Vec2 NAME() noexcept { return Vec2{X, Y}; }
+#define _FACTORY(NAME, X, Y) \
+    static constexpr Vec2 NAME() noexcept { return Vec2{X, Y}; }
 
-  FACTORY(kZero ,  0,  0)
-  FACTORY(kOne  ,  1,  1)
-  FACTORY(kUp   ,  0,  1)
-  FACTORY(kDown ,  0, -1)
-  FACTORY(kLeft , -1,  0)
-  FACTORY(kRight,  1,  0)
-  #undef FACTORY
+    _FACTORY(kZero ,  0,  0)
+    _FACTORY(kOne  ,  1,  1)
+    _FACTORY(kUp   ,  0,  1)
+    _FACTORY(kDown ,  0, -1)
+    _FACTORY(kLeft , -1,  0)
+    _FACTORY(kRight,  1,  0)
 
-  static constexpr Vec2 kUnit(T val = 1) noexcept { return {val, val}; }
+#undef _FACTORY
+
+    static constexpr Vec2 kUnit(T val = 1) noexcept { return {val, val}; }
 
 /// --- Vector math ---
 
-  [[nodiscard]] constexpr T dot(const Vec2& other) const noexcept { return x * other.x + y * other.y; }
-  [[nodiscard]] constexpr T cross(const Vec2& other) const noexcept { return x * other.y - y * other.x; }
+    [[nodiscard]]
+    constexpr T dot(const Vec2& other) const noexcept { return x * other.x + y * other.y; }
 
-  [[nodiscard]] constexpr T lengthSquared() const noexcept { return x * x + y * y; }
-  [[nodiscard]] T length() const noexcept { return std::sqrt(static_cast<double>(lengthSquared())); }
+    [[nodiscard]]
+    constexpr T cross(const Vec2& other) const noexcept { return x * other.y - y * other.x; }
 
-  [[nodiscard]] Vec2 normalized() const noexcept {
-    const T LEN = static_cast<T>(length());
-    return LEN ? (*this / LEN) : kZero();
-  }
+    [[nodiscard]]
+    constexpr T lengthSquared() const noexcept { return x * x + y * y; }
 
-  void normalize() noexcept { *this = normalized(); }
+    [[nodiscard]]
+    T length() const noexcept { return std::sqrt(static_cast<double>(lengthSquared())); }
 
-  [[nodiscard]] constexpr Vec2 perpendicular() const noexcept { return {-y, x}; }
+    [[nodiscard]]
+    Vec2 normalized() const noexcept
+    {
+        const T LEN = static_cast<T>(length());
+        return LEN ? (*this / LEN) : kZero();
+    }
 
-  [[nodiscard]] constexpr T distanceSquared(const Vec2& other) const noexcept {
-    return (*this - other).lengthSquared();
-  }
+    void normalize() noexcept { *this = normalized(); }
 
-  [[nodiscard]] T distance(const Vec2& other) const noexcept {
-    return std::sqrt(static_cast<double>(distanceSquared(other)));
-  }
+    [[nodiscard]]
+    constexpr Vec2 perpendicular() const noexcept { return {-y, x}; }
 
-  [[nodiscard]] bool nearlyEquals(const Vec2& other, T epsilon = static_cast<T>(1e-6)) const noexcept {
-    if constexpr (std::is_floating_point_v<T>)
-    return std::fabs(x - other.x) < epsilon && std::fabs(y - other.y) < epsilon;
-  }
+    [[nodiscard]]
+    constexpr T distanceSquared(const Vec2& other) const noexcept
+    {
+        return (*this - other).lengthSquared();
+    }
+
+    [[nodiscard]]
+    T distance(const Vec2& other) const noexcept
+    {
+        return std::sqrt(static_cast<double>(distanceSquared(other)));
+    }
+
+    [[nodiscard]]
+    bool nearlyEquals(const Vec2& other, T epsilon = static_cast<T>(1e-6)) const noexcept
+    {
+        if constexpr (std::is_floating_point_v<T>)
+            return std::fabs(x - other.x) < epsilon && std::fabs(y - other.y) < epsilon;
+    }
 
 /// --- Operators ---
 
-  [[nodiscard]] constexpr Vec2 operator-() const noexcept { return {-x, -y}; }
+    [[nodiscard]]
+    constexpr Vec2 operator-() const noexcept { return {-x, -y}; }
 
-  /// Vec2 (op) Vec2
-  #define VEC_VEC_OP(OPR) \
-  [[nodiscard]] constexpr Vec2 operator OPR (const Vec2& other) const noexcept { return {x OPR other.x, y OPR other.y}; } \
-  constexpr Vec2& operator OPR##= (const Vec2& other) noexcept { x OPR##= other.x; y OPR##= other.y; return *this; }
+/// Vec2 (op) Vec2
+#define _OP_VEC_VEC(OPR) \
+    [[nodiscard]] \
+    constexpr Vec2 operator OPR (const Vec2& other) const noexcept \
+    { return {x OPR other.x, y OPR other.y}; } \
+    constexpr Vec2& operator OPR##= (const Vec2& other) noexcept \
+    { x OPR##= other.x; y OPR##= other.y; return *this; } \
 
-  VEC_VEC_OP(+)
-  VEC_VEC_OP(-)
-  VEC_VEC_OP(*)
-  VEC_VEC_OP(/)
-  #undef VEC_VEC_OP
+    _OP_VEC_VEC(+)
+    _OP_VEC_VEC(-)
+    _OP_VEC_VEC(*)
+    _OP_VEC_VEC(/)
 
-  /// Vec2 (op) scalar
-  #define VEC_SCALE_OP(OPR) \
-  [[nodiscard]] constexpr Vec2 operator OPR (T scalar) const noexcept { return {x OPR scalar, y OPR scalar}; } \
-  constexpr Vec2& operator OPR##= (T scalar) noexcept { x OPR##= scalar; y OPR##= scalar; return *this; }
+#undef _OP_VEC_VEC
 
-  VEC_SCALE_OP(+)
-  VEC_SCALE_OP(-)
-  VEC_SCALE_OP(*)
-  VEC_SCALE_OP(/)
-  #undef VEC_SCALE_OP
+/// Vec2 (op) scalar
+#define _OP_VEC_SCL(OPR) \
+    [[nodiscard]] \
+    constexpr Vec2 operator OPR (T scalar) const noexcept \
+    { return {x OPR scalar, y OPR scalar}; } \
+    constexpr Vec2& operator OPR##= (T scalar) noexcept \
+    { x OPR##= scalar; y OPR##= scalar; return *this; } \
 
-  constexpr bool operator==(const Vec2& other) const noexcept = default;
-  constexpr bool operator!=(const Vec2& other) const noexcept = default;
+    _OP_VEC_SCL(+)
+    _OP_VEC_SCL(-)
+    _OP_VEC_SCL(*)
+    _OP_VEC_SCL(/)
+
+#undef _OP_VEC_SCL
+
+    constexpr bool operator==(const Vec2& other) const noexcept = default;
+    constexpr bool operator!=(const Vec2& other) const noexcept = default;
 
 /// --- Conversion ---
 
-  [[nodiscard]] constexpr operator rl::Vector2() const noexcept {
-    return {static_cast<float>(x), static_cast<float>(y)};
-  }
-
+    [[nodiscard]]
+    constexpr operator rl::Vector2() const noexcept
+    {
+        return {static_cast<float>(x), static_cast<float>(y)};
+    }
 };
 
 /// scalar (op) Vec2
-#define SCALE_VEC_OP(OPR) \
-  template <typename T> \
-  [[nodiscard]] constexpr Vec2<T> operator OPR(T scalar, const Vec2<T>& vec) noexcept { return vec OPR scalar; }
+#define _OP_SCL_VEC(OPR) \
+    template <typename T> \
+    [[nodiscard]] \
+    constexpr Vec2<T> operator OPR(T scalar, const Vec2<T>& vec) noexcept { return vec OPR scalar; }
 
-SCALE_VEC_OP(+)
-SCALE_VEC_OP(*)
-#undef SCALE_VEC_OP
+_OP_SCL_VEC(+)
+_OP_SCL_VEC(*)
+
+#undef _OP_SCL_VEC
 
 using Vec2f = Vec2<float>;
 using Vec2i = Vec2<int>;
