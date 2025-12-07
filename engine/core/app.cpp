@@ -12,6 +12,13 @@
 
 namespace dull::core {
 
+[[nodiscard]]
+AppContext AppContext::load() noexcept
+{
+    ZTODO("Load AppContext from config file");
+    return {};
+}
+
 static inline App* s_instance = nullptr;
 
 App::App(const AppContext& context)
@@ -34,6 +41,7 @@ App::App(const AppContext& context)
     rl::SetTargetFPS(context.target_fps);
 
     _is_running = true;
+    _handle._setState(ProgramState::Initial);
 
     if constexpr (config::SHOULD_LOG_APP)
     {
@@ -56,8 +64,6 @@ void App::run() noexcept
 {
     constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
     double accumulated_time = 0.0f;
-
-    _scene_sys._activate();
 
     try {
         while (!rl::WindowShouldClose() && _is_running) [[likely]] {

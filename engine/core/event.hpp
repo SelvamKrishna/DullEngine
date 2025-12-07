@@ -2,11 +2,15 @@
 
 #include "engine/misc/string_view_hashing.hpp"
 
+#include <vendor/zutils/log.hpp>
+#include <vendor/zutils/test.hpp>
+
 #include <any>
 #include <string>
 #include <string_view>
 #include <optional>
 #include <functional>
+#include <cstdint>
 
 namespace dull::core {
 

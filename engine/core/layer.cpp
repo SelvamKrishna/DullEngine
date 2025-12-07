@@ -28,6 +28,7 @@ Layer::NodeConstIt Layer::_findIterator(std::string_view name) const noexcept
 void Layer::addNode(std::unique_ptr<Node> node) noexcept
 {
     _nodes.emplace_back(std::move(node));
+    _nodes.back()->_start();
 
     ZINFO_IF(
         config::SHOULD_LOG_SCENE_SYS,

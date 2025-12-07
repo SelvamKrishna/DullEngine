@@ -13,6 +13,9 @@ private:
     std::vector<std::string_view> _layers;
 
 public:
+    explicit Scene() : _layers {} {}
+    explicit Scene(std::initializer_list<std::string_view> layers) : _layers {layers} {}
+
     void addLayer(std::string_view layer_name, size_t idx = UINT64_MAX)
     {
         ZASSERT_S(
@@ -68,10 +71,13 @@ private:
     }
 
 public:
-    void setCurrentScene(const Scene& new_scene) noexcept { _current_scene = new_scene; }
+    void setCurrentScene(Scene new_scene) noexcept { _current_scene = new_scene; }
 
     [[nodiscard]]
     Scene& getCurrentScene() noexcept { return _current_scene; }
+
+    [[nodiscard]]
+    LayerBuffer& getLayerBuffer() noexcept { return _layer_buffer; }
 };
 
 } // namespace dull::core

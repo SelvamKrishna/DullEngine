@@ -2,6 +2,7 @@
 
 #include "engine/core/event_bus.hpp"
 #include "engine/core/scene.hpp"
+#include "engine/core/handle.hpp"
 #include "engine/util/vec2.hpp"
 
 #include <vendor/zutils/tools.hpp>
@@ -19,22 +20,20 @@ struct AppContext final {
     bool        is_resizeable = false;
 
     [[nodiscard]]
-    static AppContext load()
-    {
-        ZTODO("Load AppContext from config file");
-        return {/*TODO*/};
-    }
+    static AppContext load() noexcept;
 };
 
 // =======================
 // Main application
 // =======================
 class App final {
+    friend class Handle;
+
 private:
     EventBus    _event_bus;
     SceneSystem _scene_sys;
-
-    bool _is_running = false;
+    Handle      _handle;
+    bool   _is_running = false;
 
 public:
     App() = delete;
@@ -51,13 +50,10 @@ public:
     static App& instance() noexcept;
 
     [[nodiscard]]
+    Handle& handle() noexcept { return _handle; }
+
+    [[nodiscard]]
     constexpr bool isRunning() const noexcept { return _is_running; }
-
-    [[nodiscard]]
-    EventBus& getEventBus() noexcept { return _event_bus; }
-
-    [[nodiscard]]
-    SceneSystem& getSceneSys() noexcept { return _scene_sys; }
 
     void run()  noexcept;
     void quit() noexcept { _is_running = false; }
@@ -66,3 +62,5 @@ public:
 };
 
 } // namespace dull::core
+
+#define HANDLE  ::dull::core::App::instance().handle()
