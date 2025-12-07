@@ -1,7 +1,9 @@
 #pragma once
 
-#include "engine/core/event_sys.hpp"
+#include "engine/core/event_bus.hpp"
 #include "engine/util/vec2.hpp"
+
+#include <vendor/zutils/tools.hpp>
 
 namespace dull::core {
 
@@ -13,7 +15,11 @@ struct AppContext final {
     bool        is_resizeable = false;
 
     [[nodiscard]]
-    static AppContext load() { return {/*TODO*/}; }
+    static AppContext load()
+    {
+        ZTODO("Load AppContext from config file");
+        return {/*TODO*/};
+    }
 };
 
 class App final {
