@@ -38,7 +38,7 @@ private:
     ~EventBus() = default;
 
 public:
-    uint64_t bind(std::string_view event_name, Event::Callback callback);
+    uint64_t bind  (std::string_view event_name, Event::Callback callback);
     void     unbind(std::string_view event_name, uint64_t callback_id);
     void     emit(const Event& event) const noexcept;
 

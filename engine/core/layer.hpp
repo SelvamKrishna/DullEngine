@@ -10,12 +10,30 @@
 namespace dull::core {
 
 class Layer final {
+    friend class SceneSystem;
+
 private:
     using NodeIt      = std::vector<std::unique_ptr<Node>>::iterator;
     using NodeConstIt = std::vector<std::unique_ptr<Node>>::const_iterator;
 
     std::string                        _name;
     std::vector<std::unique_ptr<Node>> _nodes;
+
+    void _activate()
+    {
+        for (auto& node : _nodes)
+            node->_start();
+    }
+    void _process()
+    {
+        for (auto& node : _nodes)
+            node->_update();
+    }
+    void _fixedProcess()
+    {
+        for (auto& node : _nodes)
+            node->_fixedUpdate();
+    }
 
     [[nodiscard]]
     Layer::NodeIt _findIterator(std::string_view name) noexcept;

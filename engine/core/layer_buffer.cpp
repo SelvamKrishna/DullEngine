@@ -4,17 +4,14 @@
 
 namespace dull::core {
 
-void LayerBuffer::loadLayer(const std::string& name, std::shared_ptr<Layer> layer)
+void LayerBuffer::loadLayer(std::unique_ptr<Layer> layer)
 {
-    _layers[name] = std::move(layer);
-}
+    ZASSERT_S(
+        _layers.find(layer->getName()) == _layers.end(),
+        "Layer with name " + std::string{layer->getName()} + " already exists in LayerBuffer"
+    );
 
-[[nodiscard]]
-std::shared_ptr<Layer> LayerBuffer::getLayer(const std::string& name) const
-{
-    auto it = _layers.find(name);
-    ZEXPECT_S(it != _layers.end(), "Cant find layer '" + name + "' in LayerBuffer");
-    return it != _layers.end() ? it->second : nullptr;
+    _layers[std::string{layer->getName()}] = std::move(layer);
 }
 
 } // namespace dull::core

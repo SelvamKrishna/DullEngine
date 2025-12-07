@@ -6,7 +6,8 @@
 
 namespace dull::config {
 
-/// --- Build Settings ---
+/// --- Engine Config (DO NOT TOUCH) ---
+
 constexpr uint32_t VER_MAJOR = 0;
 constexpr uint32_t VER_MINOR = 1;
 
@@ -23,5 +24,9 @@ inline std::string getVerString() noexcept
 {
     return std::format("{}.{}", VER_MAJOR, VER_MINOR);
 }
+
+/// --- Utilities ---
+
+constexpr uint32_t FIXED_PROCESS_FPS = 60;
 
 } // namespace dull::config

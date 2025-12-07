@@ -1,6 +1,8 @@
 #pragma once
 
 #include "engine/core/layer.hpp"
+#include "engine/misc/string_view_hashing.hpp"
+
 #include <unordered_map>
 #include <string>
 #include <memory>
@@ -8,10 +10,16 @@
 namespace dull::core {
 
 class LayerBuffer final {
-private:
-    std::unordered_map<std::string, std::shared_ptr<Layer>> _layers;
+    friend class SceneSystem;
 
-public:
+private:
+    std::unordered_map<
+        std::string,
+        std::unique_ptr<Layer>,
+        misc::StringHash,
+        misc::StringEq
+    > _layers;
+
     constexpr LayerBuffer(LayerBuffer&&)                 noexcept = delete;
     constexpr LayerBuffer(const LayerBuffer&)            noexcept = delete;
     constexpr LayerBuffer& operator=(LayerBuffer&&)      noexcept = delete;
@@ -20,10 +28,11 @@ public:
     LayerBuffer() = default;
     ~LayerBuffer() = default;
 
-    void loadLayer(const std::string& name, std::shared_ptr<Layer> layer);
-
     [[nodiscard]]
-    std::shared_ptr<Layer> getLayer(const std::string& name) const;
+    std::unique_ptr<Layer>& getLayer(std::string_view layer_name) noexcept { return _layers[std::string{layer_name}]; }
+
+public:
+    void loadLayer(std::unique_ptr<Layer> layer);
 };
 
 } // namespace dull::core

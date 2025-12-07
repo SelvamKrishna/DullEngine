@@ -54,8 +54,22 @@ App& App::instance() noexcept { return *s_instance; }
 
 void App::run() noexcept
 {
+    constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
+    double accumulated_time = 0.0f;
+
+    _scene_sys._activate();
+
     try {
         while (!rl::WindowShouldClose() && _is_running) [[likely]] {
+            accumulated_time += rl::GetFrameTime();
+            if (accumulated_time > FIXED_PROCESS_INTERVAL)
+            {
+                accumulated_time -= FIXED_PROCESS_INTERVAL;
+                _scene_sys._fixedProcess();
+            }
+
+            _scene_sys._process();
+
             rl::BeginDrawing();
             rl::ClearBackground(rl::BLACK);
             rl::DrawFPS(10, 10);

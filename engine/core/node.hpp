@@ -13,7 +13,7 @@ private:
 
     void _start() {}
     void _update() {}
-    void _fixed_update() {}
+    void _fixedUpdate() {}
 
 public:
     Node() = delete;
