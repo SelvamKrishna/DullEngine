@@ -50,7 +50,7 @@ public:
     static App& instance() noexcept;
 
     [[nodiscard]]
-    Handle& handle() noexcept { return _handle; }
+    Handle& getHandle() noexcept { return _handle; }
 
     [[nodiscard]]
     constexpr bool isRunning() const noexcept { return _is_running; }
@@ -63,4 +63,5 @@ public:
 
 } // namespace dull::core
 
-#define HANDLE  ::dull::core::App::instance().handle()
+#define DULL_HANDLE \
+    ::dull::core::App::instance().getHandle()

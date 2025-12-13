@@ -13,27 +13,20 @@ class Layer final {
     friend class SceneSystem;
 
 private:
-    using NodeIt      = std::vector<std::unique_ptr<Node>>::iterator;
-    using NodeConstIt = std::vector<std::unique_ptr<Node>>::const_iterator;
+    using NodeIt      = std::vector<std::pair<std::string,std::unique_ptr<Node>>>::iterator;
+    using NodeConstIt = std::vector<std::pair<std::string,std::unique_ptr<Node>>>::const_iterator;
 
-    std::string                        _name;
-    std::vector<std::unique_ptr<Node>> _nodes;
+    std::string _name;
+    std::vector<std::pair<std::string,std::unique_ptr<Node>>> _nodes;
 
-    void _activate()
-    {
-        for (auto& node : _nodes)
-            node->_start();
-    }
-    void _process()
-    {
-        for (auto& node : _nodes)
-            node->_update();
-    }
-    void _fixedProcess()
-    {
-        for (auto& node : _nodes)
-            node->_fixedUpdate();
-    }
+#define _FOR_ALL_ACTIVE_NODES \
+    for (auto& node : _nodes) if (node.second->isActive())
+
+    void     _activate() { _FOR_ALL_ACTIVE_NODES node.second->_start(); }
+    void      _process() { _FOR_ALL_ACTIVE_NODES if (node.second->is_process) node.second->_update(); }
+    void _fixedProcess() { _FOR_ALL_ACTIVE_NODES if (node.second->is_fixed_process) node.second->_fixedUpdate(); }
+
+#undef _FOR_ALL_ACTIVE_NODES
 
     [[nodiscard]]
     Layer::NodeIt _findIterator(std::string_view name) noexcept;
@@ -67,14 +60,8 @@ public:
     Layer& operator=(Layer&&)      = delete;
     Layer& operator=(const Layer&) = delete;
 
-    explicit Layer(
-        std::string_view name,
-        size_t initial_capacity = DEFAULT_CAPACITY
-    ) noexcept : _name{name}
-    {
-        _nodes.reserve(initial_capacity);
-        /// TODO: push layer into layer buffer
-    }
+    explicit Layer(std::string_view name, size_t initial_capacity = DEFAULT_CAPACITY) noexcept
+    : _name{name} { _nodes.reserve(initial_capacity); }
 
     ~Layer() = default;
 
@@ -86,7 +73,7 @@ public:
 
     constexpr void shrinkToFit() noexcept { _nodes.shrink_to_fit(); }
 
-    void addNode(std::unique_ptr<Node> node) noexcept;
+    void addNode(std::string name, std::unique_ptr<Node> node) noexcept;
     void removeNode(std::string_view name) noexcept;
     void removeAllNodes() noexcept;
 
@@ -172,7 +159,7 @@ public:
 
         for (const auto& NODE : _nodes)
         {
-            NodeT* casted = dynamic_cast<NodeT*>(NODE.get());
+            NodeT* casted = dynamic_cast<NodeT*>(NODE.second.get());
             if (casted) result.push_back(casted);
         }
 

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "engine/core/event_bus.hpp"
+#include "engine/core/scene.hpp"
+
 #include <cstdint>
 
 namespace dull::core {
@@ -32,9 +35,15 @@ private:
     explicit Handle() = default;
     ~Handle() = default;
 
-    void _init() const noexcept;
+    void _init() noexcept;
     void _setState(ProgramState new_state) noexcept { _state = new_state; }
+
 public:
+    SceneSystem& sceneSystem() noexcept;
+    const SceneSystem& sceneSystem() const noexcept;
+
+    EventBus& eventBus() noexcept;
+    const EventBus& eventBus() const noexcept;
 };
 
 } // namespace dull::core

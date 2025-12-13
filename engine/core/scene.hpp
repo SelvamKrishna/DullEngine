@@ -78,6 +78,15 @@ public:
 
     [[nodiscard]]
     LayerBuffer& getLayerBuffer() noexcept { return _layer_buffer; }
+
+    [[nodiscard]]
+    bool isLayerActive(std::string_view layer_name) noexcept
+    {
+        for (const std::string_view& ACTIVE_LAYER : _current_scene.getActiveLayers())
+            if (ACTIVE_LAYER == layer_name) return true;
+
+        return false;
+    }
 };
 
 } // namespace dull::core

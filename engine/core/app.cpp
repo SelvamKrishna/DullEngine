@@ -41,13 +41,13 @@ App::App(const AppContext& context)
     rl::SetTargetFPS(context.target_fps);
 
     _is_running = true;
-    _handle._setState(ProgramState::Initial);
+    _handle._init();
 
     if constexpr (config::SHOULD_LOG_APP)
     {
         ZINFO_IF(context.is_vsync, "App Init: V-Sync On");
         ZINFO_IF(context.is_resizeable, "App Init: Window made resizeable");
-        ZINFO("App Initialized: {}\n", TITLE);
+        ZINFO("App Initialized: {}", TITLE);
     }
 }
 
@@ -76,6 +76,7 @@ void App::run() noexcept
 
             _scene_sys._process();
 
+            /// TODO: Move to render system
             rl::BeginDrawing();
             rl::ClearBackground(rl::BLACK);
             rl::DrawFPS(10, 10);

@@ -7,7 +7,7 @@
 namespace dull::core {
 
 #define _EVENT_BUS \
-    App::instance().getEventBus()
+    ::dull::core::App::instance().getHandle().eventBus()
 
 uint64_t Event::bind(Event::Callback callback)
 {
