@@ -5,7 +5,7 @@
 namespace dull::core {
 
 // =======================
-// Base Node class (OVERRIDABLE)
+// Base Node class
 // =======================
 class Node {
     friend class Layer;
@@ -18,18 +18,18 @@ private:
     A node is considered 'alive' if it is active and inside an active layer
 */
 
-    // Called by layer when the Node becomes 'alive'
+    // Called when 'alive'
     virtual void _start() {}
 
-    // Called by the layer every frame while 'alive'
+    // Called every frame while 'alive' & 'is_process'
     virtual void _update() {}
 
-    // Called by the layer every fixed update while 'alive'
+    // Called every fixed interval while 'alive' & 'is_fixed_process'
     virtual void _fixedUpdate() {}
 
 public:
-    bool is_process       {true};
-    bool is_fixed_process {true};
+    bool is_process       {true}; // Whether to call _update()
+    bool is_fixed_process {true}; // Whether to call _fixedUpdate()
 
     Node() = default;
     virtual ~Node() = default;

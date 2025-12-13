@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/core/event_bus.hpp"
-#include "engine/core/scene.hpp"
+#include "engine/core/scene_system.hpp"
 
 #include <cstdint>
 

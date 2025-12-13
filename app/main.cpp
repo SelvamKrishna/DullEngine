@@ -16,12 +16,7 @@ public:
 
 int main(void)
 {
-    dull::core::App app = {
-        {
-            .title = "Hello World",
-            .window_size = {500, 500},
-        }
-    };
+    dull::core::App app = { dull::core::AppContext::load() };
 
     dull::core::Handle& handle = app.getHandle();
     auto& layer_buf = handle.sceneSystem().getLayerBuffer();
@@ -32,7 +27,7 @@ int main(void)
     layer_buf.getLayer("main1")->addNode("sample", std::make_unique<Sample>());
 
     dull::core::Scene scene1 {"main1", "main2", "main3"};
-    handle.sceneSystem().setCurrentScene(scene1);
+    handle.sceneSystem().current_scene = scene1;
 
     dull::config::taskList();
     app.run();

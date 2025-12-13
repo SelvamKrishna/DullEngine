@@ -27,6 +27,11 @@ Layer::NodeConstIt Layer::_findIterator(std::string_view name) const noexcept
 
 void Layer::addNode(std::string name, std::unique_ptr<Node> node) noexcept
 {
+    ZASSERT_S(
+        _findIterator(name) == _nodes.end(),
+        "Node with name '" + name + "' already exists in Layer (" + _name + ")"
+    );
+
     _nodes.emplace_back(std::make_pair(std::move(name), std::move(node)));
     _nodes.back().second->_start();
 

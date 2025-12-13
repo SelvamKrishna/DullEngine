@@ -7,12 +7,9 @@ namespace dull::core {
     {
         if (value == _is_active) return;
 
-        const bool WAS_ACTIVE = _is_active;
-        _is_active = value;
-
         if (
-            !WAS_ACTIVE && // Inactive before and now active
-            DULL_HANDLE.sceneSystem().isLayerActive(_layer_name) // Inside active layer
+            _is_active = value; value &&
+            DULL_HANDLE.sceneSystem().current_scene.isLayerActive(_layer_name)
         ) _start();
     }
 

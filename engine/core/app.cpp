@@ -15,8 +15,12 @@ namespace dull::core {
 [[nodiscard]]
 AppContext AppContext::load() noexcept
 {
-    ZTODO("Load AppContext from config file");
-    return {};
+    return AppContext {
+        .title         = config::TITLE,
+        .window_size   = config::WINDOW_SIZE,
+        .is_vsync      = config::IS_VSYNC,
+        .is_resizeable = config::IS_RESIZEABLE,
+    };
 }
 
 static inline App* s_instance = nullptr;
@@ -38,7 +42,6 @@ App::App(const AppContext& context)
     rl::SetConfigFlags(flags);
     rl::InitWindow(context.window_size.x, context.window_size.y, TITLE.c_str());
     rl::SetExitKey(rl::KEY_NULL);
-    rl::SetTargetFPS(context.target_fps);
 
     _is_running = true;
     _handle._init();
@@ -62,6 +65,7 @@ App& App::instance() noexcept { return *s_instance; }
 
 void App::run() noexcept
 {
+    _handle._setState(ProgramState::Process);
     constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
     double accumulated_time = 0.0f;
 

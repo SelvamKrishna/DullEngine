@@ -1,7 +1,6 @@
 #pragma once
 
 #include "engine/core/event_bus.hpp"
-#include "engine/core/scene.hpp"
 #include "engine/core/handle.hpp"
 #include "engine/util/vec2.hpp"
 
@@ -15,7 +14,6 @@ namespace dull::core {
 struct AppContext final {
     std::string title         = "Application";
     util::Vec2i window_size   = {800, 800};
-    int         target_fps    = 0;     // if 0 no max capping of fps
     bool        is_vsync      = false; // caps fps to monitor refresh rate
     bool        is_resizeable = false;
 
@@ -55,7 +53,7 @@ public:
     [[nodiscard]]
     constexpr bool isRunning() const noexcept { return _is_running; }
 
-    void run()  noexcept;
+    void  run() noexcept;
     void quit() noexcept { _is_running = false; }
 
     void logStats() const noexcept;
