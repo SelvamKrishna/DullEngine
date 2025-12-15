@@ -1,17 +1,48 @@
+#include "engine/config.hpp"
 #include "engine/core/layer_buffer.hpp"
 
-#include <vendor/zutils/test.hpp>
+#include <vendor/zlog_v2.hpp>
 
 namespace dull::core {
 
+#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_LAYER_SYS)
+
 void LayerBuffer::loadLayer(std::unique_ptr<Layer> layer)
 {
-    ZASSERT_S(
-        _layers.find(layer->getName()) == _layers.end(),
-        "Layer with name " + std::string{layer->getName()} + " already exists in LayerBuffer"
+    std::string_view layer_name = layer->getName();
+    ZASSERT(
+        _layers.find(layer_name) == _layers.end(),
+        "Layer '{}' already exists in LayerBuffer", layer->getName()
     );
 
     _layers[std::string{layer->getName()}] = std::move(layer);
+    _IF_LOG ZINFO("Layer '{}' loaded to LayerBuffer", layer_name);
 }
+
+[[nodiscard]]
+std::unique_ptr<Layer>& LayerBuffer::getLayer(std::string_view layer_name) noexcept
+{
+    auto it = _layers.find(layer_name);
+    ZASSERT(
+        it != _layers.end(),
+        "Layer '{}' not found in LayerBuffer", layer_name
+    );
+
+    return it->second;
+}
+
+void LayerBuffer::logStats() const noexcept
+{
+    ZON_RELEASE return;
+    for (const auto& LAYER : _layers)
+    {
+        ZDBG(
+            "Layer '{}'",
+            zlog::ColorText{LAYER.first.c_str(), zlog::ANSI::EX_White},
+        );
+    }
+}
+
+#undef _IF_LOG
 
 } // namespace dull::core

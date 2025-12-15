@@ -2,7 +2,7 @@
 
 #include "engine/util/vec2.hpp"
 
-#include <vendor/zutils/tools.hpp>
+#include <vendor/zlog_v2.hpp>
 
 #include <format>
 #include <string>
@@ -21,10 +21,10 @@ constexpr uint32_t FIXED_PROCESS_FPS = 60;
 
 /// --- Logging Settings ---
 
-constexpr bool SHOULD_LOG_APP       = false;
-constexpr bool SHOULD_LOG_SCENE_SYS = false;
-constexpr bool SHOULD_LOG_LAYER_SYS = false;
-constexpr bool SHOULD_LOG_EVENT_SYS = false;
+constexpr bool SHOULD_LOG_APP       = true;
+constexpr bool SHOULD_LOG_SCENE_SYS = true;
+constexpr bool SHOULD_LOG_LAYER_SYS = true;
+constexpr bool SHOULD_LOG_EVENT_SYS = true;
 
 /// --- Engine Config (DO NOT TOUCH) ---
 

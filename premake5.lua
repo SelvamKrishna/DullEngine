@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 workspace "dull_engine"
     configurations { "Debug", "Release" }
     architecture "x86_64"

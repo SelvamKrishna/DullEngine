@@ -2,8 +2,7 @@
 
 #include "engine/misc/string_view_hashing.hpp"
 
-#include <vendor/zutils/log.hpp>
-#include <vendor/zutils/test.hpp>
+#include <vendor/zlog_v2.hpp>
 
 #include <any>
 #include <string>
@@ -44,20 +43,7 @@ public:
 
     template <typename DataT>
     [[nodiscard]]
-    DataT& getData(std::string_view key) const
-    {
-        auto it = _data_map.find(key);
-        ZASSERT_NE(it, _data_map.end());
-
-        const DataT* VALUE = std::any_cast<DataT>(&it->second);
-        ZASSERT_NE(VALUE, nullptr);
-
-        return *VALUE;
-    }
-
-    template <typename DataT>
-    [[nodiscard]]
-    std::optional<DataT> tryGetData(std::string_view key) const noexcept
+    std::optional<DataT&> tryGetData(std::string_view key) const noexcept
     {
         if (
             auto it = _data_map.find(key);
@@ -67,7 +53,7 @@ public:
             VALUE != nullptr
         ) return *VALUE;
 
-        ZERR("Event Data (BAD_CAST): Try get data '{}'", key);
+        ZWARN("Event Data (BAD_CAST): Try get data '{}'", key);
         return std::nullopt;
     }
 

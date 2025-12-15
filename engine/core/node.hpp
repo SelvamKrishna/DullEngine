@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vendor/zutils/tools.hpp>
+#include <vendor/zlog_v2.hpp>
 
 namespace dull::core {
 
@@ -11,13 +11,14 @@ class Node {
     friend class Layer;
 
 private:
-    std::string_view _layer_name;
-    bool _is_active {true};
+    std::string_view _layer_name; //< Name of the owner `Layer`
+    bool _is_active {false};      //< The `Layer` will auto set default values
 
 /*
-    A node is considered 'alive' if it is active and inside an active layer
+    - A node is considered 'alive' if it is active and inside an active layer
 */
 
+    // DO NOT directly call `Node::_start()` use `Node::setActive(true)` instead.
     // Called when 'alive'
     virtual void _start() {}
 
@@ -38,6 +39,9 @@ public:
     constexpr bool isActive() const noexcept { return _is_active; }
 
     void setActive(bool value) noexcept;
+
+    [[nodiscard]]
+    const std::string_view getOwnerLayer() const noexcept { return _layer_name; }
 };
 
 } // namespace dull::core

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vendor/zutils/test.hpp>
+#include <vendor/zlog_v2.hpp>
 
 #include <vector>
 #include <functional>
@@ -16,7 +16,7 @@ private:
     bool _is_current = false;
 
 public:
-    explicit Scene() : _layers {} {}
+    explicit Scene() = default;
     explicit Scene(std::initializer_list<std::string_view> layers);
 
     void addLayer(std::string_view layer_name, size_t idx = UINT64_MAX, bool active = true);

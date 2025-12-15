@@ -3,8 +3,7 @@
 #include "engine/core/event.hpp"
 #include "engine/misc/string_view_hashing.hpp"
 
-#include <vendor/zutils/log.hpp>
-#include <vendor/zutils/test.hpp>
+#include <vendor/zlog_v2.hpp>
 
 #include <string>
 #include <string_view>
@@ -47,7 +46,7 @@ public:
     {
         Event event = Event{name};
         (event.setData(pairs.first, pairs.second), ...);
-        emit(event);
+        event.emit();
     }
 
     void logStats() const noexcept;

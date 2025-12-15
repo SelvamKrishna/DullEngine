@@ -8,8 +8,8 @@ namespace dull::core {
         if (value == _is_active) return;
 
         if (
-            _is_active = value; value &&
-            DULL_HANDLE.sceneSystem().current_scene.isLayerActive(_layer_name)
+            _is_active = value; value && // Activated
+            DULL_HANDLE.scene_sys->current_scene.isLayerActive(_layer_name) // In active layer
         ) _start();
     }
 

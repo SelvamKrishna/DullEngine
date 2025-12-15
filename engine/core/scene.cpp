@@ -1,6 +1,6 @@
 #include "engine/core/scene.hpp"
 
-#include <vendor/zutils/tools.hpp>
+#include <vendor/zlog_v2.hpp>
 
 namespace dull::core {
 
@@ -17,7 +17,7 @@ void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
         [&layer_name](const auto& layer) { return layer.first == layer_name; }
     );
 
-    ZASSERT_S(
+    ZASSERT(
         it == _layers.end(),
         "Layer with name '" + std::string{layer_name} + "' already exists"
     );
@@ -30,7 +30,7 @@ void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
 
 void Scene::removeLayer(size_t index)
 {
-    ZASSERT_S(index < _layers.size(), "Index out of range");
+    ZASSERT(index < _layers.size(), "Index out of range");
     std::erase(_layers, _layers[index]);
 }
 
@@ -89,7 +89,7 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
         [&layer_name](const LayerContext& LAYER) { return LAYER.first == layer_name; }
     );
 
-    ZASSERT_S(
+    ZASSERT(
         it != _layers.end(),
         "Layer (" + std::string{layer_name} + ") Not found"
     );

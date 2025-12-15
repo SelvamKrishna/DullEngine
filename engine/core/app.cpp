@@ -3,14 +3,14 @@
 #include "engine/util/vec2.hpp"
 
 #include <vendor/raylib.h>
-#include <vendor/zutils/log.hpp>
-#include <vendor/zutils/test.hpp>
-#include <vendor/zutils/tools.hpp>
+#include <vendor/zlog_v2.hpp>
 
 #include <format>
 #include <string>
 
 namespace dull::core {
+
+#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_APP)
 
 [[nodiscard]]
 AppContext AppContext::load() noexcept
@@ -23,14 +23,23 @@ AppContext AppContext::load() noexcept
     };
 }
 
+void AppContext::logStats() const noexcept
+{
+    ZVAR(AppContext::title);
+    ZVAR(AppContext::window_size.x);
+    ZVAR(AppContext::window_size.y);
+    ZVAR(AppContext::is_vsync);
+    ZVAR(AppContext::is_resizeable);
+}
+
 static inline App* s_instance = nullptr;
 
 App::App(const AppContext& context)
 {
-    ZASSERT_EQ(s_instance, nullptr);
+    ZPANIC_IF(s_instance != nullptr, "App can only be initialized once.");
     s_instance = this;
 
-    const std::string TITLE = zutils::config::IS_MODE_DEBUG
+    const std::string TITLE = zlog::config::IS_MODE_DEBUG
     ? std::format("Dull Engine v{} - {}", config::getVerString(), context.title)
     : context.title;
 
@@ -46,17 +55,15 @@ App::App(const AppContext& context)
     _is_running = true;
     _handle._init();
 
-    if constexpr (config::SHOULD_LOG_APP)
-    {
-        ZINFO_IF(context.is_vsync, "App Init: V-Sync On");
-        ZINFO_IF(context.is_resizeable, "App Init: Window made resizeable");
-        ZINFO("App Initialized: {}", TITLE);
+    _IF_LOG {
+        context.logStats();
+        ZINFO("App '{}' initialized", TITLE);
     }
 }
 
 App::~App() noexcept
 {
-    ZINFO_IF(config::SHOULD_LOG_APP, "App Shutdown\n");
+    _IF_LOG ZINFO("App shutting down");
     if (_is_running) [[likely]] rl::CloseWindow();
 }
 
@@ -66,11 +73,15 @@ App& App::instance() noexcept { return *s_instance; }
 void App::run() noexcept
 {
     _handle._setState(ProgramState::Process);
+
     constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
     double accumulated_time = 0.0f;
 
+    _scene_sys._activate();
+
     try {
         while (!rl::WindowShouldClose() && _is_running) [[likely]] {
+            /// TODO: Move to time system
             accumulated_time += rl::GetFrameTime();
             if (accumulated_time > FIXED_PROCESS_INTERVAL)
             {
@@ -88,15 +99,10 @@ void App::run() noexcept
         }
     }
     catch (const std::exception& ERR) {
-        ZERR("App Run (UNHANDLED): {}", ERR.what());
+        ZERR("App (UNHANDLED): {}", ERR.what());
     }
 }
 
-void App::logStats() const noexcept
-{
-    ZON_RELEASE return;
-    ZDBG("Status -> App ({})", (void*)s_instance);
-    ZVAR(_is_running);
-}
+#undef _IF_LOG
 
 } // namespace dull::core

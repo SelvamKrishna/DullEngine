@@ -32,7 +32,9 @@ public:
     void loadLayer(std::unique_ptr<Layer> layer);
 
     [[nodiscard]]
-    std::unique_ptr<Layer>& getLayer(std::string_view layer_name) noexcept { return _layers[std::string{layer_name}]; }
+    std::unique_ptr<Layer>& getLayer(std::string_view layer_name) noexcept;
+
+    void logStats() const noexcept;
 };
 
 } // namespace dull::core

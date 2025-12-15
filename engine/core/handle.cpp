@@ -9,26 +9,9 @@ void Handle::_init() noexcept
 {
     s_app_ins = &App::instance();
     _state = ProgramState::Initial;
-}
 
-SceneSystem& Handle::sceneSystem() noexcept
-{
-    return s_app_ins->_scene_sys;
-}
-
-const SceneSystem& Handle::sceneSystem() const noexcept
-{
-    return s_app_ins->_scene_sys;
-}
-
-EventBus& Handle::eventBus() noexcept
-{
-    return s_app_ins->_event_bus;
-}
-
-const EventBus& Handle::eventBus() const noexcept
-{
-    return s_app_ins->_event_bus;
+    event_bus = &s_app_ins->_event_bus;
+    scene_sys = &s_app_ins->_scene_sys;
 }
 
 } // namespace dull::core

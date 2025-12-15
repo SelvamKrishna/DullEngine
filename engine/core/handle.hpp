@@ -17,10 +17,8 @@ enum class ProgramState : uint8_t {
 };
 
 // =======================
-// Access provider to core systems
+// Global Access provider to core systems
 // =======================
-// This prevents direct access to App's internals
-// and allows controlled exposure of functionality
 class Handle final {
     friend class App;
 
@@ -39,11 +37,11 @@ private:
     void _setState(ProgramState new_state) noexcept { _state = new_state; }
 
 public:
-    SceneSystem& sceneSystem() noexcept;
-    const SceneSystem& sceneSystem() const noexcept;
+    EventBus*    event_bus = nullptr;
+    SceneSystem* scene_sys = nullptr;
 
-    EventBus& eventBus() noexcept;
-    const EventBus& eventBus() const noexcept;
+    [[nodiscard]]
+    const ProgramState& getProgramState() const noexcept { return _state; }
 };
 
 } // namespace dull::core

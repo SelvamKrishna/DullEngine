@@ -4,7 +4,7 @@
 #include "engine/core/handle.hpp"
 #include "engine/util/vec2.hpp"
 
-#include <vendor/zutils/tools.hpp>
+#include <vendor/zlog_v2.hpp>
 
 namespace dull::core {
 
@@ -14,11 +14,13 @@ namespace dull::core {
 struct AppContext final {
     std::string title         = "Application";
     util::Vec2i window_size   = {800, 800};
-    bool        is_vsync      = false; // caps fps to monitor refresh rate
+    bool        is_vsync      = false;
     bool        is_resizeable = false;
 
     [[nodiscard]]
     static AppContext load() noexcept;
+
+    void logStats() const noexcept;
 };
 
 // =======================
@@ -55,8 +57,6 @@ public:
 
     void  run() noexcept;
     void quit() noexcept { _is_running = false; }
-
-    void logStats() const noexcept;
 };
 
 } // namespace dull::core
