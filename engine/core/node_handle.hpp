@@ -3,6 +3,8 @@
 #include "engine/core/node.hpp"
 
 #include <vector>
+#include <string>
+#include <memory>
 #include <string_view>
 
 namespace dull::core {

@@ -4,12 +4,6 @@
 
 namespace dull::core {
 
-Scene::Scene(std::initializer_list<std::string_view> layers)
-{
-    for (const std::string_view& LAYER_NAME : layers)
-        _layers.emplace_back(LAYER_NAME, true);
-}
-
 void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
 {
     auto it = std::find_if(

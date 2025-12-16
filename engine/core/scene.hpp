@@ -13,11 +13,9 @@ using LayerGroup   = std::vector<std::string_view>;
 class Scene final {
 private:
     std::vector<LayerContext> _layers;
-    bool _is_current = false;
 
 public:
     explicit Scene() = default;
-    explicit Scene(std::initializer_list<std::string_view> layers);
 
     void addLayer(std::string_view layer_name, size_t idx = UINT64_MAX, bool active = true);
     void removeLayer(size_t index);

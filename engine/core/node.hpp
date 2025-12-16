@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vendor/zlog_v2.hpp>
+#include <string_view>
 
 namespace dull::core {
 

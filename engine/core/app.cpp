@@ -79,6 +79,7 @@ void App::run() noexcept
 
     _scene_sys._activate();
 
+    _IF_LOG ZINFO("App running");
     try {
         while (!rl::WindowShouldClose() && _is_running) [[likely]] {
             /// TODO: Move to time system

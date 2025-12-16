@@ -3,6 +3,8 @@
 #include "engine/core/node.hpp"
 #include "engine/core/node_handle.hpp"
 
+#include <vendor/zlog_v2.hpp>
+
 #include <string>
 #include <vector>
 #include <memory>

@@ -19,6 +19,12 @@ constexpr bool        IS_RESIZEABLE = false;
 
 constexpr uint32_t FIXED_PROCESS_FPS = 60;
 
+enum class SceneID {
+    _NULL = 0,  // DO NOT CHANGE. Add scenes vvv
+    Scene1,
+    _COUNT,     // DO NOT CHANGE. Add scenes ^^^
+};
+
 /// --- Logging Settings ---
 
 constexpr bool SHOULD_LOG_APP       = true;
@@ -41,7 +47,6 @@ inline std::string getVerString() noexcept
 
 static inline void taskList() noexcept
 {
-    ZTODO("Better Scene managing");
     ZTODO("Better Layer creation");
     ZTODO("Proper render system plugin");
 }

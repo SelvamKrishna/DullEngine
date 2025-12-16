@@ -2,6 +2,8 @@
 #include "engine/core/node_handle.hpp"
 #include "engine/core/layer.hpp"
 
+#include <vendor/zlog_v2.hpp>
+
 namespace dull::core {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_LAYER_SYS)
