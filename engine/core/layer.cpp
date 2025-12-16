@@ -1,6 +1,7 @@
 #include "engine/config.hpp"
 #include "engine/core/app.hpp"
 #include "engine/core/layer.hpp"
+#include "engine/core/node_handle.hpp"
 
 namespace dull::core {
 
@@ -29,28 +30,15 @@ void Layer::_fixedProcess()
 
 #undef _FOR_ALL_ACTIVE_NODES
 
-[[nodiscard]]
-Layer::NodeIt Layer::_findIterator(std::string_view name) noexcept
-{
-    return std::find_if(
-        _nodes.begin(), _nodes.end(),
-        [&name](const CtxNodePair& node) { return node.name == name; }
-    );
-}
-
-[[nodiscard]]
-Layer::NodeConstIt Layer::_findIterator(std::string_view name) const noexcept
-{
-    return std::find_if(
-        _nodes.begin(), _nodes.end(),
-        [&name](const CtxNodePair& node) { return node.name == name; }
-    );
-}
+void Layer::_disconnect(NodeIt node_it) noexcept { node_it->uptr->_layer_name = ""; }
 
 void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active) noexcept
 {
     ZASSERT(
-        _findIterator(name) == _nodes.end(),
+        std::find_if(
+            _nodes.begin(), _nodes.end(),
+            [&name](const CtxNodePair& node) { return node.name == name; }
+        ) == _nodes.end(),
         "Node '{}' already exists in Layer '{}'", name, _name
     );
 
@@ -75,12 +63,6 @@ void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active
     }
 }
 
-void Layer::removeNode(std::string_view name) noexcept
-{
-    std::erase_if(_nodes, [&name](const CtxNodePair& node) { return node.name == name; });
-    _IF_LOG ZINFO("Node '{}' removed from Layer '{}'", name, _name);
-}
-
 void Layer::removeAllNodes() noexcept
 {
     _nodes.clear();
@@ -88,64 +70,35 @@ void Layer::removeAllNodes() noexcept
 }
 
 [[nodiscard]]
-Node* Layer::findNode(std::string_view name) noexcept
+NodeHandle Layer::getNodeHandle(std::string_view name) noexcept
 {
-    auto it = _findIterator(name);
-    return it != _nodes.end() ? it->uptr.get() : nullptr;
-}
+    std::vector<CtxNodePair>::iterator it = std::find_if(
+        _nodes.begin(), _nodes.end(),
+        [&name](const CtxNodePair& node)
+        { return node.name == name; }
+    );
 
-const Node* Layer::findNode(std::string_view name) const noexcept
-{
-    auto it = _findIterator(name);
-    return it != _nodes.end() ? it->uptr.get() : nullptr;
-}
+    ZASSERT(
+        it != _nodes.end(),
+        "Unable to find Node '{}' in Layer '{}'",
+        name, _name
+    );
 
-[[nodiscard]]
-const Node& Layer::getNode(std::string_view name) const
-{
-    auto* NODE = findNode(name);
-    ZASSERT(NODE != nullptr);
-    return *NODE;
+    return NodeHandle { *this, it };
 }
 
 [[nodiscard]]
-Node& Layer::getNode(std::string_view name)
+NodeHandle Layer::getNodeHandle(size_t index) noexcept
 {
-    auto* node = findNode(name);
-    ZASSERT(node != nullptr);
-    return *node;
-}
+    ZASSERT(
+        index < _nodes.size(),
+        "Node index {} out of range in Layer '{}'",
+        index, _name
+    );
 
-[[nodiscard]]
-Node* Layer::tryGetNode(std::string_view name) const noexcept
-{
-    return const_cast<Node*>(this->findNode(name));
-}
+    std::vector<CtxNodePair>::iterator it = _nodes.begin() + index;
 
-[[nodiscard]]
-Node* Layer::getNodeByIndex(this auto& self, size_t index) noexcept
-{
-    return index < self._nodes.size() ? self._nodes[index].uptr.get() : nullptr;
-}
-
-[[nodiscard]]
-std::unique_ptr<Node> Layer::extractNode(std::string_view name) noexcept
-{
-    auto it = _findIterator(name);
-
-    if (it == _nodes.end())
-    {
-        _IF_LOG ZINFO("Can't extract Node '{}' from Layer '{}'", name, _name);
-        return std::unique_ptr<Node>{nullptr};
-    }
-
-    _IF_LOG ZINFO("Node '{}' extracted from Layer '{}'", name, _name);
-
-    std::unique_ptr<Node> node = {std::move(it->uptr)};
-    node->_layer_name = "";
-    _nodes.erase(it);
-
-    return node;
+    return NodeHandle { *this, it };
 }
 
 void Layer::logStats() const noexcept
@@ -161,4 +114,3 @@ void Layer::logStats() const noexcept
 #undef _IF_LOG
 
 } // namespace dull::core
-

@@ -17,7 +17,9 @@ private:
     void _update() final
     {
         if (rl::IsKeyPressed(rl::KEY_B))
-            DULL_HANDLE.scene_sys->getLayerBuffer().getLayer(getOwnerLayer())->getNode<Sample2>().setActive(true);
+            DULL_HANDLE.scene_sys->getLayerBuffer()
+                .getLayer(getOwnerLayer())->getNodeHandle<Sample2>()
+                .getNode()->setActive(true);
     }
 
 public:
