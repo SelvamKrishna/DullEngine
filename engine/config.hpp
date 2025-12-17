@@ -27,10 +27,15 @@ enum class SceneID {
 
 /// --- Logging Settings ---
 
+#ifdef NDEBUG // Release Mode
+constexpr bool SHOULD_LOG_APP       = false;
+constexpr bool SHOULD_LOG_SCENE_SYS = false;
+constexpr bool SHOULD_LOG_EVENT_SYS = false;
+#else // Debug Mode
 constexpr bool SHOULD_LOG_APP       = true;
 constexpr bool SHOULD_LOG_SCENE_SYS = true;
-constexpr bool SHOULD_LOG_LAYER_SYS = true;
 constexpr bool SHOULD_LOG_EVENT_SYS = true;
+#endif
 
 /// --- Engine Config (DO NOT TOUCH) ---
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "engine/core/event_bus.hpp"
+#include "engine/core/event_system.hpp"
+#include "engine/core/scene_system.hpp"
 #include "engine/core/handle.hpp"
 #include "engine/util/vec2.hpp"
 
@@ -27,13 +28,18 @@ struct AppContext final {
 // Main application
 // =======================
 class App final {
-    friend class Handle;
+    friend Handle;
 
 private:
-    EventBus    _event_bus;
+    EventSystem _event_sys;
     SceneSystem _scene_sys;
-    Handle      _handle;
-    bool   _is_running = false;
+
+    Handle _handle {
+        _event_sys,
+        _scene_sys,
+        _scene_sys.getLayerBuffer(),
+        _scene_sys.getSceneBuffer(),
+    };
 
 public:
     App() = delete;
@@ -52,11 +58,8 @@ public:
     [[nodiscard]]
     Handle& getHandle() noexcept { return _handle; }
 
-    [[nodiscard]]
-    constexpr bool isRunning() const noexcept { return _is_running; }
-
     void  run() noexcept;
-    void quit() noexcept { _is_running = false; }
+    void quit() noexcept;
 };
 
 } // namespace dull::core

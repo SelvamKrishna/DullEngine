@@ -6,7 +6,7 @@
 
 namespace dull::core {
 
-#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_LAYER_SYS)
+#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
 void NodeHandle::removeFromLayer() noexcept
 {
@@ -20,8 +20,7 @@ std::unique_ptr<Node> NodeHandle::extractFromLayer() noexcept
     _IF_LOG ZINFO("Node '{}' extracted from Layer '{}'", _node_it->name, _layer._name);
 
     std::unique_ptr<Node> node = {std::move(_node_it->uptr)};
-    Layer::_disconnect(_node_it);
-    _layer._nodes.erase(_node_it);
+    _layer._disconnect(_node_it);
 
     return node;
 }

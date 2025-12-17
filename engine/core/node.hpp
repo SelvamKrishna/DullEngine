@@ -38,10 +38,12 @@ public:
     [[nodiscard]]
     constexpr bool isActive() const noexcept { return _is_active; }
 
+    // Calls the Node::_start() function if it is made alive
     void setActive(bool value) noexcept;
 
+    // Name of the Owning Layer
     [[nodiscard]]
-    const std::string_view getOwnerLayer() const noexcept { return _layer_name; }
+    const std::string_view getLayer() const noexcept { return _layer_name; }
 };
 
 } // namespace dull::core

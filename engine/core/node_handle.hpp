@@ -9,23 +9,30 @@
 
 namespace dull::core {
 
+// Forward Declaration
 class Layer;
 
-struct CtxNodePair final {
-    std::string           name;
-    std::unique_ptr<Node> uptr;
+// =======================
+// NodeName : NodePointer
+// =======================
+struct NodeCtx final {
+    std::string           name; //< Node name (UNIQUE within Layer)
+    std::unique_ptr<Node> uptr; //< Pointer to Node
 };
 
+// =======================
+// Wrapper for Node to provide Layer related logic
+// =======================
 class NodeHandle final {
     friend Layer;
 
 private:
-    Layer& _layer;
-    std::vector<CtxNodePair>::iterator _node_it;
+    Layer& _layer; //< Reference to Layer owning this Node
+    std::vector<NodeCtx>::iterator _node_it; //< Node location in Layer
 
     explicit NodeHandle(
         Layer& layer,
-        std::vector<CtxNodePair>::iterator node_it
+        std::vector<NodeCtx>::iterator node_it
     ) noexcept
     : _layer {layer}
     , _node_it {node_it}
@@ -40,8 +47,10 @@ public:
     [[nodiscard]]
     std::unique_ptr<Node>& getNode() noexcept;
 
+    // Removes Node from Layer
     void removeFromLayer() noexcept;
 
+    // Removes Node from Layer and returns it
     [[nodiscard]]
     std::unique_ptr<Node> extractFromLayer() noexcept;
 };

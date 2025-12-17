@@ -5,34 +5,35 @@
 
 namespace dull::core {
 
-#define _EVENT_BUS  ::dull::core::App::instance().getHandle().event_bus
+#define _EVENT_BUS  ::dull::core::App::instance().getHandle().event_sys
 
 uint64_t Event::bind(Event::Callback callback)
 {
-    return _EVENT_BUS->bind(_name, std::move(callback));
+    return _EVENT_BUS.bind(_name, std::move(callback));
 }
 
 void Event::unbind(uint64_t id)
 {
-    return _EVENT_BUS->unbind(_name, id);
+    return _EVENT_BUS.unbind(_name, id);
 }
 
 void Event::emit() const noexcept
 {
-    return _EVENT_BUS->emit(_name);
+    return _EVENT_BUS.emit(_name);
 }
 
 void Event::logStats() const noexcept
 {
     ZON_RELEASE return;
-    ZVAR(Event::_name);
-
+    ZTRC_S("Logging Event '{}'", _name);
     for (const auto& DATA : _data_map)
+    {
         ZDBG(
             "{}{}",
             zlog::config::TAB_TAG,
             zlog::ColorText{DATA.first, zlog::ANSI::EX_White}
         );
+    }
 }
 
 #undef _EVENT_BUS

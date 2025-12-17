@@ -5,15 +5,14 @@
 
 namespace dull::core {
 
-#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_LAYER_SYS)
+#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
 #define _FOR_ALL_ACTIVE_NODES \
     for (auto& node : _nodes) if (node.uptr->isActive())
 
 void Layer::_activate()
 {
-    _FOR_ALL_ACTIVE_NODES
-        node.uptr->_start();
+    _FOR_ALL_ACTIVE_NODES node.uptr->_start();
 }
 
 void Layer::_process()
@@ -30,37 +29,34 @@ void Layer::_fixedProcess()
 
 #undef _FOR_ALL_ACTIVE_NODES
 
-void Layer::_disconnect(NodeIt node_it) noexcept { node_it->uptr->_layer_name = ""; }
+void Layer::_disconnect(std::vector<NodeCtx>::iterator node_it) noexcept
+{
+    node_it->uptr->_layer_name = "";
+    _nodes.erase(node_it);
+}
 
 void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active) noexcept
 {
     ZASSERT(
         std::find_if(
             _nodes.begin(), _nodes.end(),
-            [&name](const CtxNodePair& node) { return node.name == name; }
+            [&name](const NodeCtx& node) { return node.name == name; }
         ) == _nodes.end(),
         "Node '{}' already exists in Layer '{}'", name, _name
     );
 
     _IF_LOG ZINFO("Node '{}' added to Layer '{}'", name, _name);
     node->_layer_name = _name;
-    _nodes.emplace_back(CtxNodePair { .name = std::move(name), .uptr = std::move(node) });
+    _nodes.emplace_back(NodeCtx { .name = std::move(name), .uptr = std::move(node) });
 
     if (!is_active) return;
 
-    switch (DULL_HANDLE.getProgramState()) {
-        case ProgramState::Initial:
-        {
-            // Soft active `Node::_start()` will be called later
-            _nodes.back().uptr->_is_active = true; break;
-        }
-        case ProgramState::Process:
-        {
-            // Hard active `Node::_start()` will be called now
-            _nodes.back().uptr->setActive(true); break;
-        }
-        case ProgramState::Conclude: break;
-    }
+    if (DULL_HANDLE.getProgramState() == ProgramState::Initial)
+        _nodes.back().uptr->_is_active = true;
+        // Soft active `Node::_start()` will be called in Layer::_active()
+    else
+        _nodes.back().uptr->setActive(true);
+        // Hard active `Node::_start()` will be called now
 }
 
 void Layer::removeAllNodes() noexcept
@@ -72,9 +68,9 @@ void Layer::removeAllNodes() noexcept
 [[nodiscard]]
 NodeHandle Layer::getNodeHandle(std::string_view name) noexcept
 {
-    std::vector<CtxNodePair>::iterator it = std::find_if(
+    std::vector<NodeCtx>::iterator it = std::find_if(
         _nodes.begin(), _nodes.end(),
-        [&name](const CtxNodePair& node)
+        [&name](const NodeCtx& node)
         { return node.name == name; }
     );
 
@@ -96,7 +92,7 @@ NodeHandle Layer::getNodeHandle(size_t index) noexcept
         index, _name
     );
 
-    std::vector<CtxNodePair>::iterator it = _nodes.begin() + index;
+    std::vector<NodeCtx>::iterator it = _nodes.begin() + index;
 
     return NodeHandle { *this, it };
 }
@@ -104,11 +100,17 @@ NodeHandle Layer::getNodeHandle(size_t index) noexcept
 void Layer::logStats() const noexcept
 {
     ZON_RELEASE return;
-    ZINFO_IF(config::SHOULD_LOG_SCENE_SYS, "Status -> Layer ({})", (void*)this);
-    ZVAR(_name);
-    ZVAR(_nodes.size());
-
-    for (const CtxNodePair& NODE : _nodes) ZVAR(NODE.name);
+    ZTRC_S("Logging Layer '{}'", _name);
+    for (const NodeCtx& NODE : _nodes)
+    {
+        ZDBG(
+            "{}Node '{}'{}{}",
+            zlog::config::TAB_TAG,
+            NODE.name,
+            zlog::config::TAG_TAG,
+            NODE.uptr->isActive()
+        );
+    }
 }
 
 #undef _IF_LOG

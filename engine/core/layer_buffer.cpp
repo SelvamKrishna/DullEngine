@@ -5,7 +5,7 @@
 
 namespace dull::core {
 
-#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_LAYER_SYS)
+#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
 void LayerBuffer::loadLayer(std::unique_ptr<Layer> layer)
 {
@@ -15,7 +15,7 @@ void LayerBuffer::loadLayer(std::unique_ptr<Layer> layer)
         "Layer '{}' already exists in LayerBuffer", layer->getName()
     );
 
-    _layers[std::string{layer->getName()}] = std::move(layer);
+    _layers[layer->getName()] = std::move(layer);
     _IF_LOG ZINFO("Layer '{}' loaded to LayerBuffer", layer_name);
 }
 
@@ -34,13 +34,8 @@ std::unique_ptr<Layer>& LayerBuffer::getLayer(std::string_view layer_name) noexc
 void LayerBuffer::logStats() const noexcept
 {
     ZON_RELEASE return;
-    for (const auto& LAYER : _layers)
-    {
-        ZDBG(
-            "Layer '{}'",
-            zlog::ColorText{LAYER.first.c_str(), zlog::ANSI::EX_White},
-        );
-    }
+    ZTRC_S("Logging LayerBuffer");
+    for (const auto& LAYER : _layers) LAYER.second->logStats();
 }
 
 #undef _IF_LOG

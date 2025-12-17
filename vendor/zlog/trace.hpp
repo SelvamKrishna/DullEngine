@@ -47,4 +47,4 @@ public:
 // Scope tracing
 #define ZTRC         _ZTRC_ANON {std::format("{}()", __FUNCTION__)}
 #define ZTRC_C(CLS)  _ZTRC_ANON {std::format("{}::{}()", #CLS, __FUNCTION__)}
-#define ZTRC_S(DSC)  _ZTRC_ANON {DSC}
+#define ZTRC_S(...)  _ZTRC_ANON {::zlog::internal::ProString {__VA_ARGS__}.TEXT}

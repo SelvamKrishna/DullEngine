@@ -1,11 +1,14 @@
 #pragma once
 
-#include "engine/core/event_bus.hpp"
-#include "engine/core/scene_system.hpp"
-
 #include <cstdint>
 
 namespace dull::core {
+
+// Forward Declaration
+class EventSystem;
+class SceneSystem;
+class LayerBuffer;
+class SceneBuffer;
 
 // =======================
 // A enum to keep track of the app state
@@ -30,18 +33,40 @@ private:
     constexpr Handle& operator=(Handle&&)      noexcept = delete;
     constexpr Handle& operator=(const Handle&) noexcept = delete;
 
-    explicit Handle() = default;
+    explicit Handle(
+        EventSystem& event_sys,
+        SceneSystem& scene_sys,
+        LayerBuffer& layer_buf,
+        SceneBuffer& scene_buf
+    )
+    : event_sys {event_sys}
+    , scene_sys {scene_sys}
+    , layer_buf {layer_buf}
+    , scene_buf {scene_buf}
+    {}
+
     ~Handle() = default;
 
     void _init() noexcept;
     void _setState(ProgramState new_state) noexcept { _state = new_state; }
 
 public:
-    EventBus*    event_bus = nullptr;
-    SceneSystem* scene_sys = nullptr;
+    EventSystem& event_sys; //< Handles all event related logic
+    SceneSystem& scene_sys; //< Handles all scene related logic
+    LayerBuffer& layer_buf; //< Stores all layer related data
+    SceneBuffer& scene_buf; //< Stores all scene related data
 
     [[nodiscard]]
     const ProgramState& getProgramState() const noexcept { return _state; }
+
+    [[nodiscard]]
+    constexpr bool isStarting() const noexcept { return _state == ProgramState::Initial; }
+
+    [[nodiscard]]
+    constexpr bool isRunning() const noexcept { return _state == ProgramState::Process; }
+
+    [[nodiscard]]
+    constexpr bool isQuitting() const noexcept { return _state == ProgramState::Conclude; }
 };
 
 } // namespace dull::core

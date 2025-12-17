@@ -52,7 +52,6 @@ App::App(const AppContext& context)
     rl::InitWindow(context.window_size.x, context.window_size.y, TITLE.c_str());
     rl::SetExitKey(rl::KEY_NULL);
 
-    _is_running = true;
     _handle._init();
 
     _IF_LOG {
@@ -64,7 +63,7 @@ App::App(const AppContext& context)
 App::~App() noexcept
 {
     _IF_LOG ZINFO("App shutting down");
-    if (_is_running) [[likely]] rl::CloseWindow();
+    if (_handle.isRunning()) [[likely]] rl::CloseWindow();
 }
 
 [[nodiscard]]
@@ -77,11 +76,12 @@ void App::run() noexcept
     constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
     double accumulated_time = 0.0f;
 
+    _IF_LOG ZINFO("App running");
+
     _scene_sys._activate();
 
-    _IF_LOG ZINFO("App running");
     try {
-        while (!rl::WindowShouldClose() && _is_running) [[likely]] {
+        while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
             /// TODO: Move to time system
             accumulated_time += rl::GetFrameTime();
             if (accumulated_time > FIXED_PROCESS_INTERVAL)
@@ -103,6 +103,8 @@ void App::run() noexcept
         ZERR("App (UNHANDLED): {}", ERR.what());
     }
 }
+
+void App::quit() noexcept { _handle._setState(ProgramState::Conclude); }
 
 #undef _IF_LOG
 

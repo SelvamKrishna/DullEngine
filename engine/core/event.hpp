@@ -13,20 +13,23 @@
 
 namespace dull::core {
 
+// =======================
+// Event with additional Data information
+// =======================
 class Event final {
 private:
     using DataMap = std::unordered_map<
-        std::string,
-        std::any,
+        std::string, //< Name of the variable
+        std::any,    //< Content of the variable
         misc::StringHash,
         misc::StringEq
     >;
 
-    std::string    _name;
+    std::string _name;
     Event::DataMap _data_map;
 
 public:
-    using Callback = std::function<void(const class Event&)>;
+    using Callback = std::function<void(const class Event&)>; // Function to call when emitted
 
     Event() = delete;
 
@@ -41,9 +44,10 @@ public:
     [[nodiscard]]
     std::string_view getName() const noexcept { return _name; }
 
+    // Used by the Listener to access underlying data
     template <typename DataT>
     [[nodiscard]]
-    std::optional<DataT&> tryGetData(std::string_view key) const noexcept
+    std::optional<const DataT&> getData(std::string_view key) const noexcept
     {
         if (
             auto it = _data_map.find(key);
@@ -57,16 +61,23 @@ public:
         return std::nullopt;
     }
 
+    // Used by the Sender to add context to the Event
     template <typename DataT>
     void setData(std::string_view key, DataT&& value)
     {
         _data_map.emplace(key, std::forward<DataT>(value));
     }
 
+    // Binds Callback function with Event
     uint64_t bind(Event::Callback callback);
-    void     unbind(uint64_t callback_id);
-    void     emit() const noexcept;
 
+    // Unbinds Callback function with Event
+    void unbind(uint64_t callback_id);
+
+    // Emits Event calling all the binded callback function
+    void emit() const noexcept;
+
+    // DEV: Logs all stores variables
     void logStats() const noexcept;
 };
 
