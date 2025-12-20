@@ -3,67 +3,109 @@
 #include "engine/util/vec2.hpp"
 
 #include <vendor/raylib.h>
-#include <vendor/zutils/zutils.hpp>
+#include <vendor/zlog_v2.hpp>
 
 #include <format>
 #include <string>
 
 namespace dull::core {
 
-static inline App* s_instance {nullptr};
+#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_APP)
 
-App::App(const misc::AppContext& context) {
-  ZASSERT_EQ(s_instance, nullptr);
-
-  const std::string TITLE = (config::IS_DEBUG_BUILD)
-  ? std::format("Dull Engine v{} - {}", config::getVerString(), context.title)
-  : context.title;
-
-  int flags {
-    (context.is_vsync      ? rl::FLAG_VSYNC_HINT       : 0) |
-    (context.is_resizeable ? rl::FLAG_WINDOW_RESIZABLE : 0)
-  };
-
-  rl::SetConfigFlags(flags);
-  rl::InitWindow(context.window_size.x, context.window_size.y, TITLE.c_str());
-  rl::SetExitKey(rl::KEY_NULL);
-  rl::SetTargetFPS(context.target_fps);
-
-  _is_running = true;
-  s_instance = this;
-
-  if constexpr (config::SHOULD_LOG_APP) {
-    ZLOGI_IF(context.is_vsync)      << "App Init: V-Sync On";
-    ZLOGI_IF(context.is_resizeable) << "App Init: Window made resizeable";
-
-    ZLOGI << "App Initialized: " << TITLE << "\n";
-  }
+[[nodiscard]]
+AppContext AppContext::load() noexcept
+{
+    return AppContext {
+        .title         = config::TITLE,
+        .window_size   = config::WINDOW_SIZE,
+        .is_vsync      = config::IS_VSYNC,
+        .is_resizeable = config::IS_RESIZEABLE,
+    };
 }
 
-App::~App() noexcept {
-  if (_is_running) [[likely]] rl::CloseWindow();
-  ZLOGI_IF(config::SHOULD_LOG_APP) << "App Shutdown";
+void AppContext::logStats() const noexcept
+{
+    ZVAR(AppContext::title);
+    ZVAR(AppContext::window_size.x);
+    ZVAR(AppContext::window_size.y);
+    ZVAR(AppContext::is_vsync);
+    ZVAR(AppContext::is_resizeable);
 }
 
-[[nodiscard]] App& App::instance() noexcept { return *s_instance; }
+static inline App* s_instance = nullptr;
 
-int App::run() noexcept {
-  try {
-    while (!rl::WindowShouldClose()) [[likely]] {
-      rl::BeginDrawing();
-      rl::ClearBackground(rl::BLACK);
-      rl::DrawFPS(10, 10);
-      rl::EndDrawing();
+App::App(const AppContext& context)
+{
+    ZPANIC_IF(s_instance != nullptr, "App can only be initialized once.");
+    s_instance = this;
+
+    const std::string TITLE = zlog::config::IS_MODE_DEBUG
+    ? std::format("Dull Engine v{} - {}", config::getVerString(), context.title)
+    : context.title;
+
+    int flags = {
+        (context.is_vsync      ? rl::FLAG_VSYNC_HINT       : 0) |
+        (context.is_resizeable ? rl::FLAG_WINDOW_RESIZABLE : 0)
+    };
+
+    rl::SetConfigFlags(flags);
+    rl::InitWindow(context.window_size.x, context.window_size.y, TITLE.c_str());
+    rl::SetExitKey(rl::KEY_NULL);
+
+    _handle._init();
+
+    _IF_LOG {
+        context.logStats();
+        ZINFO("App '{}' initialized", TITLE);
     }
-
-  } catch (const std::exception& ERR) {
-    ZLOGE << "App Run (UNHANDLED): " << ERR.what();
-    return EXIT_FAILURE;
-  }
-
-  return EXIT_SUCCESS;
 }
 
-[[nodiscard]] EventBus& App::getEventBus() noexcept { return _event_bus; }
+App::~App() noexcept
+{
+    _IF_LOG ZINFO("App shutting down");
+    if (_handle.isRunning()) [[likely]] rl::CloseWindow();
+}
+
+[[nodiscard]]
+App& App::instance() noexcept { return *s_instance; }
+
+void App::run() noexcept
+{
+    _handle._setState(ProgramState::Process);
+
+    constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
+    double accumulated_time = 0.0f;
+
+    _IF_LOG ZINFO("App running");
+
+    _scene_sys._activate();
+
+    try {
+        while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
+            /// TODO: Move to time system
+            accumulated_time += rl::GetFrameTime();
+            if (accumulated_time > FIXED_PROCESS_INTERVAL)
+            {
+                accumulated_time -= FIXED_PROCESS_INTERVAL;
+                _scene_sys._fixedProcess();
+            }
+
+            _scene_sys._process();
+
+            /// TODO: Move to render system
+            rl::BeginDrawing();
+            rl::ClearBackground(rl::BLACK);
+            rl::DrawFPS(10, 10);
+            rl::EndDrawing();
+        }
+    }
+    catch (const std::exception& ERR) {
+        ZERR("App (UNHANDLED): {}", ERR.what());
+    }
+}
+
+void App::quit() noexcept { _handle._setState(ProgramState::Conclude); }
+
+#undef _IF_LOG
 
 } // namespace dull::core
