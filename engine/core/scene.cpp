@@ -1,3 +1,4 @@
+#include "engine/config.hpp"
 #include "engine/core/app.hpp"
 #include "engine/core/scene.hpp"
 
@@ -29,7 +30,7 @@ void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
     else
         _layers.insert(_layers.begin() + idx, { layer_name, active });
 
-    _IF_LOG ZINFO("Layer '{}' added to Scene", layer_name);
+    _IF_LOG ZINFO("Layer '{}' added to Scene '{}'", layer_name, _name);
 }
 
 void Scene::removeLayer(std::string_view layer_name)
@@ -104,7 +105,7 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
     it->is_active = active;
 
     // Layer is made active and Scene is currently processing
-    if (active && DULL_HANDLE.scene_sys.isSceneCurrent(_scene_id))
+    if (active && DULL_HANDLE.scene_sys.isSceneCurrent(_name))
         DULL_HANDLE.layer_buf.getLayer(layer_name)->_activate();
 
     _IF_LOG ZINFO("Layer '{}' made {}", layer_name, active ? "active" : "inactive");
@@ -113,6 +114,8 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
 void Scene::logStats() const noexcept
 {
     ZON_RELEASE return;
+    ZTRC_S("Loggin Scene '{}'", _name);
+
     for (const LayerCtx& LAYER_CTX : _layers)
     {
         ZDBG(

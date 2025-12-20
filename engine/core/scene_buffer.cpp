@@ -6,28 +6,45 @@
 namespace dull::core {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
-#define _AS_IDX(VAL)  static_cast<size_t>(VAL)
 
-SceneBuffer::SceneBuffer()
+SceneBuffer::SceneIt SceneBuffer::_findScene(std::string_view scene_name) noexcept
 {
-    _scenes[_AS_IDX(config::SceneID::_NULL)] = std::make_unique<Scene>(); // NULL SCENE
+    return std::find_if(
+        _scenes.begin(), _scenes.end(),
+        [&scene_name](const std::unique_ptr<Scene>& scene)
+        {
+            return scene->_name == scene_name;
+        }
+    );
 }
 
-void SceneBuffer::loadScene(config::SceneID scene_id, std::unique_ptr<Scene> scene)
+void SceneBuffer::loadScene(std::unique_ptr<Scene> scene)
 {
-    size_t scene_idx = _AS_IDX(scene_id);
-    scene->_scene_id = scene_id;
-    _scenes[scene_idx] = std::move(scene);
+    ZASSERT(
+        _findScene(scene->_name) == _scenes.end(),
+        "Scene '{}' already loaded into SceneBuffer", scene->_name
+    );
 
-    _IF_LOG ZINFO("Scene '{}' loaded to SceneBuffer", scene_idx);
+    _IF_LOG ZINFO("Scene '{}' loaded into SceneBuffer", scene->_name);
+    _scenes.emplace_back(std::move(scene));
 }
 
 [[nodiscard]]
-std::unique_ptr<Scene>& SceneBuffer::getScene(config::SceneID scene_id) noexcept
+std::unique_ptr<Scene>& SceneBuffer::getScene(std::string_view scene_name) noexcept
 {
-    size_t scene_index = _AS_IDX(scene_id);
-    ZASSERT(_scenes.size() > scene_index, "The provided SceneID is out of range in the SceneBuffer");
-    return _scenes[scene_index];
+    auto it = _findScene(scene_name);
+
+    ZASSERT(
+        it != _scenes.end(),
+        "Scene '{}' not found in SceneBuffer", scene_name
+    );
+
+    return *it;
+}
+
+bool SceneBuffer::hasScene(std::string_view& scene_name) noexcept
+{
+    return _findScene(scene_name) != _scenes.end();
 }
 
 void SceneBuffer::logStats() const noexcept
@@ -37,7 +54,6 @@ void SceneBuffer::logStats() const noexcept
     for (const std::unique_ptr<Scene>& SCENE : _scenes) SCENE->logStats();
 }
 
-#undef _AS_IDX
 #undef _IF_LOG
 
 } // namespace dull::core

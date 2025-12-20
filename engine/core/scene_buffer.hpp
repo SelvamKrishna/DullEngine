@@ -1,10 +1,10 @@
 #pragma once
 
-#include "engine/config.hpp"
 #include "engine/core/scene.hpp"
 
 #include <memory>
-#include <array>
+#include <vector>
+#include <string_view>
 
 namespace dull::core {
 
@@ -15,27 +15,33 @@ class SceneBuffer final {
     friend class SceneSystem;
 
 private:
-    // Fixed size array size calculated from SceneID enum in dull::config
-    std::array<std::unique_ptr<Scene>, static_cast<size_t>(config::SceneID::_COUNT)> _scenes;
+    std::vector<std::unique_ptr<Scene>> _scenes;
+
+    using SceneIt = std::vector<std::unique_ptr<Scene>>::iterator;
 
     constexpr SceneBuffer(SceneBuffer&&)                 noexcept = delete;
     constexpr SceneBuffer(const SceneBuffer&)            noexcept = delete;
     constexpr SceneBuffer& operator=(SceneBuffer&&)      noexcept = delete;
     constexpr SceneBuffer& operator=(const SceneBuffer&) noexcept = delete;
 
-    SceneBuffer();
+    explicit SceneBuffer() = default;
     ~SceneBuffer() = default;
+
+    SceneIt _findScene(std::string_view scene_name) noexcept;
 
 public:
     // Loads scene into buffer
-    void loadScene(config::SceneID scene_id, std::unique_ptr<Scene> scene);
+    void loadScene(std::unique_ptr<Scene> scene);
 
     // Get access to scene using its unique ID
     [[nodiscard]]
-    std::unique_ptr<Scene>& getScene(config::SceneID scene_id) noexcept;
+    std::unique_ptr<Scene>& getScene(std::string_view scene_name) noexcept;
 
     [[nodiscard]]
-    size_t sceneCount() const noexcept { return _scenes.size(); }
+    bool hasScene(std::string_view& scene_name) noexcept;
+
+    [[nodiscard]]
+    size_t sceneCount() noexcept { return _scenes.size(); }
 
     // DEV: Logs all scenes within buffer
     void logStats() const noexcept;

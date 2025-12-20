@@ -1,7 +1,5 @@
 #pragma once
 
-#include "engine/config.hpp"
-
 #include <vendor/zlog_v2.hpp>
 
 #include <vector>
@@ -28,14 +26,14 @@ class Scene final {
 
 private:
     std::vector<LayerCtx> _layers; //< Collection of Layer Context
-    config::SceneID _scene_id;
+    std::string           _name;   //< Scene name (UNIQUE)
 
     void _activate();
     void _process();
     void _fixedProcess();
 
 public:
-    explicit Scene() = default;
+    explicit Scene(std::string scene_name) noexcept : _name {std::move(scene_name)} {}
 
     // Add Layer with given Index(Process Order) and Activity
     void addLayer(std::string_view layer_name, size_t idx = UINT64_MAX, bool active = true);

@@ -42,16 +42,16 @@ int main(void)
     layer_buf.getLayer("main1")->addNode("sample", std::make_unique<Sample>());
     layer_buf.getLayer("main1")->addNode("sample2", std::make_unique<Sample2>(), false);
 
-    auto sc1 = std::make_unique<dull::core::Scene>();
+    auto sc1 = std::make_unique<dull::core::Scene>("Scene1");
 
     sc1->addLayer("main1");
 
-    handle.scene_sys.getSceneBuffer().loadScene(dull::config::SceneID::Scene1, std::move(sc1));
-    handle.scene_sys.setCurrentScene(dull::config::SceneID::Scene1);
+    handle.scene_sys.getSceneBuffer().loadScene(std::move(sc1));
+    handle.scene_sys.setCurrentScene("Scene1");
 
     dull::config::taskList();
 
-    handle.scene_sys.logStats();
+    handle.scene_buf.logStats();
 
     app.run();
 }
