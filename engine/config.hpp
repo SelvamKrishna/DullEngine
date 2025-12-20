@@ -19,12 +19,6 @@ constexpr bool        IS_RESIZEABLE = false;
 
 constexpr uint32_t FIXED_PROCESS_FPS = 60;
 
-enum class SceneID {
-    _NULL = 0,  // DO NOT CHANGE. Add scenes vvv
-    Scene1,
-    _COUNT,     // DO NOT CHANGE. Add scenes ^^^
-};
-
 /// --- Logging Settings ---
 
 #ifdef NDEBUG // Release Mode

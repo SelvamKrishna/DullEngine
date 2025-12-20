@@ -1,0 +1,4 @@
+feat: class sys::TimeSystem impl
+- processing and fixed processing logic moved to TimeSystem
+- time frame data move to TimeSystem
+- core::Handle and core::App impl TimeSystem

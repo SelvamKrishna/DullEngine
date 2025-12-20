@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "engine/system/time_sys.hpp"
+
 namespace dull::core {
 
 // Forward Declaration
@@ -13,11 +15,7 @@ class SceneBuffer;
 // =======================
 // A enum to keep track of the app state
 // =======================
-enum class ProgramState : uint8_t {
-    Initial,
-    Process,
-    Conclude,
-};
+enum class ProgramState : uint8_t { Initial, Process, Conclude, };
 
 // =======================
 // Global Access provider to core systems
@@ -34,12 +32,14 @@ private:
     constexpr Handle& operator=(const Handle&) noexcept = delete;
 
     explicit Handle(
+        sys::TimeSystem& time_sys,
         EventSystem& event_sys,
         SceneSystem& scene_sys,
         LayerBuffer& layer_buf,
         SceneBuffer& scene_buf
     )
-    : event_sys {event_sys}
+    : time_sys {time_sys}
+    , event_sys {event_sys}
     , scene_sys {scene_sys}
     , layer_buf {layer_buf}
     , scene_buf {scene_buf}
@@ -51,6 +51,7 @@ private:
     void _setState(ProgramState new_state) noexcept { _state = new_state; }
 
 public:
+    sys::TimeSystem& time_sys; //< Stores all time related data
     EventSystem& event_sys; //< Handles all event related logic
     SceneSystem& scene_sys; //< Handles all scene related logic
     LayerBuffer& layer_buf; //< Stores all layer related data

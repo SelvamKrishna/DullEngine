@@ -73,22 +73,14 @@ void App::run() noexcept
 {
     _handle._setState(ProgramState::Process);
 
-    constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
-    double accumulated_time = 0.0f;
-
     _IF_LOG ZINFO("App running");
 
     _scene_sys._activate();
 
     try {
         while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
-            /// TODO: Move to time system
-            accumulated_time += rl::GetFrameTime();
-            if (accumulated_time > FIXED_PROCESS_INTERVAL)
-            {
-                accumulated_time -= FIXED_PROCESS_INTERVAL;
+            if (_time_sys._isFixedProcess())
                 _scene_sys._fixedProcess();
-            }
 
             _scene_sys._process();
 

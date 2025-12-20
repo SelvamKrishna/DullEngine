@@ -3,6 +3,7 @@
 #include "engine/core/event_system.hpp"
 #include "engine/core/scene_system.hpp"
 #include "engine/core/handle.hpp"
+#include "engine/system/time_sys.hpp"
 #include "engine/util/vec2.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -31,10 +32,12 @@ class App final {
     friend Handle;
 
 private:
+    sys::TimeSystem _time_sys;
     EventSystem _event_sys;
     SceneSystem _scene_sys;
 
     Handle _handle {
+        _time_sys ,
         _event_sys,
         _scene_sys,
         _scene_sys.getLayerBuffer(),
