@@ -12,24 +12,13 @@ namespace dull::core {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_APP)
 
-[[nodiscard]]
-AppContext AppContext::load() noexcept
-{
-    return AppContext {
-        .title         = config::TITLE,
-        .window_size   = config::WINDOW_SIZE,
-        .is_vsync      = config::IS_VSYNC,
-        .is_resizeable = config::IS_RESIZEABLE,
-    };
-}
-
 void AppContext::logStats() const noexcept
 {
-    ZVAR(AppContext::title);
-    ZVAR(AppContext::window_size.x);
-    ZVAR(AppContext::window_size.y);
-    ZVAR(AppContext::is_vsync);
-    ZVAR(AppContext::is_resizeable);
+    ZVAR(title);
+    ZVAR(window_size.x);
+    ZVAR(window_size.y);
+    ZVAR(is_vsync);
+    ZVAR(is_resizeable);
 }
 
 static inline App* s_instance = nullptr;
@@ -79,9 +68,7 @@ void App::run() noexcept
 
     try {
         while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
-            if (_time_sys._isFixedProcess())
-                _scene_sys._fixedProcess();
-
+            if (_time_sys._isFixedProcess()) _scene_sys._fixedProcess();
             _scene_sys._process();
 
             /// TODO: Move to render system

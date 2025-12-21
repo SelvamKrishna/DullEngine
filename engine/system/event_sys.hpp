@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/core/event.hpp"
+#include "engine/system/event.hpp"
 #include "engine/misc/string_view_hashing.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -11,13 +11,16 @@
 #include <unordered_map>
 #include <vector>
 
-namespace dull::core {
+// Forward Declaration
+namespace dull::core { class App; }
+
+namespace dull::sys {
 
 // =======================
 // Controls all event related logic
 // =======================
 class EventSystem final {
-    friend class App;
+    friend class dull::core::App;
 
 private:
     mutable std::shared_mutex _mutex;
@@ -63,4 +66,4 @@ public:
     void logStats() const noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::sys

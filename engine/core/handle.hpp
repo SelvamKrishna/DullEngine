@@ -4,10 +4,12 @@
 
 #include "engine/system/time_sys.hpp"
 
+// Forward Declaration
+
+namespace dull::sys { class EventSystem; };
+
 namespace dull::core {
 
-// Forward Declaration
-class EventSystem;
 class SceneSystem;
 class LayerBuffer;
 class SceneBuffer;
@@ -16,6 +18,15 @@ class SceneBuffer;
 // A enum to keep track of the app state
 // =======================
 enum class ProgramState : uint8_t { Initial, Process, Conclude, };
+
+struct HandleCtx final {
+    sys::TimeSystem& time_sys; //< Stores all time related data
+    sys::EventSystem& event_sys; //< Handles all event related logic
+    SceneSystem& scene_sys; //< Handles all scene related logic
+    LayerBuffer& layer_buf; //< Stores all layer related data
+    SceneBuffer& scene_buf; //< Stores all scene related data
+    double& delta_time; //< Reference to delta time
+};
 
 // =======================
 // Global Access provider to core systems
@@ -31,31 +42,14 @@ private:
     constexpr Handle& operator=(Handle&&)      noexcept = delete;
     constexpr Handle& operator=(const Handle&) noexcept = delete;
 
-    explicit Handle(
-        sys::TimeSystem& time_sys,
-        EventSystem& event_sys,
-        SceneSystem& scene_sys,
-        LayerBuffer& layer_buf,
-        SceneBuffer& scene_buf
-    )
-    : time_sys {time_sys}
-    , event_sys {event_sys}
-    , scene_sys {scene_sys}
-    , layer_buf {layer_buf}
-    , scene_buf {scene_buf}
-    {}
-
+    explicit Handle(HandleCtx ctx) : ctx {ctx} {}
     ~Handle() = default;
 
     void _init() noexcept;
     void _setState(ProgramState new_state) noexcept { _state = new_state; }
 
 public:
-    sys::TimeSystem& time_sys; //< Stores all time related data
-    EventSystem& event_sys; //< Handles all event related logic
-    SceneSystem& scene_sys; //< Handles all scene related logic
-    LayerBuffer& layer_buf; //< Stores all layer related data
-    SceneBuffer& scene_buf; //< Stores all scene related data
+    HandleCtx ctx;
 
     [[nodiscard]]
     const ProgramState& getProgramState() const noexcept { return _state; }

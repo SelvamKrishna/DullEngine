@@ -1,11 +1,11 @@
 #include "engine/config.hpp"
-#include "engine/core/event_system.hpp"
+#include "engine/system/event_sys.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
 #include <atomic>
 
-namespace dull::core {
+namespace dull::sys {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_EVENT_SYS)
 
@@ -77,4 +77,4 @@ void EventSystem::logStats() const noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::core
+} // namespace dull::sys

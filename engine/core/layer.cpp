@@ -51,7 +51,7 @@ void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active
 
     if (!is_active) return;
 
-    if (DULL_HANDLE.getProgramState() == ProgramState::Initial)
+    if (App::instance().getHandle().getProgramState() == ProgramState::Initial)
         _nodes.back().uptr->_is_active = true;
         // Soft active `Node::_start()` will be called in Layer::_active()
     else

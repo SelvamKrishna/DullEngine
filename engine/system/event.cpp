@@ -1,11 +1,11 @@
 #include "engine/core/app.hpp"
-#include "engine/core/event.hpp"
+#include "engine/system/event.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
-namespace dull::core {
+namespace dull::sys {
 
-#define _EVENT_BUS  ::dull::core::App::instance().getHandle().event_sys
+#define _EVENT_BUS  DULL_CTX.event_sys
 
 uint64_t Event::bind(Event::Callback callback)
 {
@@ -38,4 +38,4 @@ void Event::logStats() const noexcept
 
 #undef _EVENT_BUS
 
-} // namespace dull::core
+} // namespace dull::sys

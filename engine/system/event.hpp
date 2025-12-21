@@ -11,7 +11,7 @@
 #include <functional>
 #include <cstdint>
 
-namespace dull::core {
+namespace dull::sys {
 
 // =======================
 // Event with additional Data information
@@ -81,4 +81,4 @@ public:
     void logStats() const noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::sys

@@ -29,7 +29,7 @@ void SceneSystem::setCurrentScene(std::string_view scene_name) noexcept
     _current_scene = scene_name;
 
     // Only when running; Unless SceneSystem::_active() is called within App::run()
-    if (DULL_HANDLE.isRunning()) _activate();
+    if (App::instance().getHandle().isRunning()) _activate();
 }
 
 [[nodiscard]]
