@@ -1,7 +1,7 @@
 #include "engine/config.hpp"
 
 #include "engine/core/app.hpp"
-#include "engine/process/scene_system.hpp"
+#include "engine/process/scene_processor.hpp"
 
 namespace dull::process {
 

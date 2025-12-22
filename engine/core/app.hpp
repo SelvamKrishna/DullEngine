@@ -36,7 +36,6 @@ private:
         _time_sys,
         _event_sys,
         _processor,
-        _time_sys.s_delta_time
     } };
 
 public:

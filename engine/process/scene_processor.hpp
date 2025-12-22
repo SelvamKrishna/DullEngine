@@ -19,6 +19,7 @@ class SceneProcessor : private misc::IProcessor {
 
 private:
     LayerBuffer _layer_buffer; //< Collection of all loaded Layers
+
     SceneBuffer _scene_buffer; //< Collection of all loaded Scenes
 
     std::string_view _current_scene; //< Scene currently active
@@ -26,8 +27,8 @@ private:
     explicit SceneProcessor() = default;
     ~SceneProcessor() = default;
 
-    void iStart() final;
-    void iProcess() final;
+    void iStart()        final;
+    void iProcess()      final;
     void iFixedProcess() final;
 
 public:

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/util/vec2.hpp"
-#include "engine/process/scene_system.hpp"
+#include "engine/process/scene_processor.hpp"
 
 #include <vendor/zlog_v2.hpp>
 

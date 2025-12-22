@@ -4,10 +4,7 @@
 
 #include "engine/config.hpp"
 #include "engine/system/time_sys.hpp"
-
-// Forward Declaration
-
-namespace dull::sys { class EventSystem; };
+#include "engine/system/event_sys.hpp"
 
 namespace dull::core {
 
@@ -17,10 +14,9 @@ namespace dull::core {
 enum class ProgramState : uint8_t { Initial, Process, Conclude, };
 
 struct HandleCtx final {
-    sys::TimeSystem&   time_sys;      //< Stores all time related data
-    sys::EventSystem&  event_sys;     //< Handles all event related logic
-    config::Processor& processor;     //< Handles all logic processing
-    double&            delta_time;    //< Reference to delta time
+    sys::TimeSystem&   time_sys;  //< Stores all time related data
+    sys::EventSystem&  event_sys; //< Handles all event related logic
+    config::Processor& processor; //< Handles all logic processing
 };
 
 // =======================

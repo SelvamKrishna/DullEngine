@@ -1,17 +1,15 @@
 #pragma once
 
-// Forward Declaration
-namespace dull::core { class App; }
-
 namespace dull::misc {
 
+// =======================
+// Logic Processing interface
+// =======================
 class IProcessor {
-    friend class App;
-
 public:
-    virtual void iStart() = 0;
-    virtual void iProcess() = 0;
-    virtual void iFixedProcess() = 0;
+    virtual void iStart()        = 0; // Called once
+    virtual void iProcess()      = 0; // Called every frame
+    virtual void iFixedProcess() = 0; // Called every fixed frame
 
     virtual ~IProcessor() = default;
 };

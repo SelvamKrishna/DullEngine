@@ -30,8 +30,8 @@ private:
     std::vector<LayerCtx> _layers; //< Collection of Layer Context
     std::string           _name;   //< Scene name (UNIQUE)
 
-    void iStart() final;
-    void iProcess() final;
+    void iStart()        final;
+    void iProcess()      final;
     void iFixedProcess() final;
 
 public:
