@@ -1,9 +1,9 @@
 #include "engine/config.hpp"
 #include "engine/core/app.hpp"
-#include "engine/core/layer.hpp"
-#include "engine/core/node_handle.hpp"
+#include "engine/process/layer.hpp"
+#include "engine/process/node_handle.hpp"
 
-namespace dull::core {
+namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
@@ -46,7 +46,7 @@ void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active
 
     if (!is_active) return;
 
-    if (App::instance().getHandle().getProgramState() == ProgramState::Initial)
+    if (DULL_HANDLE.isStarting())
         _nodes.back().uptr->_is_active = true;
         // Soft active `Node::_start()` will be called in Layer::_active()
     else
@@ -110,4 +110,4 @@ void Layer::logStats() const noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::core
+} // namespace dull::process

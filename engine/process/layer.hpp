@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/core/node.hpp"
-#include "engine/core/node_handle.hpp"
+#include "engine/process/node.hpp"
+#include "engine/process/node_handle.hpp"
 #include "engine/misc/processor.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace dull::core {
+namespace dull::process {
 
 // =======================
 // Collection of all Nodes
@@ -104,4 +104,4 @@ public:
 
 };
 
-} // namespace dull::core
+} // namespace dull::process

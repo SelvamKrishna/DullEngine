@@ -30,7 +30,7 @@ class App final {
 private:
     sys::TimeSystem _time_sys;
     sys::EventSystem _event_sys;
-    config::Processor _processor {};
+    config::Processor _processor;
 
     Handle _handle { {
         _time_sys,
@@ -62,4 +62,5 @@ public:
 
 } // namespace dull::core
 
-#define DULL_CTX ::dull::core::App::instance().getHandle().ctx
+#define DULL_HANDLE ::dull::core::App::instance().getHandle()
+#define DULL_CTX    DULL_HANDLE.ctx

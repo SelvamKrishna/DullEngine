@@ -7,7 +7,7 @@
 #include <vector>
 #include <functional>
 
-namespace dull::core {
+namespace dull::process {
 
 // =======================
 // LayerName : IsActive
@@ -73,4 +73,4 @@ public:
     void logStats() const noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::process

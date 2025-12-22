@@ -1,13 +1,13 @@
 #pragma once
 
-#include "engine/core/layer.hpp"
+#include "engine/process/layer.hpp"
 #include "engine/misc/string_view_hashing.hpp"
 
 #include <unordered_map>
 #include <string_view>
 #include <memory>
 
-namespace dull::core {
+namespace dull::process {
 
 // =======================
 // List of all Layers
@@ -43,4 +43,4 @@ public:
     void logStats() const noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::process

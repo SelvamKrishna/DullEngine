@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include "engine/config.hpp"
 #include "engine/system/time_sys.hpp"
 
 // Forward Declaration
@@ -9,10 +10,6 @@
 namespace dull::sys { class EventSystem; };
 
 namespace dull::core {
-
-class SceneProcessor;
-class LayerBuffer;
-class SceneBuffer;
 
 // =======================
 // A enum to keep track of the app state

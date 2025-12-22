@@ -1,10 +1,10 @@
 #include "engine/config.hpp"
 #include "engine/core/app.hpp"
-#include "engine/core/scene.hpp"
+#include "engine/process/scene.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
-namespace dull::core {
+namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
@@ -125,4 +125,4 @@ void Scene::logStats() const noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::core
+} // namespace dull::process

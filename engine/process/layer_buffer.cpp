@@ -1,9 +1,9 @@
 #include "engine/config.hpp"
-#include "engine/core/layer_buffer.hpp"
+#include "engine/process/layer_buffer.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
-namespace dull::core {
+namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
@@ -40,4 +40,4 @@ void LayerBuffer::logStats() const noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::core
+} // namespace dull::process

@@ -2,8 +2,7 @@
 
 #include "engine/misc/processor.hpp"
 
-namespace dull::core {
-
+namespace dull::process {
 // =======================
 // Base Node class
 // =======================
@@ -32,4 +31,4 @@ public:
     void setActive(bool value) noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::process

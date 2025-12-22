@@ -1,13 +1,13 @@
 #pragma once
 
-#include "engine/core/node.hpp"
+#include "engine/process/node.hpp"
 
 #include <vector>
 #include <string>
 #include <memory>
 #include <string_view>
 
-namespace dull::core {
+namespace dull::process {
 
 // Forward Declaration
 class Layer;
@@ -55,4 +55,4 @@ public:
     std::unique_ptr<Node> extractFromLayer() noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::process

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/util/vec2.hpp"
-#include "engine/core/scene_system.hpp"
+#include "engine/process/scene_system.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
@@ -20,7 +20,7 @@ constexpr bool        IS_RESIZEABLE = false;
 
 constexpr uint32_t FIXED_PROCESS_FPS = 60;
 
-using Processor = core::SceneProcessor;
+using Processor = process::SceneProcessor;
 
 /// --- Logging Settings ---
 

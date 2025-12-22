@@ -1,18 +1,21 @@
 #pragma once
 
-#include "engine/core/layer_buffer.hpp"
-#include "engine/core/scene_buffer.hpp"
+#include "engine/process/layer_buffer.hpp"
+#include "engine/process/scene_buffer.hpp"
 #include "engine/misc/processor.hpp"
 
 #include <string_view>
 
-namespace dull::core {
+// Forward Declaration
+namespace dull::core { class App; }
+
+namespace dull::process {
 
 // =======================
 // Manager of all scene related logic
 // =======================
 class SceneProcessor : private misc::IProcessor {
-    friend class App;
+    friend class core::App;
 
 private:
     LayerBuffer _layer_buffer; //< Collection of all loaded Layers
@@ -50,4 +53,4 @@ public:
     void logStats() const noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::process

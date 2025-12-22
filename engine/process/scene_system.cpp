@@ -1,15 +1,14 @@
 #include "engine/config.hpp"
-#include "engine/core/app.hpp"
-#include "engine/core/scene_system.hpp"
 
-namespace dull::core {
+#include "engine/core/app.hpp"
+#include "engine/process/scene_system.hpp"
+
+namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
-void SceneProcessor::iStart() { getCurrentScene()->iStart(); }
-
-void SceneProcessor::iProcess() { getCurrentScene()->iProcess(); }
-
+void SceneProcessor::iStart()        { getCurrentScene()->iStart();        }
+void SceneProcessor::iProcess()      { getCurrentScene()->iProcess();      }
 void SceneProcessor::iFixedProcess() { getCurrentScene()->iFixedProcess(); }
 
 void SceneProcessor::setCurrentScene(std::string_view scene_name) noexcept
@@ -28,8 +27,7 @@ void SceneProcessor::setCurrentScene(std::string_view scene_name) noexcept
 
     _current_scene = scene_name;
 
-    // Only when running; Unless SceneSystem::_active() is called within App::run()
-    if (App::instance().getHandle().isRunning()) iStart();
+    if (DULL_HANDLE.isRunning()) [[likely]] iStart();
 }
 
 [[nodiscard]]
@@ -49,4 +47,4 @@ void SceneProcessor::logStats() const noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::core
+} // namespace dull::process

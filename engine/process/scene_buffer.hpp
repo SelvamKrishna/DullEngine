@@ -1,12 +1,12 @@
 #pragma once
 
-#include "engine/core/scene.hpp"
+#include "engine/process/scene.hpp"
 
 #include <memory>
 #include <vector>
 #include <string_view>
 
-namespace dull::core {
+namespace dull::process {
 
 // =======================
 // Collection of all Scene related data
@@ -47,4 +47,4 @@ public:
     void logStats() const noexcept;
 };
 
-} // namespace dull::core
+} // namespace dull::process

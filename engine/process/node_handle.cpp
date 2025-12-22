@@ -1,10 +1,10 @@
 #include "engine/config.hpp"
-#include "engine/core/node_handle.hpp"
-#include "engine/core/layer.hpp"
+#include "engine/process/node_handle.hpp"
+#include "engine/process/layer.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
-namespace dull::core {
+namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
@@ -33,4 +33,4 @@ std::unique_ptr<Node>& NodeHandle::getNode() noexcept { return _node_it->uptr; }
 
 #undef _IF_LOG
 
-} // namespace dull::core
+} // namespace dull::process

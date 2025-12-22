@@ -1,6 +1,6 @@
-#include "engine/core/node.hpp"
+#include "engine/process/node.hpp"
 
-namespace dull::core {
+namespace dull::process {
 
 void Node::setActive(bool value) noexcept
 {
