@@ -70,8 +70,7 @@ void EventSystem::logStats() const noexcept
             PAIR.second.size()
         );
 
-        for (const auto& LISTENER : PAIR.second)
-            ZDBG("ID({}),", LISTENER.id);
+        for (const auto& LISTENER : PAIR.second) ZDBG("ID({}),", LISTENER.id);
     }
 }
 

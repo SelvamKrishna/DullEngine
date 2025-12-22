@@ -1,5 +1,7 @@
 #pragma once
 
+#include "engine/process/layer.hpp"
+#include "engine/misc/buffer.hpp"
 #include "engine/misc/processor.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -23,19 +25,19 @@ using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 // Manager of all scene related logic
 // =======================
 class Scene final : private misc::IProcessor {
-    friend class SceneProcessor;
-    friend class SceneBuffer;
+    friend class DefaultProcessor;
 
 private:
-    std::vector<LayerCtx> _layers; //< Collection of Layer Context
-    std::string           _name;   //< Scene name (UNIQUE)
+    static misc::Buffer<Layer> s_layer_buf; //< Static owned buffer of all loaded Layers
+    std::vector<LayerCtx>      _layers;     //< Ref of Layers within scene
 
     void iStart()        final;
     void iProcess()      final;
     void iFixedProcess() final;
 
 public:
-    explicit Scene(std::string scene_name) noexcept : _name {std::move(scene_name)} {}
+    [[nodiscard]]
+    static misc::Buffer<Layer>& getLayerBuffer() noexcept { return s_layer_buf; }
 
     // Add Layer with given Index(Process Order) and Activity
     void addLayer(std::string_view layer_name, size_t idx = UINT64_MAX, bool active = true);

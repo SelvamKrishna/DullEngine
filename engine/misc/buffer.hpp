@@ -13,14 +13,12 @@ namespace dull::misc {
 template <typename DataT>
 class Buffer {
 private:
-    using Map = std::unordered_map<
+    std::unordered_map<
         std::string,
         std::unique_ptr<DataT>,
         misc::StringHash,
         misc::StringEq
-    >;
-
-    Map _buffer;
+    > _buffer;
 
 public:
     bool hasData(std::string_view key) const

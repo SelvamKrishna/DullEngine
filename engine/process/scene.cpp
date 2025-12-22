@@ -1,26 +1,27 @@
 #include "engine/config.hpp"
-#include "engine/core/app.hpp"
 #include "engine/process/scene.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
 namespace dull::process {
 
+misc::Buffer<Layer> Scene::s_layer_buf = {};
+
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
 void Scene::iStart()
 {
-    forAllActiveLayers([](auto& layer) { layer.iStart(); });
+    forAllActiveLayers([](Layer& layer) { layer.iStart(); });
 }
 
 void Scene::iProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer.iProcess(); });
+    forAllActiveLayers([](Layer& layer) { layer.iProcess(); });
 }
 
 void Scene::iFixedProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer.iFixedProcess(); });
+    forAllActiveLayers([](Layer& layer) { layer.iFixedProcess(); });
 }
 
 void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
@@ -30,7 +31,7 @@ void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
     else
         _layers.insert(_layers.begin() + idx, { layer_name, active });
 
-    _IF_LOG ZINFO("Layer '{}' added to Scene '{}'", layer_name, _name);
+    _IF_LOG ZINFO("Layer '{}' added to Scene", layer_name);
 }
 
 void Scene::removeLayer(std::string_view layer_name)
@@ -74,7 +75,7 @@ LayerGroup Scene::getInactiveLayers() noexcept
 void Scene::forAllActiveLayers(LayerMethod& function) noexcept
 {
     for (const auto& [NAME, IS_ACTIVE] : _layers) if (IS_ACTIVE)
-        function(DULL_CTX.processor.getLayerBuffer().getData(NAME));
+        function(s_layer_buf.getData(NAME));
 }
 
 [[nodiscard]]
@@ -109,7 +110,6 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
 void Scene::logStats() const noexcept
 {
     ZON_RELEASE return;
-    ZTRC_S("Loggin Scene '{}'", _name);
 
     for (const LayerCtx& LAYER_CTX : _layers)
     {

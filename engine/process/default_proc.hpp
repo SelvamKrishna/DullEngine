@@ -15,16 +15,15 @@ namespace dull::process {
 // =======================
 // Manager of all scene related logic
 // =======================
-class SceneProcessor : private misc::IProcessor {
+class DefaultProcessor : private misc::IProcessor {
     friend class core::App;
 
 private:
-    misc::Buffer<Layer> _layer_buffer; //< Collection of all loaded Layers
-    misc::Buffer<Scene> _scene_buffer; //< Collection of all loaded Scenes
+    misc::Buffer<Scene> _scene_buf;  //< Collection of all loaded Scenes
     std::string_view _current_scene; //< Scene currently active
 
-    explicit SceneProcessor() = default;
-    ~SceneProcessor() = default;
+    explicit DefaultProcessor() = default;
+    ~DefaultProcessor() = default;
 
     void iStart()        final;
     void iProcess()      final;
@@ -32,10 +31,7 @@ private:
 
 public:
     [[nodiscard]]
-    misc::Buffer<Layer>& getLayerBuffer() noexcept { return _layer_buffer; }
-
-    [[nodiscard]]
-    misc::Buffer<Scene>& getSceneBuffer() noexcept { return _scene_buffer; }
+    misc::Buffer<Scene>& getSceneBuffer() noexcept { return _scene_buf; }
 
     // Changes scene using scene_id
     void setCurrentScene(std::string_view scene_name) noexcept;
