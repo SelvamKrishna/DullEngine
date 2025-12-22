@@ -23,7 +23,7 @@ using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 // Manager of all scene related logic
 // =======================
 class Scene final : private misc::IProcessor {
-    friend class SceneSystem;
+    friend class SceneProcessor;
     friend class SceneBuffer;
 
 private:

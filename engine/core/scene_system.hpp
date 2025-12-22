@@ -11,7 +11,7 @@ namespace dull::core {
 // =======================
 // Manager of all scene related logic
 // =======================
-class SceneSystem : private misc::IProcessor {
+class SceneProcessor : private misc::IProcessor {
     friend class App;
 
 private:
@@ -20,8 +20,8 @@ private:
 
     std::string_view _current_scene; //< Scene currently active
 
-    explicit SceneSystem() = default;
-    ~SceneSystem() = default;
+    explicit SceneProcessor() = default;
+    ~SceneProcessor() = default;
 
     void iStart() final;
     void iProcess() final;

@@ -1,9 +1,8 @@
 #pragma once
 
+#include "engine/core/handle.hpp"
 #include "engine/system/time_sys.hpp"
 #include "engine/system/event_sys.hpp"
-#include "engine/core/scene_system.hpp"
-#include "engine/core/handle.hpp"
 #include "engine/util/vec2.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -31,14 +30,12 @@ class App final {
 private:
     sys::TimeSystem _time_sys;
     sys::EventSystem _event_sys;
-    SceneSystem _scene_sys;
+    config::Processor _processor {};
 
     Handle _handle { {
-        _time_sys ,
+        _time_sys,
         _event_sys,
-        _scene_sys,
-        _scene_sys.getLayerBuffer(),
-        _scene_sys.getSceneBuffer(),
+        _processor,
         _time_sys.s_delta_time
     } };
 
@@ -59,11 +56,10 @@ public:
     [[nodiscard]]
     const Handle& getHandle() noexcept { return _handle; }
 
-    void  run() noexcept;
+    void run() noexcept;
     void quit() noexcept;
 };
 
 } // namespace dull::core
 
-#define DULL_CTX \
-    ::dull::core::App::instance().getHandle().ctx
+#define DULL_CTX ::dull::core::App::instance().getHandle().ctx

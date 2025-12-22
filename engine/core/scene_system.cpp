@@ -6,13 +6,13 @@ namespace dull::core {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
-void SceneSystem::iStart() { getCurrentScene()->iStart(); }
+void SceneProcessor::iStart() { getCurrentScene()->iStart(); }
 
-void SceneSystem::iProcess() { getCurrentScene()->iProcess(); }
+void SceneProcessor::iProcess() { getCurrentScene()->iProcess(); }
 
-void SceneSystem::iFixedProcess() { getCurrentScene()->iFixedProcess(); }
+void SceneProcessor::iFixedProcess() { getCurrentScene()->iFixedProcess(); }
 
-void SceneSystem::setCurrentScene(std::string_view scene_name) noexcept
+void SceneProcessor::setCurrentScene(std::string_view scene_name) noexcept
 {
     if (scene_name == _current_scene) return; // No changes
 
@@ -33,12 +33,12 @@ void SceneSystem::setCurrentScene(std::string_view scene_name) noexcept
 }
 
 [[nodiscard]]
-std::unique_ptr<Scene>& SceneSystem::getCurrentScene() noexcept
+std::unique_ptr<Scene>& SceneProcessor::getCurrentScene() noexcept
 {
     return _scene_buffer.getScene(_current_scene);
 }
 
-void SceneSystem::logStats() const noexcept
+void SceneProcessor::logStats() const noexcept
 {
     ZTRC_S("Logging SceneSystem");
     ZDBG("Current Scene = {}", _current_scene);

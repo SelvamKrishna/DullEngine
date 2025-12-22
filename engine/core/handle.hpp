@@ -10,7 +10,7 @@ namespace dull::sys { class EventSystem; };
 
 namespace dull::core {
 
-class SceneSystem;
+class SceneProcessor;
 class LayerBuffer;
 class SceneBuffer;
 
@@ -20,12 +20,10 @@ class SceneBuffer;
 enum class ProgramState : uint8_t { Initial, Process, Conclude, };
 
 struct HandleCtx final {
-    sys::TimeSystem& time_sys; //< Stores all time related data
-    sys::EventSystem& event_sys; //< Handles all event related logic
-    SceneSystem& scene_sys; //< Handles all scene related logic
-    LayerBuffer& layer_buf; //< Stores all layer related data
-    SceneBuffer& scene_buf; //< Stores all scene related data
-    double& delta_time; //< Reference to delta time
+    sys::TimeSystem&   time_sys;      //< Stores all time related data
+    sys::EventSystem&  event_sys;     //< Handles all event related logic
+    config::Processor& processor;     //< Handles all logic processing
+    double&            delta_time;    //< Reference to delta time
 };
 
 // =======================

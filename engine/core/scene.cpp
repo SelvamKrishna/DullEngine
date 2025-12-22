@@ -74,7 +74,7 @@ LayerGroup Scene::getInactiveLayers() noexcept
 void Scene::forAllActiveLayers(LayerMethod& function) noexcept
 {
     for (const auto& [NAME, IS_ACTIVE] : _layers) if (IS_ACTIVE)
-        function(DULL_CTX.layer_buf.getLayer(NAME));
+        function(DULL_CTX.processor.getLayerBuffer().getLayer(NAME));
 }
 
 [[nodiscard]]
@@ -103,11 +103,6 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
     if (it->is_active == active) return; // No changes
 
     it->is_active = active;
-
-    // Layer is made active and Scene is currently processing
-    if (active && DULL_CTX.scene_sys.isSceneCurrent(_name))
-        DULL_CTX.layer_buf.getLayer(layer_name)->iStart();
-
     _IF_LOG ZINFO("Layer '{}' made {}", layer_name, active ? "active" : "inactive");
 }
 

@@ -13,7 +13,7 @@ namespace dull::core {
 // List of all Layers
 // =======================
 class LayerBuffer final {
-    friend class SceneSystem;
+    friend class SceneProcessor;
 
 private:
     std::unordered_map<

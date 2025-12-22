@@ -12,7 +12,7 @@ namespace dull::core {
 // Collection of all Scene related data
 // =======================
 class SceneBuffer final {
-    friend class SceneSystem;
+    friend class SceneProcessor;
 
 private:
     std::vector<std::unique_ptr<Scene>> _scenes;

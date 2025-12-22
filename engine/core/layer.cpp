@@ -29,11 +29,7 @@ void Layer::iFixedProcess()
 
 #undef _FOR_ALL_ACTIVE_NODES
 
-void Layer::_disconnect(std::vector<NodeCtx>::iterator node_it) noexcept
-{
-    node_it->uptr->_layer_name = "";
-    _nodes.erase(node_it);
-}
+void Layer::_disconnect(std::vector<NodeCtx>::iterator node_it) noexcept { _nodes.erase(node_it); }
 
 void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active) noexcept
 {
@@ -46,7 +42,6 @@ void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active
     );
 
     _IF_LOG ZINFO("Node '{}' added to Layer '{}'", name, _name);
-    node->_layer_name = _name;
     _nodes.emplace_back(NodeCtx { .name = std::move(name), .uptr = std::move(node) });
 
     if (!is_active) return;

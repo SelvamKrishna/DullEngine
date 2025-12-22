@@ -64,12 +64,12 @@ void App::run() noexcept
 
     _IF_LOG ZINFO("App running");
 
-    _scene_sys.iStart();
+    _processor.iStart();
 
     try {
         while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
-            if (_time_sys._isFixedProcess()) _scene_sys.iFixedProcess();
-            _scene_sys.iProcess();
+            if (_time_sys._isFixedProcess()) _processor.iFixedProcess();
+            _processor.iProcess();
 
             /// TODO: Move to render system
             rl::BeginDrawing();

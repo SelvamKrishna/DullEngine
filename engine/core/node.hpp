@@ -2,8 +2,6 @@
 
 #include "engine/misc/processor.hpp"
 
-#include <string_view>
-
 namespace dull::core {
 
 // =======================
@@ -13,7 +11,6 @@ class Node : private misc::IProcessor {
     friend class Layer;
 
 private:
-    std::string_view _layer_name; //< Name of the owner `Layer`
     bool _is_active {false};      //< The `Layer` will auto set default values
 
     // DO NOT directly call `Node::iStart()` use `Node::setActive(true)` instead.
@@ -33,10 +30,6 @@ public:
 
     // Calls the Node::_start() function if it is made alive
     void setActive(bool value) noexcept;
-
-    // Name of the Owning Layer
-    [[nodiscard]]
-    const std::string_view getLayer() const noexcept { return _layer_name; }
 };
 
 } // namespace dull::core
