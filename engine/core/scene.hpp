@@ -1,5 +1,7 @@
 #pragma once
 
+#include "engine/misc/processor.hpp"
+
 #include <vendor/zlog_v2.hpp>
 
 #include <vector>
@@ -20,7 +22,7 @@ using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 // =======================
 // Manager of all scene related logic
 // =======================
-class Scene final {
+class Scene final : private misc::IProcessor {
     friend class SceneSystem;
     friend class SceneBuffer;
 
@@ -28,9 +30,9 @@ private:
     std::vector<LayerCtx> _layers; //< Collection of Layer Context
     std::string           _name;   //< Scene name (UNIQUE)
 
-    void _activate();
-    void _process();
-    void _fixedProcess();
+    void iStart() final;
+    void iProcess() final;
+    void iFixedProcess() final;
 
 public:
     explicit Scene(std::string scene_name) noexcept : _name {std::move(scene_name)} {}

@@ -10,21 +10,21 @@ namespace dull::core {
 #define _FOR_ALL_ACTIVE_NODES \
     for (auto& node : _nodes) if (node.uptr->isActive())
 
-void Layer::_activate()
+void Layer::iStart()
 {
-    _FOR_ALL_ACTIVE_NODES node.uptr->_start();
+    _FOR_ALL_ACTIVE_NODES node.uptr->iStart();
 }
 
-void Layer::_process()
+void Layer::iProcess()
 {
     _FOR_ALL_ACTIVE_NODES
-        if (node.uptr->is_process) node.uptr->_update();
+        if (node.uptr->is_process) node.uptr->iProcess();
 }
 
-void Layer::_fixedProcess()
+void Layer::iFixedProcess()
 {
     _FOR_ALL_ACTIVE_NODES
-        if (node.uptr->is_fixed_process) node.uptr->_fixedUpdate();
+        if (node.uptr->is_fixed_process) node.uptr->iFixedProcess();
 }
 
 #undef _FOR_ALL_ACTIVE_NODES

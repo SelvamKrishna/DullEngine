@@ -8,19 +8,19 @@ namespace dull::core {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
-void Scene::_activate()
+void Scene::iStart()
 {
-    forAllActiveLayers([](auto& layer) { layer->_activate(); });
+    forAllActiveLayers([](auto& layer) { layer->iStart(); });
 }
 
-void Scene::_process()
+void Scene::iProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer->_process(); });
+    forAllActiveLayers([](auto& layer) { layer->iProcess(); });
 }
 
-void Scene::_fixedProcess()
+void Scene::iFixedProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer->_fixedProcess(); });
+    forAllActiveLayers([](auto& layer) { layer->iFixedProcess(); });
 }
 
 void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
@@ -106,7 +106,7 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
 
     // Layer is made active and Scene is currently processing
     if (active && DULL_CTX.scene_sys.isSceneCurrent(_name))
-        DULL_CTX.layer_buf.getLayer(layer_name)->_activate();
+        DULL_CTX.layer_buf.getLayer(layer_name)->iStart();
 
     _IF_LOG ZINFO("Layer '{}' made {}", layer_name, active ? "active" : "inactive");
 }

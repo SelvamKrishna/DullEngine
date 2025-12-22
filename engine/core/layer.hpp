@@ -2,6 +2,7 @@
 
 #include "engine/core/node.hpp"
 #include "engine/core/node_handle.hpp"
+#include "engine/misc/processor.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
@@ -16,7 +17,7 @@ namespace dull::core {
 // =======================
 // Collection of all Nodes
 // =======================
-class Layer final {
+class Layer : private misc::IProcessor {
     friend class Scene;
     friend class NodeHandle;
 
@@ -24,9 +25,9 @@ private:
     std::string           _name;  //< Name of the layer (UNIQUE)
     std::vector<NodeCtx> _nodes;  //< Collection of Nodes
 
-    void _activate();
-    void _process();
-    void _fixedProcess();
+    void iStart() final;
+    void iProcess() final;
+    void iFixedProcess() final;
 
     // Detaches node from layer
     // Used by the NodeHandle

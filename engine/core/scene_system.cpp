@@ -6,11 +6,11 @@ namespace dull::core {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
-void SceneSystem::_activate() { getCurrentScene()->_activate(); }
+void SceneSystem::iStart() { getCurrentScene()->iStart(); }
 
-void SceneSystem::_process() { getCurrentScene()->_process(); }
+void SceneSystem::iProcess() { getCurrentScene()->iProcess(); }
 
-void SceneSystem::_fixedProcess() { getCurrentScene()->_fixedProcess(); }
+void SceneSystem::iFixedProcess() { getCurrentScene()->iFixedProcess(); }
 
 void SceneSystem::setCurrentScene(std::string_view scene_name) noexcept
 {
@@ -29,7 +29,7 @@ void SceneSystem::setCurrentScene(std::string_view scene_name) noexcept
     _current_scene = scene_name;
 
     // Only when running; Unless SceneSystem::_active() is called within App::run()
-    if (App::instance().getHandle().isRunning()) _activate();
+    if (App::instance().getHandle().isRunning()) iStart();
 }
 
 [[nodiscard]]

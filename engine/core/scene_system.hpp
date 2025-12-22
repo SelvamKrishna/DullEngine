@@ -2,6 +2,7 @@
 
 #include "engine/core/layer_buffer.hpp"
 #include "engine/core/scene_buffer.hpp"
+#include "engine/misc/processor.hpp"
 
 #include <string_view>
 
@@ -10,7 +11,7 @@ namespace dull::core {
 // =======================
 // Manager of all scene related logic
 // =======================
-class SceneSystem final {
+class SceneSystem : private misc::IProcessor {
     friend class App;
 
 private:
@@ -22,9 +23,9 @@ private:
     explicit SceneSystem() = default;
     ~SceneSystem() = default;
 
-    void _activate();
-    void _process();
-    void _fixedProcess();
+    void iStart() final;
+    void iProcess() final;
+    void iFixedProcess() final;
 
 public:
     [[nodiscard]]
