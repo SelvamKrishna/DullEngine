@@ -10,17 +10,17 @@ namespace dull::process {
 
 void Scene::iStart()
 {
-    forAllActiveLayers([](auto& layer) { layer->iStart(); });
+    forAllActiveLayers([](auto& layer) { layer.iStart(); });
 }
 
 void Scene::iProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer->iProcess(); });
+    forAllActiveLayers([](auto& layer) { layer.iProcess(); });
 }
 
 void Scene::iFixedProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer->iFixedProcess(); });
+    forAllActiveLayers([](auto& layer) { layer.iFixedProcess(); });
 }
 
 void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
@@ -74,7 +74,7 @@ LayerGroup Scene::getInactiveLayers() noexcept
 void Scene::forAllActiveLayers(LayerMethod& function) noexcept
 {
     for (const auto& [NAME, IS_ACTIVE] : _layers) if (IS_ACTIVE)
-        function(DULL_CTX.processor.getLayerBuffer().getLayer(NAME));
+        function(DULL_CTX.processor.getLayerBuffer().getData(NAME));
 }
 
 [[nodiscard]]

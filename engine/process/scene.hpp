@@ -59,7 +59,7 @@ public:
     LayerGroup getInactiveLayers() noexcept;
 
     // Map a function to all Active Layers
-    using LayerMethod = const std::function<void(std::unique_ptr<class Layer>&)>;
+    using LayerMethod = const std::function<void(class Layer&)>;
     void forAllActiveLayers(LayerMethod& function) noexcept;
 
     // Checks wether a Layer is active within a Scene

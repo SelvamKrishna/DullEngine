@@ -7,7 +7,8 @@ int main(void)
 
     const auto& DULL = DULL_CTX;
 
-    DULL.processor.getSceneBuffer().loadScene(
+    DULL.processor.getSceneBuffer().loadData(
+        "Scene1",
         std::make_unique<dull::process::Scene>("Scene1")
     );
     DULL.processor.setCurrentScene("Scene1");

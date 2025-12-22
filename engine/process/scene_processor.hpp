@@ -1,8 +1,9 @@
 #pragma once
 
-#include "engine/process/layer_buffer.hpp"
-#include "engine/process/scene_buffer.hpp"
+#include "engine/misc/buffer.hpp"
 #include "engine/misc/processor.hpp"
+#include "engine/process/layer.hpp"
+#include "engine/process/scene.hpp"
 
 #include <string_view>
 
@@ -18,10 +19,8 @@ class SceneProcessor : private misc::IProcessor {
     friend class core::App;
 
 private:
-    LayerBuffer _layer_buffer; //< Collection of all loaded Layers
-
-    SceneBuffer _scene_buffer; //< Collection of all loaded Scenes
-
+    misc::Buffer<Layer> _layer_buffer; //< Collection of all loaded Layers
+    misc::Buffer<Scene> _scene_buffer; //< Collection of all loaded Scenes
     std::string_view _current_scene; //< Scene currently active
 
     explicit SceneProcessor() = default;
@@ -33,17 +32,17 @@ private:
 
 public:
     [[nodiscard]]
-    LayerBuffer& getLayerBuffer() noexcept { return _layer_buffer; }
+    misc::Buffer<Layer>& getLayerBuffer() noexcept { return _layer_buffer; }
 
     [[nodiscard]]
-    SceneBuffer& getSceneBuffer() noexcept { return _scene_buffer; }
+    misc::Buffer<Scene>& getSceneBuffer() noexcept { return _scene_buffer; }
 
     // Changes scene using scene_id
     void setCurrentScene(std::string_view scene_name) noexcept;
 
     // Returns the active Scene
     [[nodiscard]]
-    std::unique_ptr<Scene>& getCurrentScene() noexcept;
+    Scene& getCurrentScene() noexcept;
 
     // Returns true if provided SceneID is the current Scene
     [[nodiscard]]
