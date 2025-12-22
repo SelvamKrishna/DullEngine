@@ -3,15 +3,18 @@
 #include "engine/misc/processor.hpp"
 
 namespace dull::process {
+
 // =======================
 // Base Node class
 // =======================
-class Node : private misc::IProcessor {
+class Node : protected misc::IProcessor {
+    friend core::App;
     friend class Layer;
 
 private:
     bool _is_active {false};      //< The `Layer` will auto set default values
 
+protected:
     // DO NOT directly call `Node::iStart()` use `Node::setActive(true)` instead.
     void iStart() override {}
     void iProcess() override {}

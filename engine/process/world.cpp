@@ -1,17 +1,17 @@
 #include "engine/config.hpp"
 
 #include "engine/core/app.hpp"
-#include "engine/process/default_proc.hpp"
+#include "engine/process/world.hpp"
 
 namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
-void DefaultProcessor::iStart()        { getCurrentScene().iStart();        }
-void DefaultProcessor::iProcess()      { getCurrentScene().iProcess();      }
-void DefaultProcessor::iFixedProcess() { getCurrentScene().iFixedProcess(); }
+void World::iStart()        { getCurrentScene().iStart();        }
+void World::iProcess()      { getCurrentScene().iProcess();      }
+void World::iFixedProcess() { getCurrentScene().iFixedProcess(); }
 
-void DefaultProcessor::setCurrentScene(std::string_view scene_name) noexcept
+void World::setCurrentScene(std::string_view scene_name) noexcept
 {
     if (scene_name == _current_scene) return;
 
@@ -31,12 +31,12 @@ void DefaultProcessor::setCurrentScene(std::string_view scene_name) noexcept
 }
 
 [[nodiscard]]
-Scene& DefaultProcessor::getCurrentScene() noexcept
+Scene& World::getCurrentScene() noexcept
 {
     return _scene_buf.getData(_current_scene);
 }
 
-void DefaultProcessor::logStats() const noexcept
+void World::logStats() const noexcept
 {
     ZTRC_S("Logging SceneSystem");
     ZDBG("Current Scene = {}", _current_scene);

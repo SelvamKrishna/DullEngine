@@ -45,7 +45,7 @@ void Scene::removeLayer(std::string_view layer_name)
 }
 
 [[nodiscard]]
-LayerGroup Scene::getLayersBy(std::function<bool(const LayerCtx&)> condition) noexcept
+LayerGroup Scene::getLayersBy(std::function<bool(const LayerConfig&)> condition) noexcept
 {
     if (_layers.empty()) [[unlikely]] return {};
 
@@ -63,13 +63,13 @@ LayerGroup Scene::getLayersBy(std::function<bool(const LayerCtx&)> condition) no
 [[nodiscard]]
 LayerGroup Scene::getActiveLayers() noexcept
 {
-    return getLayersBy([](const LayerCtx& layer){ return layer.is_active; });
+    return getLayersBy([](const LayerConfig& layer){ return layer.is_active; });
 }
 
 [[nodiscard]]
 LayerGroup Scene::getInactiveLayers() noexcept
 {
-    return getLayersBy([](const LayerCtx& layer){ return !layer.is_active; });
+    return getLayersBy([](const LayerConfig& layer){ return !layer.is_active; });
 }
 
 void Scene::forAllActiveLayers(LayerMethod& function) noexcept
@@ -93,7 +93,7 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
 {
     auto it = std::find_if(
         _layers.begin(), _layers.end(),
-        [&layer_name](const LayerCtx& LAYER) { return LAYER.layer_name == layer_name; }
+        [&layer_name](const LayerConfig& LAYER) { return LAYER.layer_name == layer_name; }
     );
 
     ZASSERT(
@@ -111,7 +111,7 @@ void Scene::logStats() const noexcept
 {
     ZON_RELEASE return;
 
-    for (const LayerCtx& LAYER_CTX : _layers)
+    for (const LayerConfig& LAYER_CTX : _layers)
     {
         ZDBG(
             "{}Layer '{}'{}{}",

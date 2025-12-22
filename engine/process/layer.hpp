@@ -10,6 +10,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <functional>
 #include <type_traits>
 
 namespace dull::process {
@@ -18,6 +19,7 @@ namespace dull::process {
 // Collection of all Nodes
 // =======================
 class Layer : private misc::IProcessor {
+    friend core::App;
     friend class Scene;
     friend class NodeHandle;
 
@@ -96,6 +98,9 @@ public:
     // Read only access to all underlying Nodes
     [[nodiscard]]
     const std::vector<NodeCtx>& getAllNodes() const noexcept { return _nodes; }
+
+    // Map a function to all Active Layers
+    void forAllNodes(const std::function<void(Node&)>& function) noexcept;
 
     // DEV: Logs name and activity of all underlying nodes
     void logStats() const noexcept;

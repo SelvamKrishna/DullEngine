@@ -12,9 +12,9 @@
 namespace dull::process {
 
 // =======================
-// LayerName : IsActive
+// Configuration of a Layer within Scene
 // =======================
-struct LayerCtx final {
+struct LayerConfig final {
     std::string_view layer_name; // Name of the Layer (UNIQUE), String stored within Layer
     bool             is_active;  // Is the layer active
 };
@@ -25,11 +25,12 @@ using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 // Manager of all scene related logic
 // =======================
 class Scene final : private misc::IProcessor {
-    friend class DefaultProcessor;
+    friend core::App;
+    friend class World;
 
 private:
     static misc::Buffer<Layer> s_layer_buf; //< Static owned buffer of all loaded Layers
-    std::vector<LayerCtx>      _layers;     //< Ref of Layers within scene
+    std::vector<LayerConfig>   _layers;     //< Ref of Layers within scene
 
     void iStart()        final;
     void iProcess()      final;
@@ -46,11 +47,11 @@ public:
     void removeLayer(std::string_view layer_name);
 
     [[nodiscard]]
-    std::vector<LayerCtx>& getLayers() noexcept { return _layers; }
+    std::vector<LayerConfig>& getLayers() noexcept { return _layers; }
 
     // Filters thru Layers with the provided condition
     [[nodiscard]]
-    LayerGroup getLayersBy(std::function<bool(const LayerCtx&)> condition) noexcept;
+    LayerGroup getLayersBy(std::function<bool(const LayerConfig&)> condition) noexcept;
 
     // Get all active Layers
     [[nodiscard]]

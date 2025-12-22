@@ -7,27 +7,21 @@ namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
-#define _FOR_ALL_ACTIVE_NODES \
-    for (auto& node : _nodes) if (node.uptr->isActive())
-
-void Layer::iStart()
-{
-    _FOR_ALL_ACTIVE_NODES node.uptr->iStart();
-}
+void Layer::iStart() { forAllNodes([](Node& node) { node.iStart(); }); }
 
 void Layer::iProcess()
 {
-    _FOR_ALL_ACTIVE_NODES
-        if (node.uptr->is_process) node.uptr->iProcess();
+    forAllNodes(
+        [](Node& node) { if (node.is_process) node.iProcess(); }
+    );
 }
 
 void Layer::iFixedProcess()
 {
-    _FOR_ALL_ACTIVE_NODES
-        if (node.uptr->is_fixed_process) node.uptr->iFixedProcess();
+    forAllNodes(
+        [](Node& node) { if (node.is_fixed_process) node.iFixedProcess(); }
+    );
 }
-
-#undef _FOR_ALL_ACTIVE_NODES
 
 void Layer::_disconnect(std::vector<NodeCtx>::iterator node_it) noexcept { _nodes.erase(node_it); }
 
@@ -90,6 +84,11 @@ NodeHandle Layer::getNodeHandle(size_t index) noexcept
     std::vector<NodeCtx>::iterator it = _nodes.begin() + index;
 
     return NodeHandle { *this, it };
+}
+
+void Layer::forAllNodes(const std::function<void(Node&)>& function) noexcept
+{
+    for (const auto& [NAME, U_PTR] : _nodes) function(*U_PTR.get());
 }
 
 void Layer::logStats() const noexcept

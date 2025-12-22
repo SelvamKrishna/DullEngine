@@ -7,23 +7,20 @@
 
 #include <string_view>
 
-// Forward Declaration
-namespace dull::core { class App; }
-
 namespace dull::process {
 
 // =======================
 // Manager of all scene related logic
 // =======================
-class DefaultProcessor : private misc::IProcessor {
-    friend class core::App;
+class World : private misc::IProcessor {
+    friend core::App;
 
 private:
     misc::Buffer<Scene> _scene_buf;  //< Collection of all loaded Scenes
     std::string_view _current_scene; //< Scene currently active
 
-    explicit DefaultProcessor() = default;
-    ~DefaultProcessor() = default;
+    explicit World() = default;
+    ~World() = default;
 
     void iStart()        final;
     void iProcess()      final;
