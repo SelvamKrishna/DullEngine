@@ -3,9 +3,7 @@
 #include "engine/process/node.hpp"
 
 #include <vector>
-#include <string>
 #include <memory>
-#include <string_view>
 
 namespace dull::process {
 
@@ -13,39 +11,28 @@ namespace dull::process {
 class Layer;
 
 // =======================
-// NodeName : NodePointer
-// =======================
-struct NodeCtx final {
-    std::string           name; //< Node name (UNIQUE within Layer)
-    std::unique_ptr<Node> uptr; //< Pointer to Node
-};
-
-// =======================
 // Wrapper for Node to provide Layer related logic
 // =======================
-class NodeHandle final {
+class LayerNodeHandle final {
     friend Layer;
 
 private:
-    Layer& _layer; //< Reference to Layer owning this Node
-    std::vector<NodeCtx>::iterator _node_it; //< Node location in Layer
+    using NodeIt = std::vector<std::unique_ptr<Node>>::iterator;
 
-    explicit NodeHandle(
+    Layer& _layer;   //< Reference to Layer owning this Node
+    NodeIt _node_it; //< Node location in Layer
+
+    explicit LayerNodeHandle(
         Layer& layer,
-        std::vector<NodeCtx>::iterator node_it
+        NodeIt node_it
     ) noexcept
-    : _layer {layer}
+    : _layer   {layer}
     , _node_it {node_it}
     {}
 
 public:
-    NodeHandle() = delete;
-
     [[nodiscard]]
-    const std::string_view getName() const noexcept;
-
-    [[nodiscard]]
-    std::unique_ptr<Node>& getNode() noexcept;
+    Node& getNode() noexcept { return *_node_it->get(); }
 
     // Removes Node from Layer
     void removeFromLayer() noexcept;

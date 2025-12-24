@@ -23,28 +23,30 @@ void Layer::iFixedProcess()
     );
 }
 
-void Layer::_disconnect(std::vector<NodeCtx>::iterator node_it) noexcept { _nodes.erase(node_it); }
+void Layer::_disconnect(NodeIt node_it) noexcept { _nodes.erase(node_it); }
 
-void Layer::addNode(std::string name, std::unique_ptr<Node> node, bool is_active) noexcept
+void Layer::addNode(std::unique_ptr<Node> node, bool is_active) noexcept
 {
+    std::string_view node_name;
+
     ZASSERT(
         std::find_if(
             _nodes.begin(), _nodes.end(),
-            [&name](const NodeCtx& node) { return node.name == name; }
+            [&node_name](const std::unique_ptr<Node>& node) { return node->getName() == node_name; }
         ) == _nodes.end(),
-        "Node '{}' already exists in Layer '{}'", name, _name
+        "Node '{}' already exists in Layer '{}'", node_name, _name
     );
 
-    _IF_LOG ZINFO("Node '{}' added to Layer '{}'", name, _name);
-    _nodes.emplace_back(NodeCtx { .name = std::move(name), .uptr = std::move(node) });
+    _IF_LOG ZINFO("Node '{}' added to Layer '{}'", node_name, _name);
+    _nodes.emplace_back(std::move(node));
 
-    if (!is_active) return;
+    if (!is_active) return; // Layer currently not processing
 
     if (DULL_HANDLE.isStarting())
-        _nodes.back().uptr->_is_active = true;
+        _nodes.back()->_is_active = true;
         // Soft active `Node::_start()` will be called in Layer::_active()
     else
-        _nodes.back().uptr->setActive(true);
+        _nodes.back()->setActive(true);
         // Hard active `Node::_start()` will be called now
 }
 
@@ -55,12 +57,12 @@ void Layer::removeAllNodes() noexcept
 }
 
 [[nodiscard]]
-NodeHandle Layer::getNodeHandle(std::string_view name) noexcept
+LayerNodeHandle Layer::getNodeHandle(std::string_view name) noexcept
 {
-    std::vector<NodeCtx>::iterator it = std::find_if(
+    NodeIt it = std::find_if(
         _nodes.begin(), _nodes.end(),
-        [&name](const NodeCtx& node)
-        { return node.name == name; }
+        [&name](const std::unique_ptr<Node>& node)
+        { return node->getName() == name; }
     );
 
     ZASSERT(
@@ -69,11 +71,11 @@ NodeHandle Layer::getNodeHandle(std::string_view name) noexcept
         name, _name
     );
 
-    return NodeHandle { *this, it };
+    return LayerNodeHandle { *this, it };
 }
 
 [[nodiscard]]
-NodeHandle Layer::getNodeHandle(size_t index) noexcept
+LayerNodeHandle Layer::getNodeHandle(size_t index) noexcept
 {
     ZASSERT(
         index < _nodes.size(),
@@ -81,28 +83,26 @@ NodeHandle Layer::getNodeHandle(size_t index) noexcept
         index, _name
     );
 
-    std::vector<NodeCtx>::iterator it = _nodes.begin() + index;
-
-    return NodeHandle { *this, it };
+    return LayerNodeHandle { *this, _nodes.begin() + index };
 }
 
 void Layer::forAllNodes(const std::function<void(Node&)>& function) noexcept
 {
-    for (const auto& [NAME, U_PTR] : _nodes) function(*U_PTR.get());
+    for (auto& node : _nodes) function(*node.get());
 }
 
 void Layer::logStats() const noexcept
 {
     ZON_RELEASE return;
     ZTRC_S("Logging Layer '{}'", _name);
-    for (const NodeCtx& NODE : _nodes)
+    for (const auto& NODE : _nodes)
     {
         ZDBG(
             "{}Node '{}'{}{}",
             zlog::config::TAB_TAG,
-            NODE.name,
+            NODE->getName(),
             zlog::config::TAG_TAG,
-            NODE.uptr->isActive()
+            NODE->isActive()
         );
     }
 }

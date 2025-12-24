@@ -2,6 +2,8 @@
 
 #include "engine/misc/processor.hpp"
 
+#include <string>
+
 namespace dull::process {
 
 // =======================
@@ -12,7 +14,8 @@ class Node : protected misc::IProcessor {
     friend class Layer;
 
 private:
-    bool _is_active {false};      //< The `Layer` will auto set default values
+    std::string _name;       //< Node name (UNIQUE within Layer)
+    bool _is_active {false}; //< The `Layer` will auto set default values
 
 protected:
     // DO NOT directly call `Node::iStart()` use `Node::setActive(true)` instead.
@@ -24,8 +27,11 @@ public:
     bool is_process       {true}; // Whether to call _update()
     bool is_fixed_process {true}; // Whether to call _fixedUpdate()
 
-    Node() = default;
+    Node(std::string name) : _name {name} {}
     virtual ~Node() = default;
+
+    [[nodiscard]]
+    constexpr std::string_view getName() const noexcept { return _name; }
 
     [[nodiscard]]
     constexpr bool isActive() const noexcept { return _is_active; }
