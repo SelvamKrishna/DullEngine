@@ -1,10 +1,10 @@
 #include "engine/config.hpp"
-#include "engine/process/node_handle.hpp"
 #include "engine/process/layer.hpp"
+#include "engine/misc/node_handle.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
-namespace dull::process {
+namespace dull::misc {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
@@ -19,14 +19,14 @@ void LayerNodeHandle::removeFromLayer() noexcept
 }
 
 [[nodiscard]]
-std::unique_ptr<Node> LayerNodeHandle::extractFromLayer() noexcept
+std::unique_ptr<process::Node> LayerNodeHandle::extractFromLayer() noexcept
 {
     _IF_LOG ZINFO(
         "Node '{}' extracted from Layer '{}'",
         getNode().getName(), _layer.getName()
     );
 
-    std::unique_ptr<Node> node {std::move(_node_it->get())};
+    std::unique_ptr<process::Node> node {std::move(_node_it->get())};
     _layer._disconnect(_node_it);
 
     return node;
@@ -34,4 +34,4 @@ std::unique_ptr<Node> LayerNodeHandle::extractFromLayer() noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::process
+} // namespace dull::misc

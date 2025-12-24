@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/process/node.hpp"
-#include "engine/process/node_handle.hpp"
+#include "engine/misc/node_handle.hpp"
 #include "engine/misc/processor.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -21,7 +21,7 @@ namespace dull::process {
 class Layer : private misc::IProcessor {
     friend core::App;
     friend class Scene;
-    friend class LayerNodeHandle;
+    friend class misc::LayerNodeHandle;
 
 private:
     std::string                        _name;  //< Name of the layer (UNIQUE)
@@ -47,7 +47,7 @@ public:
 
     explicit Layer(
         std::string name,
-        size_t initial_capacity = DEFAULT_CAPACITY
+        size_t initial_capacity = DEFAULT_CAPACITY // For performance
     ) noexcept
     : _name {std::move(name)} { _nodes.reserve(initial_capacity); }
 
@@ -71,7 +71,7 @@ public:
     template <typename NodeT>
         requires std::is_base_of_v<Node, NodeT>
     [[nodiscard]]
-    LayerNodeHandle getNodeHandle() noexcept
+    misc::LayerNodeHandle getNodeHandle() noexcept
     {
         NodeIt it = std::find_if(
             _nodes.begin(), _nodes.end(),
@@ -85,16 +85,16 @@ public:
             typeid(NodeT).name(), _name
         );
 
-        return LayerNodeHandle { *this, it };
+        return misc::LayerNodeHandle { *this, it };
     }
 
     // Get the NodeHandle of a Node using its name (UNIQUE within Layer)
     [[nodiscard]]
-    LayerNodeHandle getNodeHandle(std::string_view name) noexcept;
+    misc::LayerNodeHandle getNodeHandle(std::string_view name) noexcept;
 
     // Get the NodeHandle of a Node using its index
     [[nodiscard]]
-    LayerNodeHandle getNodeHandle(size_t index) noexcept;
+    misc::LayerNodeHandle getNodeHandle(size_t index) noexcept;
 
     // Read only access to all underlying Nodes
     [[nodiscard]]

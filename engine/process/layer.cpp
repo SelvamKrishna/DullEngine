@@ -1,7 +1,7 @@
 #include "engine/config.hpp"
 #include "engine/core/app.hpp"
 #include "engine/process/layer.hpp"
-#include "engine/process/node_handle.hpp"
+#include "engine/misc/node_handle.hpp"
 
 namespace dull::process {
 
@@ -11,16 +11,12 @@ void Layer::iStart() { forAllNodes([](Node& node) { node.iStart(); }); }
 
 void Layer::iProcess()
 {
-    forAllNodes(
-        [](Node& node) { if (node.is_process) node.iProcess(); }
-    );
+    forAllNodes([](Node& node) { if (node.is_process) node.iProcess(); });
 }
 
 void Layer::iFixedProcess()
 {
-    forAllNodes(
-        [](Node& node) { if (node.is_fixed_process) node.iFixedProcess(); }
-    );
+    forAllNodes([](Node& node) { if (node.is_fixed_process) node.iFixedProcess(); });
 }
 
 void Layer::_disconnect(NodeIt node_it) noexcept { _nodes.erase(node_it); }
@@ -32,7 +28,8 @@ void Layer::addNode(std::unique_ptr<Node> node, bool is_active) noexcept
     ZASSERT(
         std::find_if(
             _nodes.begin(), _nodes.end(),
-            [&node_name](const std::unique_ptr<Node>& node) { return node->getName() == node_name; }
+            [&node_name](const std::unique_ptr<Node>& node)
+            { return node->getName() == node_name; }
         ) == _nodes.end(),
         "Node '{}' already exists in Layer '{}'", node_name, _name
     );
@@ -41,6 +38,11 @@ void Layer::addNode(std::unique_ptr<Node> node, bool is_active) noexcept
     _nodes.emplace_back(std::move(node));
 
     if (!is_active) return; // Layer currently not processing
+
+    ZON_DEBUG {
+        if (_nodes.size() == _nodes.capacity()) [[unlikely]]
+            ZPERFORMANCE("Layer '{}' size exceeding capacity of '{}'", _name, _nodes.size());
+    }
 
     if (DULL_HANDLE.isStarting())
         _nodes.back()->_is_active = true;
@@ -57,7 +59,7 @@ void Layer::removeAllNodes() noexcept
 }
 
 [[nodiscard]]
-LayerNodeHandle Layer::getNodeHandle(std::string_view name) noexcept
+misc::LayerNodeHandle Layer::getNodeHandle(std::string_view name) noexcept
 {
     NodeIt it = std::find_if(
         _nodes.begin(), _nodes.end(),
@@ -71,11 +73,11 @@ LayerNodeHandle Layer::getNodeHandle(std::string_view name) noexcept
         name, _name
     );
 
-    return LayerNodeHandle { *this, it };
+    return misc::LayerNodeHandle { *this, it };
 }
 
 [[nodiscard]]
-LayerNodeHandle Layer::getNodeHandle(size_t index) noexcept
+misc::LayerNodeHandle Layer::getNodeHandle(size_t index) noexcept
 {
     ZASSERT(
         index < _nodes.size(),
@@ -83,7 +85,7 @@ LayerNodeHandle Layer::getNodeHandle(size_t index) noexcept
         index, _name
     );
 
-    return LayerNodeHandle { *this, _nodes.begin() + index };
+    return misc::LayerNodeHandle { *this, _nodes.begin() + index };
 }
 
 void Layer::forAllNodes(const std::function<void(Node&)>& function) noexcept
