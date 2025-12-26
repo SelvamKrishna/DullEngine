@@ -27,7 +27,7 @@ void World::setCurrentScene(std::string_view scene_name) noexcept
 
     _current_scene = scene_name;
 
-    if (DULL_HANDLE.isRunning()) [[likely]] getCurrentScene().iStart();
+    if (dull::HANDLE.isRunning()) [[likely]] getCurrentScene().iStart();
 }
 
 [[nodiscard]]

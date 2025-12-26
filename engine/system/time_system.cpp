@@ -1,8 +1,8 @@
-#include "engine/system/time_sys.hpp"
+#include "engine/system/time_system.hpp"
 
 #include <vendor/raylib.h>
 
-namespace dull::sys {
+namespace dull::system {
 
 double TimeSystem::s_delta_time = 0.0;
 
@@ -22,4 +22,4 @@ bool TimeSystem::_isFixedProcess() noexcept
     return false;
 }
 
-} // namespace dull::sys
+} // namespace dull::system

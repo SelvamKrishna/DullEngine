@@ -5,10 +5,10 @@
 // Forward Declaration
 namespace dull::core { class App; }
 
-namespace dull::sys {
+namespace dull::system {
 
 // =======================
-// Time System
+// Time systemtem
 // =======================
 class TimeSystem final {
     friend class dull::core::App;
@@ -36,4 +36,4 @@ public:
     double getDeltaTime() const noexcept { return s_delta_time; }
 };
 
-} // namespace dull::sys
+} // namespace dull::system

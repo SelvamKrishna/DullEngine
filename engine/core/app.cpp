@@ -14,6 +14,7 @@ namespace dull::core {
 
 void AppContext::logStats() const noexcept
 {
+    ZTRC_S("Logging AppContext");
     ZVAR(title);
     ZVAR(window_size.x);
     ZVAR(window_size.y);
@@ -41,7 +42,7 @@ App::App(const AppContext& context)
     rl::InitWindow(context.window_size.x, context.window_size.y, TITLE.c_str());
     rl::SetExitKey(rl::KEY_NULL);
 
-    _handle._init();
+    _handle._setState(ProgramState::Initialization);
 
     _IF_LOG {
         context.logStats();
@@ -60,7 +61,7 @@ App& App::instance() noexcept { return *s_instance; }
 
 void App::run() noexcept
 {
-    _handle._setState(ProgramState::Process);
+    _handle._setState(ProgramState::Processing);
 
     _IF_LOG ZINFO("App running");
 
@@ -83,7 +84,7 @@ void App::run() noexcept
     }
 }
 
-void App::quit() noexcept { _handle._setState(ProgramState::Conclude); }
+void App::quit() noexcept { _handle._setState(ProgramState::ShuttingDown); }
 
 #undef _IF_LOG
 

@@ -44,7 +44,7 @@ void Layer::addNode(std::unique_ptr<Node> node, bool is_active) noexcept
             ZPERFORMANCE("Layer '{}' size exceeding capacity of '{}'", _name, _nodes.size());
     }
 
-    if (DULL_HANDLE.isStarting())
+    if (dull::HANDLE.isStarting())
         _nodes.back()->_is_active = true;
         // Soft active `Node::_start()` will be called in Layer::_active()
     else

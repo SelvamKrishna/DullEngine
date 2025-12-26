@@ -10,6 +10,9 @@
 
 namespace dull::misc {
 
+// =======================
+// String Hashed owned collection of Data
+// =======================
 template <typename DataT>
 class Buffer {
 private:
@@ -21,27 +24,21 @@ private:
     > _buffer;
 
 public:
-    bool hasData(std::string_view key) const
-    {
-        return _buffer.find(std::string{key}) != _buffer.end();
-    }
+    bool hasData(std::string_view key) const { return _buffer.find(key) != _buffer.end(); }
 
     bool loadData(std::string_view key, std::unique_ptr<DataT> data)
     {
         if (!data) return false;
-        auto [it, inserted] = _buffer.emplace(std::string{key}, std::move(data));
+        auto [it, inserted] = _buffer.emplace(key, std::move(data));
         return inserted;
     }
 
-    bool unloadData(std::string_view key)
-    {
-        return _buffer.erase(std::string{key}) > 0;
-    }
+    bool unloadData(std::string_view key) { return _buffer.erase(key) > 0; }
 
     [[nodiscard]]
     DataT& getData(std::string_view key)
     {
-        auto it = _buffer.find(std::string{key});
+        auto it = _buffer.find(key);
         ZASSERT(it != _buffer.end(), "Trying to get unloaded data");
         return *it->second;
     }
@@ -49,7 +46,7 @@ public:
     [[nodiscard]]
     const DataT& getData(std::string_view key) const
     {
-        auto it = _buffer.find(std::string{key});
+        auto it = _buffer.find(key);
         ZASSERT(it != _buffer.end(), "Trying to get unloaded data");
         return *it->second;
     }

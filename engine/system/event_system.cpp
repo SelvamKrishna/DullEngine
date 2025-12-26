@@ -1,11 +1,11 @@
 #include "engine/config.hpp"
-#include "engine/system/event_sys.hpp"
+#include "engine/system/event_system.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
 #include <atomic>
 
-namespace dull::sys {
+namespace dull::system {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_EVENT_SYS)
 
@@ -29,7 +29,7 @@ void EventSystem::unbind(std::string_view event_name, uint64_t id)
     auto it = _listeners.find(event_name);
     if (it == _listeners.end())
     {
-        _IF_LOG ZWARN("Event '{}' not found in EventSystem", event_name);
+        _IF_LOG ZWARN("Event '{}' not found in Eventsystemtem", event_name);
         return;
     }
 
@@ -40,7 +40,7 @@ void EventSystem::unbind(std::string_view event_name, uint64_t id)
     if (!it->second.empty()) return;
 
     _listeners.erase(it);
-    _IF_LOG ZINFO("Event '{}' has 0 listerners, Removed from EventSystem", event_name);
+    _IF_LOG ZINFO("Event '{}' has 0 listerners, Removed from Eventsystemtem", event_name);
 }
 
 void EventSystem::emit(const Event &event) const noexcept
@@ -49,7 +49,7 @@ void EventSystem::emit(const Event &event) const noexcept
 
     if (it == _listeners.end())
     {
-        _IF_LOG ZWARN("Event '{}' not found in EventSystem", event.getName());
+        _IF_LOG ZWARN("Event '{}' not found in Eventsystemtem", event.getName());
         return;
     }
 
@@ -60,7 +60,7 @@ void EventSystem::emit(const Event &event) const noexcept
 void EventSystem::logStats() const noexcept
 {
     ZON_RELEASE return;
-    ZTRC_S("Logging EventSystem");
+    ZTRC_S("Logging Eventsystemtem");
 
     for (const auto& PAIR : _listeners)
     {
@@ -76,4 +76,4 @@ void EventSystem::logStats() const noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::sys
+} // namespace dull::system

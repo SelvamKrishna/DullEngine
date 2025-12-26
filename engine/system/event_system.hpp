@@ -14,7 +14,7 @@
 // Forward Declaration
 namespace dull::core { class App; }
 
-namespace dull::sys {
+namespace dull::system {
 
 // =======================
 // Controls all event related logic
@@ -66,4 +66,4 @@ public:
     void logStats() const noexcept;
 };
 
-} // namespace dull::sys
+} // namespace dull::system
