@@ -1,8 +1,6 @@
 #pragma once
 
 #include "engine/process/layer.hpp"
-#include "engine/process/scene.hpp"
-#include "engine/misc/buffer.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
@@ -13,15 +11,9 @@ private:
     std::unique_ptr<process::Layer> _layer;
 
 public:
-    explicit LayerBuilder(std::string layer_name)
-    : _layer {std::make_unique<process::Layer>(std::move(layer_name))}
-    {}
+    explicit LayerBuilder(std::string layer_name);
 
-    LayerBuilder& reserve(size_t capacity) noexcept
-    {
-        _layer->_nodes.reserve(capacity);
-        return *this;
-    }
+    LayerBuilder& reserve(size_t capacity) noexcept;
 
     template <typename NodeT, typename... Args>
         requires std::is_base_of_v<process::Node, NodeT>
@@ -43,17 +35,9 @@ public:
     }
 
     [[nodiscard]]
-    std::unique_ptr<process::Layer> build() noexcept
-    {
-        ZASSERT(_layer != nullptr, "LayerBuilder::{} called more than once", __func__);
-        return std::move(_layer);
-    }
+    std::unique_ptr<process::Layer> build() noexcept;
 
-    void pushToBuffer() noexcept
-    {
-        ZASSERT(_layer != nullptr, "LayerBuilder::{} called more than once", __func__);
-        process::Scene::getLayerBuffer().loadData(_layer->getName(), std::move(_layer));
-    }
+    void pushToBuffer() noexcept;
 };
 
 } // namespace dull::misc

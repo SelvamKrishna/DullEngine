@@ -2,6 +2,7 @@
 #include <engine/core/app.hpp>
 
 #include <engine/misc/layer_builder.hpp>
+#include <engine/misc/scene_builder.hpp>
 
 void printTaskList() noexcept
 {
@@ -21,7 +22,7 @@ class Node1 : public dull::process::Node {
     void iProcess() override { ZDBG("Hello Procees"); }
 
 public:
-    Node1(std::string name) : dull::process::Node {std::move(name)} {}
+    Node1(std::string name) : Node {std::move(name)} {}
 };
 
 int main(void)
@@ -30,15 +31,15 @@ int main(void)
     printTaskList();
 
     dull::misc::LayerBuilder{"Layer1"}
-        .addNode<Node1>(true, "Node1")
+        .reserve(1)
+        .addNode<Node1>(true, "name")
         .pushToBuffer();
 
+    dull::misc::SceneBuilder{"Scene1"}
+        .addLayer("Layer1")
+        .pushToBuffer();
 
-    auto s1 = std::make_unique<dull::process::Scene>("sc1");
-    s1->addLayer("Layer1");
-
-    dull::process::World::getSceneBuffer().loadData("sc1", std::move(s1));
-    DULL_CTX.processor.setCurrentScene("sc1");
+    DULL_CTX.processor.setCurrentScene("Scene1");
 
     app.run();
 }

@@ -9,6 +9,8 @@ misc::Buffer<Layer> Scene::s_layer_buf = {};
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
+Scene::Scene(std::string name) : misc::INamedProcessor {std::move(name)} {}
+
 void Scene::iStart()
 {
     forAllActiveLayers([](Layer& layer) { layer.iStart(); });
@@ -45,7 +47,7 @@ void Scene::removeLayer(std::string_view layer_name)
 }
 
 [[nodiscard]]
-LayerGroup Scene::getLayersBy(std::function<bool(const LayerConfig&)> condition) noexcept
+Scene::LayerGroup Scene::getLayersBy(std::function<bool(const LayerConfig&)> condition) noexcept
 {
     if (_layers.empty()) [[unlikely]] return {};
 
@@ -61,13 +63,13 @@ LayerGroup Scene::getLayersBy(std::function<bool(const LayerConfig&)> condition)
 }
 
 [[nodiscard]]
-LayerGroup Scene::getActiveLayers() noexcept
+Scene::LayerGroup Scene::getActiveLayers() noexcept
 {
     return getLayersBy([](const LayerConfig& layer){ return layer.is_active; });
 }
 
 [[nodiscard]]
-LayerGroup Scene::getInactiveLayers() noexcept
+Scene::LayerGroup Scene::getInactiveLayers() noexcept
 {
     return getLayersBy([](const LayerConfig& layer){ return !layer.is_active; });
 }

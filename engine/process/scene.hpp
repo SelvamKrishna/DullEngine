@@ -17,7 +17,7 @@ namespace dull::process {
 // =======================
 // Manager of all scene related logic
 // =======================
-class Scene final : private misc::IProcessor {
+class Scene final : private misc::INamedProcessor {
     friend core::App;
     friend class World;
     friend misc::SceneBuilder;
@@ -43,18 +43,8 @@ private:
     void iFixedProcess() final;
 
 public:
-    static constexpr size_t DEFAULT_CAPACITY = 8;
+    Scene(std::string name);
 
-    explicit Scene(
-        std::string name,
-        size_t initial_capacity = DEFAULT_CAPACITY // For performance
-    ) noexcept
-    : _name {std::move(name)} { _layers.reserve(initial_capacity); }
-
-    [[nodiscard]]
-    std::string_view getName() const noexcept { return _name; }
-
-    [[nodiscard]]
     static misc::Buffer<Layer>& getLayerBuffer() noexcept { return s_layer_buf; }
 
     // Add Layer with given Index(Process Order) and Activity

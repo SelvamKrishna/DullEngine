@@ -6,7 +6,6 @@
 
 #include <vendor/zlog_v2.hpp>
 
-#include <string>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -21,14 +20,13 @@ namespace dull::process {
 // =======================
 // Collection of all Nodes
 // =======================
-class Layer : private misc::IProcessor {
+class Layer : private misc::INamedProcessor {
     friend core::App;
     friend class Scene;
     friend class misc::LayerNodeHandle;
     friend class misc::LayerBuilder;
 
 private:
-    std::string                        _name;  //< Name of the layer (UNIQUE)
     std::vector<std::unique_ptr<Node>> _nodes; //< Collection of Nodes
 
     using NodeIt = std::vector<std::unique_ptr<Node>>::iterator;
@@ -42,33 +40,19 @@ private:
     void _disconnect(NodeIt node_it) noexcept;
 
 public:
-    static constexpr size_t DEFAULT_CAPACITY = 16;
-
     Layer(Layer&&)                 = delete;
     Layer(const Layer&)            = delete;
     Layer& operator=(Layer&&)      = delete;
     Layer& operator=(const Layer&) = delete;
 
-    explicit Layer(
-        std::string name,
-        size_t initial_capacity = DEFAULT_CAPACITY // For performance
-    ) noexcept
-    : _name {std::move(name)} { _nodes.reserve(initial_capacity); }
-
+    Layer(std::string name);
     ~Layer() = default;
-
-    [[nodiscard]]
-    std::string_view getName() const noexcept { return _name; }
 
     [[nodiscard]]
     size_t getNodeCount() const noexcept { return _nodes.size(); }
 
     void shrinkToFit() noexcept { _nodes.shrink_to_fit(); }
-
-    // Adds a node into the Layer
     void addNode(std::unique_ptr<Node> node, bool is_active = true) noexcept;
-
-    // Clears all nodes from Layer
     void removeAllNodes() noexcept;
 
     // Get the NodeHandle of a Node using its type

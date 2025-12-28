@@ -7,6 +7,8 @@ namespace dull::process {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
+Layer::Layer(std::string name) : misc::INamedProcessor {std::move(name)} {}
+
 void Layer::iStart() { forAllNodes([](Node& node) { node.iStart(); }); }
 
 void Layer::iProcess()

@@ -2,19 +2,16 @@
 
 #include "engine/misc/processor.hpp"
 
-#include <string>
-
 namespace dull::process {
 
 // =======================
 // Base Node class
 // =======================
-class Node : protected misc::IProcessor {
+class Node : public misc::INamedProcessor {
     friend core::App;
     friend class Layer;
 
 private:
-    std::string _name;       //< Node name (UNIQUE within Layer)
     bool _is_active {false}; //< The `Layer` will auto set default values
 
 protected:
@@ -27,11 +24,8 @@ public:
     bool is_process       {true}; // Whether to call _update()
     bool is_fixed_process {true}; // Whether to call _fixedUpdate()
 
-    Node(std::string name) : _name {name} {}
+    Node(std::string name);
     virtual ~Node() = default;
-
-    [[nodiscard]]
-    constexpr std::string_view getName() const noexcept { return _name; }
 
     [[nodiscard]]
     constexpr bool isActive() const noexcept { return _is_active; }
