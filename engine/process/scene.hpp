@@ -9,17 +9,10 @@
 #include <vector>
 #include <functional>
 
+//Forward Declaration
+namespace dull::misc { class SceneBuilder; }
+
 namespace dull::process {
-
-// =======================
-// Configuration of a Layer within Scene
-// =======================
-struct LayerConfig final {
-    std::string_view layer_name; // Name of the Layer (UNIQUE), String stored within Layer
-    bool             is_active;  // Is the layer active
-};
-
-using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 
 // =======================
 // Manager of all scene related logic
@@ -27,9 +20,22 @@ using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 class Scene final : private misc::IProcessor {
     friend core::App;
     friend class World;
+    friend misc::SceneBuilder;
+
+// =======================
+// Configuration of a Layer within Scene
+// =======================
+
+    struct LayerConfig final {
+        std::string_view layer_name; // Name of the Layer (UNIQUE), String stored within Layer
+        bool             is_active;  // Is the layer active
+    };
+
+    using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 
 private:
     static misc::Buffer<Layer> s_layer_buf; //< Static owned buffer of all loaded Layers
+    std::string                _name;       //< Name of the scene (UNIQUE)
     std::vector<LayerConfig>   _layers;     //< Ref of Layers within scene
 
     void iStart()        final;
@@ -37,6 +43,17 @@ private:
     void iFixedProcess() final;
 
 public:
+    static constexpr size_t DEFAULT_CAPACITY = 8;
+
+    explicit Scene(
+        std::string name,
+        size_t initial_capacity = DEFAULT_CAPACITY // For performance
+    ) noexcept
+    : _name {std::move(name)} { _layers.reserve(initial_capacity); }
+
+    [[nodiscard]]
+    std::string_view getName() const noexcept { return _name; }
+
     [[nodiscard]]
     static misc::Buffer<Layer>& getLayerBuffer() noexcept { return s_layer_buf; }
 

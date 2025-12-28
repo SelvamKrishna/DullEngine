@@ -23,7 +23,7 @@ void Layer::_disconnect(NodeIt node_it) noexcept { _nodes.erase(node_it); }
 
 void Layer::addNode(std::unique_ptr<Node> node, bool is_active) noexcept
 {
-    std::string_view node_name;
+    std::string_view node_name = node->getName();
 
     ZASSERT(
         std::find_if(
@@ -44,7 +44,7 @@ void Layer::addNode(std::unique_ptr<Node> node, bool is_active) noexcept
             ZPERFORMANCE("Layer '{}' size exceeding capacity of '{}'", _name, _nodes.size());
     }
 
-    if (dull::HANDLE.isStarting())
+    if (DULL_HANDLE.isStarting())
         _nodes.back()->_is_active = true;
         // Soft active `Node::_start()` will be called in Layer::_active()
     else

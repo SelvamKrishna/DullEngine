@@ -13,6 +13,9 @@
 #include <functional>
 #include <type_traits>
 
+// Forward Declaration
+namespace dull::misc { class LayerBuilder; }
+
 namespace dull::process {
 
 // =======================
@@ -22,6 +25,7 @@ class Layer : private misc::IProcessor {
     friend core::App;
     friend class Scene;
     friend class misc::LayerNodeHandle;
+    friend class misc::LayerBuilder;
 
 private:
     std::string                        _name;  //< Name of the layer (UNIQUE)

@@ -5,6 +5,8 @@
 
 namespace dull::process {
 
+misc::Buffer<Scene> World::s_scene_buf = {};
+
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
 void World::iStart()        { getCurrentScene().iStart();        }
@@ -16,7 +18,7 @@ void World::setCurrentScene(std::string_view scene_name) noexcept
     if (scene_name == _current_scene) return;
 
     ZASSERT( // If Scene not laready loaded into buffer
-        _scene_buf.hasData(scene_name),
+        s_scene_buf.hasData(scene_name),
         "Scene '{}' not loaded into SceneBuffer", scene_name
     );
 
@@ -27,13 +29,13 @@ void World::setCurrentScene(std::string_view scene_name) noexcept
 
     _current_scene = scene_name;
 
-    if (dull::HANDLE.isRunning()) [[likely]] getCurrentScene().iStart();
+    if (DULL_HANDLE.isRunning()) [[likely]] getCurrentScene().iStart();
 }
 
 [[nodiscard]]
 Scene& World::getCurrentScene() noexcept
 {
-    return _scene_buf.getData(_current_scene);
+    return s_scene_buf.getData(_current_scene);
 }
 
 void World::logStats() const noexcept

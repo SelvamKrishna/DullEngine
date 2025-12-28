@@ -16,8 +16,8 @@ class World : private misc::IProcessor {
     friend core::App;
 
 private:
-    misc::Buffer<Scene> _scene_buf;  //< Collection of all loaded Scenes
-    std::string_view _current_scene; //< Scene currently active
+    static misc::Buffer<Scene> s_scene_buf; //< Collection of all loaded Scenes
+    std::string_view _current_scene;        //< Scene currently active
 
     explicit World() = default;
     ~World() = default;
@@ -28,7 +28,7 @@ private:
 
 public:
     [[nodiscard]]
-    misc::Buffer<Scene>& getSceneBuffer() noexcept { return _scene_buf; }
+    static misc::Buffer<Scene>& getSceneBuffer() noexcept { return s_scene_buf; }
 
     // Changes scene using scene_id
     void setCurrentScene(std::string_view scene_name) noexcept;

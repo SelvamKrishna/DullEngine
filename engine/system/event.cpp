@@ -5,7 +5,7 @@
 
 namespace dull::system {
 
-#define _EVENT_BUS  ::dull::CTX.event_sys
+#define _EVENT_BUS  DULL_CTX.event_sys
 
 uint64_t Event::bind(Event::Callback callback)
 {

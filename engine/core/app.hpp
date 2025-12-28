@@ -5,6 +5,12 @@
 #include "engine/system/event_system.hpp"
 #include "engine/util/vec2.hpp"
 
+// Forward Include
+#include "engine/process/world.hpp" // IWYU pragma: keep
+#include "engine/process/scene.hpp" // IWYU pragma: keep
+#include "engine/process/layer.hpp" // IWYU pragma: keep
+#include "engine/process/node.hpp"  // IWYU pragma: keep
+
 #include <vendor/zlog_v2.hpp>
 
 namespace dull::core {
@@ -55,11 +61,7 @@ public:
 
 } // namespace dull::core
 
-// Quick Access
-/// WARN: Using before contructing `App` class will break
-namespace dull {
+/// MACROS:
 
-static const dull::core::Handle& HANDLE = ::dull::core::App::instance().getHandle();
-static const dull::core::HandleContext& CTX = HANDLE.ctx;
-
-} // namespace dull
+#define DULL_HANDLE ::dull::core::App::instance().getHandle()
+#define DULL_CTX    ::dull::core::App::instance().getHandle().ctx
