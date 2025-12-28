@@ -36,15 +36,15 @@ void Layer::addNode(std::unique_ptr<Node> node, bool is_active) noexcept
         "Node '{}' already exists in Layer '{}'", node_name, _name
     );
 
-    _IF_LOG ZINFO("Node '{}' added to Layer '{}'", node_name, _name);
-    _nodes.emplace_back(std::move(node));
-
-    if (!is_active) return; // Layer currently not processing
-
     ZON_DEBUG {
         if (_nodes.size() == _nodes.capacity()) [[unlikely]]
             ZPERFORMANCE("Layer '{}' size exceeding capacity of '{}'", _name, _nodes.size());
     }
+
+    _IF_LOG ZINFO("Node '{}' added to Layer '{}'", node_name, _name);
+    _nodes.emplace_back(std::move(node));
+
+    if (!is_active) return; // Layer currently not processing
 
     if (DULL_HANDLE.isStarting())
         _nodes.back()->_is_active = true;

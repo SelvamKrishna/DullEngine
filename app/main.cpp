@@ -6,9 +6,8 @@
 
 void printTaskList() noexcept
 {
-    ZTODO("Better Layer creation");
-    ZTODO("Better Scene creation");
     ZTODO("Proper render system plugin");
+    ZTODO("Tree like node processing");
 }
 
 class Node1 : public dull::process::Node {
@@ -31,8 +30,7 @@ int main(void)
     printTaskList();
 
     dull::misc::LayerBuilder{"Layer1"}
-        .reserve(1)
-        .addNode<Node1>(true, "name")
+        .addNode<Node1>(true, "Node1")
         .pushToBuffer();
 
     dull::misc::SceneBuilder{"Scene1"}

@@ -35,8 +35,8 @@ private:
     void iFixedProcess() final;
 
 public:
-    void onStart(ProcessFn fn) noexcept; //< Only change the Start fn
-    void onProcess(ProcessFn fn) noexcept; //< Only change the Process fn
+    void onStart(ProcessFn fn) noexcept;        //< Only change the Start fn
+    void onProcess(ProcessFn fn) noexcept;      //< Only change the Process fn
     void onFixedProcess(ProcessFn fn) noexcept; //< Only change the FixedProcess fn
 
     // Sets all process functions

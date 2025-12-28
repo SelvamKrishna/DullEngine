@@ -28,6 +28,20 @@ void Scene::iFixedProcess()
 
 void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
 {
+    ZASSERT(
+        std::find_if(
+            _layers.begin(), _layers.end(),
+            [&layer_name](const LayerConfig& scene_layer)
+            { return scene_layer.layer_name == layer_name; }
+        ) == _layers.end(),
+        "Layer '{}' already exists in Scene '{}'", layer_name, _name
+    );
+
+    ZON_DEBUG {
+        if (_layers.size() == _layers.capacity()) [[unlikely]]
+            ZPERFORMANCE("Scene '{}' size exceeding capacity of '{}'", _name, _layers.size());
+    }
+
     if (idx == UINT64_MAX) // Default
         _layers.emplace_back(layer_name, active);
     else

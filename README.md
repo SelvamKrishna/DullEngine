@@ -41,3 +41,9 @@ The `IProcessor` interface defines the core update hooks used by the engine.
   - Only one scene is processed at any given time.
 
 Any of the above processors can be used in `dull::config::Processor`.
+
+## Development Features
+
+- Use `misc::LayerBuilder` for easier Layer creation.
+- Use `misc::SceneBuilder` for easier Scene creation.
+- Create `core::App` class before handling other engine features.

@@ -4,14 +4,10 @@
 
 namespace dull::misc {
 
-SceneBuilder::SceneBuilder(std::string scene_name)
-: _scene {std::make_unique<process::Scene>(std::move(scene_name))}
-{}
-
-SceneBuilder& SceneBuilder::reserve(size_t capacity) noexcept
+SceneBuilder::SceneBuilder(std::string layer_name, size_t reserve)
+: _scene {std::make_unique<process::Scene>(std::move(layer_name))}
 {
-    _scene->_layers.reserve(capacity);
-    return *this;
+    _scene->_layers.reserve(reserve);
 }
 
 SceneBuilder& SceneBuilder::addLayer(std::string_view layer_name, size_t idx, bool active)
@@ -30,7 +26,13 @@ std::unique_ptr<process::Scene> SceneBuilder::build() noexcept
 void SceneBuilder::pushToBuffer() noexcept
 {
     ZASSERT(_scene != nullptr, "SceneBuilder::{} called more than once", __func__);
-    process::World::getSceneBuffer().loadData(_scene->getName(), std::move(_scene));
+
+    std::string name_copy = std::string{_scene->getName()};
+
+    ZASSERT(
+        process::World::getSceneBuffer().loadData(_scene->getName(), std::move(_scene)),
+        "LayerBuffer failed to load Layer '{}'", name_copy
+    );
 }
 
 } // namespace dull::misc
