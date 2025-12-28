@@ -22,6 +22,7 @@ class Scene final : private misc::INamedProcessor {
     friend class World;
     friend misc::SceneBuilder;
 
+public:
 // =======================
 // Configuration of a Layer within Scene
 // =======================

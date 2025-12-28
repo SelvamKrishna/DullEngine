@@ -47,7 +47,7 @@ void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
     else
         _layers.insert(_layers.begin() + idx, { layer_name, active });
 
-    _IF_LOG ZINFO("Layer '{}' added to Scene", layer_name);
+    _IF_LOG ZINFO("Layer '{}' added to Scene '{}'", layer_name, _name);
 }
 
 void Scene::removeLayer(std::string_view layer_name)
@@ -57,7 +57,7 @@ void Scene::removeLayer(std::string_view layer_name)
         [&layer_name](const auto& layer) { return layer.layer_name == layer_name; }
     );
 
-    _IF_LOG ZINFO("Layer '{}' removed to Scene", layer_name);
+    _IF_LOG ZINFO("Layer '{}' removed to Scene '{}'", layer_name, _name);
 }
 
 [[nodiscard]]
@@ -120,13 +120,13 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
     if (it->is_active == active) return; // No changes
 
     it->is_active = active;
-    _IF_LOG ZINFO("Layer '{}' made {}", layer_name, active ? "active" : "inactive");
+    _IF_LOG ZINFO("Layer '{}' made {} in Scene '{}'", layer_name, active ? "active" : "inactive", _name);
 }
 
 void Scene::logStats() const noexcept
 {
     ZON_RELEASE return;
-
+    ZTRC_S("Logging Scene '{}'", _name);
     for (const LayerConfig& LAYER_CTX : _layers)
     {
         ZDBG(

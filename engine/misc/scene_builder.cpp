@@ -4,15 +4,23 @@
 
 namespace dull::misc {
 
-SceneBuilder::SceneBuilder(std::string layer_name, size_t reserve)
-: _scene {std::make_unique<process::Scene>(std::move(layer_name))}
+SceneBuilder::SceneBuilder(std::string scene_name, size_t reserve)
+: _scene {std::make_unique<process::Scene>(std::move(scene_name))}
 {
     _scene->_layers.reserve(reserve);
 }
 
-SceneBuilder& SceneBuilder::addLayer(std::string_view layer_name, size_t idx, bool active)
+SceneBuilder& SceneBuilder::addLayer(std::string_view layer_name, bool active, size_t idx)
 {
     _scene->addLayer(layer_name, idx, active);
+    return *this;
+}
+
+SceneBuilder& SceneBuilder::addLayers(std::initializer_list<process::Scene::LayerConfig> layers)
+{
+    for (auto& LAYER_CFG : layers)
+        addLayer(LAYER_CFG.layer_name, LAYER_CFG.is_active);
+
     return *this;
 }
 

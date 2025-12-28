@@ -6,6 +6,11 @@
 
 namespace dull::misc {
 
+struct SceneBuilderContext {
+    std::string scene_name;
+    std::initializer_list<process::Scene::LayerConfig> layers;
+};
+
 // =======================
 // Builder patter for Scene
 // =======================
@@ -16,10 +21,13 @@ private:
 public:
     static constexpr size_t DEFAULT_CAPACITY { 16 };
 
-    explicit SceneBuilder(std::string layer_name, size_t reserve = DEFAULT_CAPACITY);
+    explicit SceneBuilder(std::string scene_name, size_t reserve = DEFAULT_CAPACITY);
 
     // Adds `Layer` to `Scene`
-    SceneBuilder& addLayer(std::string_view layer_name, size_t idx = UINT64_MAX, bool active = true);
+    SceneBuilder& addLayer(std::string_view layer_name, bool active = true, size_t idx = UINT64_MAX);
+
+    // Adds multiple `Layer` to `Scene` in the provided order
+    SceneBuilder& addLayers(std::initializer_list<process::Scene::LayerConfig> layers);
 
     [[nodiscard]]
     std::unique_ptr<process::Scene> build() noexcept;
