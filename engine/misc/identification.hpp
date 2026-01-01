@@ -11,12 +11,25 @@ template <typename TagT>
 class StrongID {
 public:
     using NumericT = uint32_t;
-    static constexpr NumericT NumericMax = UINT32_MAX;
+    static constexpr NumericT NumericMax = UINT_MAX;
 
     const NumericT ID;
 
     [[nodiscard]]
     constexpr operator NumericT() const noexcept { return ID; }
+
+#define _OP_COMP(OPR) \
+    [[nodiscard]]     \
+    bool operator OPR(const StrongID& other) const noexcept { return ID OPR other.ID; }
+
+    _OP_COMP(==)
+    _OP_COMP(!=)
+    _OP_COMP(<)
+    _OP_COMP(<=)
+    _OP_COMP(>)
+    _OP_COMP(>=)
+
+#undef _OP_COMP
 };
 
 template <typename TagT>
@@ -27,7 +40,7 @@ public:
         static std::atomic<uint32_t> counter {1}; // 0 = invalid
 
         uint32_t value = counter.fetch_add(1, std::memory_order_relaxed);
-        ZASSERT(value != 0 && value != UINT32_MAX, "NumericIDGenerator exhausted");
+        ZASSERT(value != 0 && value != StrongID<TagT>::NumericMax, "NumericIDGenerator exhausted");
 
         return StrongID<TagT> {value};
     }
@@ -36,30 +49,31 @@ public:
 template <typename TagT>
 class Identified {
 private:
+    StrongID<TagT> _id;
 #ifndef NDEBUG
     std::string _name;
 #endif
-    StrongID<TagT> _id {};
 
 public:
-#ifndef NDEBUG
     explicit Identified(std::string name) noexcept
-    : _name {std::move(name)}
-    , _id {IDGenerator<TagT>::generate()}
-    {}
-#else
-    explicit Identified(std::string = {}) noexcept
     : _id {IDGenerator<TagT>::generate()}
-    {}
-#endif
+    #ifndef NDEBUG
+    , _name {std::move(name)}
+    #endif
+    { (void)name; }
 
     [[nodiscard]]
     const StrongID<TagT>& getID() const noexcept { return _id; }
 
-#ifndef NDEBUG
     [[nodiscard]]
-    std::string_view getName() const noexcept { return _name; }
-#endif
+    std::string_view getName() const noexcept
+    {
+    #ifndef NDEBUG
+        return _name;
+    #else
+        return "";
+    #endif
+    }
 };
 
 } // namespace dull::misc
