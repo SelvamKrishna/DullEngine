@@ -2,21 +2,21 @@
 
 #include <cstdint>
 
-namespace dull::core {
+#include "engine/config.hpp"
+#include "engine/system/time_system.hpp"
+#include "engine/system/event_system.hpp"
 
-// Forward Declaration
-class EventSystem;
-class SceneSystem;
-class LayerBuffer;
-class SceneBuffer;
+namespace dull::core {
 
 // =======================
 // A enum to keep track of the app state
 // =======================
-enum class ProgramState : uint8_t {
-    Initial,
-    Process,
-    Conclude,
+enum class ProgramState : uint8_t { Initialization, Processing, ShuttingDown, };
+
+struct HandleContext final {
+    system::TimeSystem&  time_sys;  //< Stores all time related data
+    system::EventSystem& event_sys; //< Handles all event related logic
+    config::Processor&   processor; //< Handles all logic processing
 };
 
 // =======================
@@ -26,47 +26,29 @@ class Handle final {
     friend class App;
 
 private:
-    ProgramState _state = ProgramState::Initial;
+    ProgramState _state = ProgramState::Initialization;
 
     constexpr Handle(Handle&&)                 noexcept = delete;
     constexpr Handle(const Handle&)            noexcept = delete;
     constexpr Handle& operator=(Handle&&)      noexcept = delete;
     constexpr Handle& operator=(const Handle&) noexcept = delete;
 
-    explicit Handle(
-        EventSystem& event_sys,
-        SceneSystem& scene_sys,
-        LayerBuffer& layer_buf,
-        SceneBuffer& scene_buf
-    )
-    : event_sys {event_sys}
-    , scene_sys {scene_sys}
-    , layer_buf {layer_buf}
-    , scene_buf {scene_buf}
-    {}
-
+    explicit Handle(HandleContext ctx) : ctx {ctx} {}
     ~Handle() = default;
 
-    void _init() noexcept;
     void _setState(ProgramState new_state) noexcept { _state = new_state; }
 
 public:
-    EventSystem& event_sys; //< Handles all event related logic
-    SceneSystem& scene_sys; //< Handles all scene related logic
-    LayerBuffer& layer_buf; //< Stores all layer related data
-    SceneBuffer& scene_buf; //< Stores all scene related data
+    HandleContext ctx;
 
     [[nodiscard]]
-    const ProgramState& getProgramState() const noexcept { return _state; }
+    constexpr bool isStarting() const noexcept { return _state == ProgramState::Initialization; }
 
     [[nodiscard]]
-    constexpr bool isStarting() const noexcept { return _state == ProgramState::Initial; }
+    constexpr bool isRunning() const noexcept { return _state == ProgramState::Processing; }
 
     [[nodiscard]]
-    constexpr bool isRunning() const noexcept { return _state == ProgramState::Process; }
-
-    [[nodiscard]]
-    constexpr bool isQuitting() const noexcept { return _state == ProgramState::Conclude; }
+    constexpr bool isQuitting() const noexcept { return _state == ProgramState::ShuttingDown; }
 };
 
 } // namespace dull::core

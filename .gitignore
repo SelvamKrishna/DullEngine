@@ -6,6 +6,7 @@ premake5.exe
 .vscode/
 compile_flags.txt
 
-# Tests
+# Test Artifacts
 *.log
 test/
+CHANGES.txt

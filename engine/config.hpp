@@ -1,46 +1,50 @@
 #pragma once
 
 #include "engine/util/vec2.hpp"
-
 #include <vendor/zlog_v2.hpp>
 
 #include <format>
 #include <string>
 #include <cstdint>
 
+// Forward Declaration
+namespace dull::process {
+
+class Layer;
+class Scene;
+class World;
+
+} // namespace dull::process
+
 namespace dull::config {
 
 /// --- Application Settings ---
 
-constexpr std::string TITLE         = "Application";
-constexpr util::Vec2i WINDOW_SIZE   = {800, 800};
-constexpr bool        IS_VSYNC      = false;
-constexpr bool        IS_RESIZEABLE = false;
+constexpr std::string TITLE         { "Application" };
+constexpr util::Vec2i WINDOW_SIZE   { {800, 800} };
+constexpr bool        IS_VSYNC      { false };
+constexpr bool        IS_RESIZEABLE { false };
 
-constexpr uint32_t FIXED_PROCESS_FPS = 60;
+constexpr uint32_t FIXED_PROCESS_FPS { 60 };
 
-enum class SceneID {
-    _NULL = 0,  // DO NOT CHANGE. Add scenes vvv
-    Scene1,
-    _COUNT,     // DO NOT CHANGE. Add scenes ^^^
-};
+using Processor = process::World;
 
 /// --- Logging Settings ---
 
 #ifdef NDEBUG // Release Mode
-constexpr bool SHOULD_LOG_APP       = false;
-constexpr bool SHOULD_LOG_SCENE_SYS = false;
-constexpr bool SHOULD_LOG_EVENT_SYS = false;
+constexpr bool SHOULD_LOG_APP       { false };
+constexpr bool SHOULD_LOG_SCENE_SYS { false };
+constexpr bool SHOULD_LOG_EVENT_SYS { false };
 #else // Debug Mode
-constexpr bool SHOULD_LOG_APP       = true;
-constexpr bool SHOULD_LOG_SCENE_SYS = true;
-constexpr bool SHOULD_LOG_EVENT_SYS = true;
+constexpr bool SHOULD_LOG_APP       { true };
+constexpr bool SHOULD_LOG_SCENE_SYS { true };
+constexpr bool SHOULD_LOG_EVENT_SYS { true };
 #endif
 
 /// --- Engine Config (DO NOT TOUCH) ---
 
-constexpr uint32_t VER_MAJOR = 0;
-constexpr uint32_t VER_MINOR = 1;
+constexpr uint32_t VER_MAJOR { 0 };
+constexpr uint32_t VER_MINOR { 1 };
 
 /// --- Utilities ---
 
@@ -48,12 +52,6 @@ constexpr uint32_t VER_MINOR = 1;
 inline std::string getVerString() noexcept
 {
     return std::format("{}.{}", VER_MAJOR, VER_MINOR);
-}
-
-static inline void taskList() noexcept
-{
-    ZTODO("Better Layer creation");
-    ZTODO("Proper render system plugin");
 }
 
 } // namespace dull::config

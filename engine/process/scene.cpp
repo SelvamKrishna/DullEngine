@@ -1,30 +1,47 @@
 #include "engine/config.hpp"
-#include "engine/core/app.hpp"
-#include "engine/core/scene.hpp"
+#include "engine/process/scene.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
-namespace dull::core {
+namespace dull::process {
+
+misc::Buffer<Layer> Scene::s_layer_buf = {};
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
-void Scene::_activate()
+Scene::Scene(std::string name) : misc::INamedProcessor {std::move(name)} {}
+
+void Scene::iStart()
 {
-    forAllActiveLayers([](auto& layer) { layer->_activate(); });
+    forAllActiveLayers([](Layer& layer) { layer.iStart(); });
 }
 
-void Scene::_process()
+void Scene::iProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer->_process(); });
+    forAllActiveLayers([](Layer& layer) { layer.iProcess(); });
 }
 
-void Scene::_fixedProcess()
+void Scene::iFixedProcess()
 {
-    forAllActiveLayers([](auto& layer) { layer->_fixedProcess(); });
+    forAllActiveLayers([](Layer& layer) { layer.iFixedProcess(); });
 }
 
 void Scene::addLayer(std::string_view layer_name, size_t idx, bool active)
 {
+    ZASSERT(
+        std::find_if(
+            _layers.begin(), _layers.end(),
+            [&layer_name](const LayerConfig& scene_layer)
+            { return scene_layer.layer_name == layer_name; }
+        ) == _layers.end(),
+        "Layer '{}' already exists in Scene '{}'", layer_name, _name
+    );
+
+    ZON_DEBUG {
+        if (_layers.size() == _layers.capacity()) [[unlikely]]
+            ZPERFORMANCE("Scene '{}' size exceeding capacity of '{}'", _name, _layers.size());
+    }
+
     if (idx == UINT64_MAX) // Default
         _layers.emplace_back(layer_name, active);
     else
@@ -40,11 +57,11 @@ void Scene::removeLayer(std::string_view layer_name)
         [&layer_name](const auto& layer) { return layer.layer_name == layer_name; }
     );
 
-    _IF_LOG ZINFO("Layer '{}' removed to Scene", layer_name);
+    _IF_LOG ZINFO("Layer '{}' removed to Scene '{}'", layer_name, _name);
 }
 
 [[nodiscard]]
-LayerGroup Scene::getLayersBy(std::function<bool(const LayerCtx&)> condition) noexcept
+Scene::LayerGroup Scene::getLayersBy(std::function<bool(const LayerConfig&)> condition) noexcept
 {
     if (_layers.empty()) [[unlikely]] return {};
 
@@ -60,21 +77,21 @@ LayerGroup Scene::getLayersBy(std::function<bool(const LayerCtx&)> condition) no
 }
 
 [[nodiscard]]
-LayerGroup Scene::getActiveLayers() noexcept
+Scene::LayerGroup Scene::getActiveLayers() noexcept
 {
-    return getLayersBy([](const LayerCtx& layer){ return layer.is_active; });
+    return getLayersBy([](const LayerConfig& layer){ return layer.is_active; });
 }
 
 [[nodiscard]]
-LayerGroup Scene::getInactiveLayers() noexcept
+Scene::LayerGroup Scene::getInactiveLayers() noexcept
 {
-    return getLayersBy([](const LayerCtx& layer){ return !layer.is_active; });
+    return getLayersBy([](const LayerConfig& layer){ return !layer.is_active; });
 }
 
 void Scene::forAllActiveLayers(LayerMethod& function) noexcept
 {
     for (const auto& [NAME, IS_ACTIVE] : _layers) if (IS_ACTIVE)
-        function(DULL_HANDLE.layer_buf.getLayer(NAME));
+        function(s_layer_buf.getData(NAME));
 }
 
 [[nodiscard]]
@@ -92,7 +109,7 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
 {
     auto it = std::find_if(
         _layers.begin(), _layers.end(),
-        [&layer_name](const LayerCtx& LAYER) { return LAYER.layer_name == layer_name; }
+        [&layer_name](const LayerConfig& LAYER) { return LAYER.layer_name == layer_name; }
     );
 
     ZASSERT(
@@ -103,20 +120,14 @@ void Scene::setLayerActive(std::string_view layer_name, bool active) noexcept
     if (it->is_active == active) return; // No changes
 
     it->is_active = active;
-
-    // Layer is made active and Scene is currently processing
-    if (active && DULL_HANDLE.scene_sys.isSceneCurrent(_name))
-        DULL_HANDLE.layer_buf.getLayer(layer_name)->_activate();
-
-    _IF_LOG ZINFO("Layer '{}' made {}", layer_name, active ? "active" : "inactive");
+    _IF_LOG ZINFO("Layer '{}' made {} in Scene '{}'", layer_name, active ? "active" : "inactive", _name);
 }
 
 void Scene::logStats() const noexcept
 {
     ZON_RELEASE return;
-    ZTRC_S("Loggin Scene '{}'", _name);
-
-    for (const LayerCtx& LAYER_CTX : _layers)
+    ZTRC_S("Logging Scene '{}'", _name);
+    for (const LayerConfig& LAYER_CTX : _layers)
     {
         ZDBG(
             "{}Layer '{}'{}{}",
@@ -130,4 +141,4 @@ void Scene::logStats() const noexcept
 
 #undef _IF_LOG
 
-} // namespace dull::core
+} // namespace dull::process

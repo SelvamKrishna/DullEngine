@@ -1,57 +1,43 @@
 #include <engine/config.hpp>
 #include <engine/core/app.hpp>
-#include <engine/core/scene.hpp>
 
-class Sample2 : public dull::core::Node {
-private:
-    void _start() final { ZDBG("Node: Started Sample 2"); }
-    void _update() final { }
+#include <engine/misc/layer_builder.hpp>
+#include <engine/misc/scene_builder.hpp>
 
-public:
-    Sample2() : dull::core::Node() {}
-};
+class Node1 : public dull::process::Node {
+    void iStart() override {
+        ZDBG("Hllo World");
 
-class Sample : public dull::core::Node {
-private:
-    void _start() final { ZDBG("Node: Started Sample 1"); }
-    void _update() final
-    {
-        if (rl::IsKeyPressed(rl::KEY_B))
-        {
-            DULL_HANDLE.scene_sys.getLayerBuffer()
-                .getLayer(getLayer())->getNodeHandle<Sample2>()
-                .getNode()->setActive(true);
-        }
+        is_process = false;
+        is_fixed_process = false;
     }
 
+    void iProcess() override { ZDBG("Hello Procees"); }
+
 public:
-    Sample() : dull::core::Node() {}
+    Node1(std::string name) : Node {std::move(name)} {}
 };
 
 int main(void)
 {
-    dull::core::App app = { dull::core::AppContext::load() };
-    dull::core::Handle& handle = app.getHandle();
+    dull::core::App app;
 
-    auto& layer_buf = handle.layer_buf;
+    dull::misc::LayerBuilder{"Layer1"}
+        .addNode<Node1>(true, "Node1")
+        .pushToBuffer();
 
-    layer_buf.loadLayer(std::make_unique<dull::core::Layer>("main1"));
-    layer_buf.loadLayer(std::make_unique<dull::core::Layer>("main2"));
-    layer_buf.loadLayer(std::make_unique<dull::core::Layer>("main3"));
+    dull::misc::LayerBuilder{"Layer2"}
+        .addNode<Node1>(true, "Node1")
+        .pushToBuffer();
 
-    layer_buf.getLayer("main1")->addNode("sample", std::make_unique<Sample>());
-    layer_buf.getLayer("main1")->addNode("sample2", std::make_unique<Sample2>(), false);
+    dull::misc::SceneBuilder{"Scene1"}
+        .addLayers({
+            {"Layer1", true},
+            {"Layer2", true},
+        })
+        .pushToBuffer();
 
-    auto sc1 = std::make_unique<dull::core::Scene>("Scene1");
-
-    sc1->addLayer("main1");
-
-    handle.scene_sys.getSceneBuffer().loadScene(std::move(sc1));
-    handle.scene_sys.setCurrentScene("Scene1");
-
-    dull::config::taskList();
-
-    handle.scene_buf.logStats();
+    DULL_CTX.processor.setCurrentScene("Scene1");
 
     app.run();
 }

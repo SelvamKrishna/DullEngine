@@ -4,6 +4,9 @@
 
 namespace dull::misc {
 
+// =======================
+// Hasher for string with string_view key
+// =======================
 struct StringHash {
     using is_transparent = void;
 
@@ -13,6 +16,9 @@ struct StringHash {
     }
 };
 
+// =======================
+// Comparator b/w 2 string_view
+// =======================
 struct StringEq {
     using is_transparent = void;
 

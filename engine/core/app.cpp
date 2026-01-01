@@ -12,24 +12,14 @@ namespace dull::core {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_APP)
 
-[[nodiscard]]
-AppContext AppContext::load() noexcept
-{
-    return AppContext {
-        .title         = config::TITLE,
-        .window_size   = config::WINDOW_SIZE,
-        .is_vsync      = config::IS_VSYNC,
-        .is_resizeable = config::IS_RESIZEABLE,
-    };
-}
-
 void AppContext::logStats() const noexcept
 {
-    ZVAR(AppContext::title);
-    ZVAR(AppContext::window_size.x);
-    ZVAR(AppContext::window_size.y);
-    ZVAR(AppContext::is_vsync);
-    ZVAR(AppContext::is_resizeable);
+    ZTRC_S("Logging AppContext");
+    ZVAR(title);
+    ZVAR(window_size.x);
+    ZVAR(window_size.y);
+    ZVAR(is_vsync);
+    ZVAR(is_resizeable);
 }
 
 static inline App* s_instance = nullptr;
@@ -52,7 +42,7 @@ App::App(const AppContext& context)
     rl::InitWindow(context.window_size.x, context.window_size.y, TITLE.c_str());
     rl::SetExitKey(rl::KEY_NULL);
 
-    _handle._init();
+    _handle._setState(ProgramState::Initialization);
 
     _IF_LOG {
         context.logStats();
@@ -71,26 +61,16 @@ App& App::instance() noexcept { return *s_instance; }
 
 void App::run() noexcept
 {
-    _handle._setState(ProgramState::Process);
-
-    constexpr double FIXED_PROCESS_INTERVAL = 1.0 / config::FIXED_PROCESS_FPS;
-    double accumulated_time = 0.0f;
+    _handle._setState(ProgramState::Processing);
 
     _IF_LOG ZINFO("App running");
 
-    _scene_sys._activate();
+    _processor.iStart();
 
     try {
         while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
-            /// TODO: Move to time system
-            accumulated_time += rl::GetFrameTime();
-            if (accumulated_time > FIXED_PROCESS_INTERVAL)
-            {
-                accumulated_time -= FIXED_PROCESS_INTERVAL;
-                _scene_sys._fixedProcess();
-            }
-
-            _scene_sys._process();
+            if (_time_sys._isFixedProcess()) _processor.iFixedProcess();
+            _processor.iProcess();
 
             /// TODO: Move to render system
             rl::BeginDrawing();
@@ -104,7 +84,7 @@ void App::run() noexcept
     }
 }
 
-void App::quit() noexcept { _handle._setState(ProgramState::Conclude); }
+void App::quit() noexcept { _handle._setState(ProgramState::ShuttingDown); }
 
 #undef _IF_LOG
 

@@ -31,13 +31,13 @@ struct Color {
     _FACTORY(kTransparent, 0, 0, 0, 0)
 
     _FACTORY(kWhite  , 255, 255, 255, 255)
-    _FACTORY(kBlack  , 0  , 0  , 0  , 255)
     _FACTORY(kRed    , 255, 0  , 0  , 255)
     _FACTORY(kGreen  , 0  , 255, 0  , 255)
     _FACTORY(kBlue   , 0  , 0  , 255, 255)
-    _FACTORY(kYellow , 255, 255, 0  , 255)
     _FACTORY(kCyan   , 0  , 255, 255, 255)
     _FACTORY(kMagenta, 255, 0  , 255, 255)
+    _FACTORY(kYellow , 255, 255, 0  , 255)
+    _FACTORY(kBlack  , 0  , 0  , 0  , 255)
 
 #undef _FACTORY
 
