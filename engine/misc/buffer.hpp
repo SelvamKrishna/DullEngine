@@ -1,12 +1,8 @@
 #pragma once
 
-#include "engine/misc/string_view_hashing.hpp"
-
 #include <vendor/zlog_v2.hpp>
 
-#include <string>
 #include <memory>
-#include <unordered_map>
 
 namespace dull::misc {
 
@@ -16,12 +12,7 @@ namespace dull::misc {
 template <typename DataT>
 class Buffer {
 private:
-    std::unordered_map<
-        std::string,
-        std::unique_ptr<DataT>, // Uniquely owned data
-        misc::StringHash,
-        misc::StringEq
-    > _buffer;
+    std::vector<std::unique_ptr<DataT>> _buffer;
 
 public:
     // Checks if key already exists
