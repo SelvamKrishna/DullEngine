@@ -55,6 +55,9 @@ private:
 #endif
 
 public:
+    using Tag = TagT;
+    using ID = StrongID<TagT>;
+
     explicit Identified(std::string name) noexcept
     : _id {IDGenerator<TagT>::generate()}
     #ifndef NDEBUG

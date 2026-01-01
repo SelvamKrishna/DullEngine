@@ -2,7 +2,7 @@
 
 namespace dull::process {
 
-Node::Node(std::string name) : misc::INamedProcessor {std::move(name)} {}
+Node::Node(std::string name) : misc::Identified<NodeTag> {name} {}
 
 void Node::setActive(bool value) noexcept
 {
