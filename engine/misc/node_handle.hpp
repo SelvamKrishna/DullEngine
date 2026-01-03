@@ -2,7 +2,6 @@
 
 #include "engine/process/node.hpp"
 
-#include <vector>
 #include <memory>
 
 // Forward Declaration
@@ -17,26 +16,26 @@ class LayerNodeHandle final {
     friend process::Layer;
 
 private:
-    using NodeIt = std::vector<std::unique_ptr<process::Node>>::iterator;
+    process::Layer&   _layer;   //< Reference to Layer owning this Node
+    process::Node::ID _node_id; //< Node ID
 
-    process::Layer& _layer; //< Reference to Layer owning this Node
-    NodeIt _node_it;        //< Node location in Layer
-
-    explicit LayerNodeHandle(process::Layer& layer, NodeIt node_it) noexcept
+    explicit LayerNodeHandle(process::Layer& layer, process::Node::ID id) noexcept
     : _layer   {layer}
-    , _node_it {node_it}
+    , _node_id {id}
     {}
 
+    // Get Node pointer from Layer's buffer
+    [[nodiscard]] process::Node* findNode() noexcept;
+
 public:
-    [[nodiscard]]
-    process::Node& getNode() noexcept { return *_node_it->get(); }
+    // Get underlying Node from Layer's buffer
+    [[nodiscard]] process::Node& getNode() noexcept;
 
     // Removes Node from Layer
     void removeFromLayer() noexcept;
 
     // Removes Node from Layer and returns it
-    [[nodiscard]]
-    std::unique_ptr<process::Node> extractFromLayer() noexcept;
+    [[nodiscard]] std::unique_ptr<process::Node> extractFromLayer() noexcept;
 };
 
 } // namespace dull::misc

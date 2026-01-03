@@ -11,14 +11,16 @@ namespace dull::misc {
 template <typename DataT>
     requires std::is_base_of_v<Identified<typename DataT::Tag>, DataT>
 class Buffer {
-private:
-    using BufferIt      = std::vector<std::unique_ptr<DataT>>::iterator;
-    using BufferConstIt = std::vector<std::unique_ptr<DataT>>::const_iterator;
+public:
+    using iterator       = std::vector<std::unique_ptr<DataT>>::iterator;
+    using const_iterator = std::vector<std::unique_ptr<DataT>>::const_iterator;
 
+private:
     std::vector<std::unique_ptr<DataT>> _buffer;
 
+    // Binary search the buffer for the iterator using the ID
     [[nodiscard]]
-    BufferConstIt _searchIterator(const typename DataT::ID& id) const noexcept
+    const_iterator _searchIterator(const typename DataT::ID& id) const noexcept
     {
         return std::lower_bound(
             _buffer.begin(), _buffer.end(), id,
@@ -27,8 +29,9 @@ private:
         );
     }
 
+    // Binary search the buffer for the const iterator using the ID
     [[nodiscard]]
-    BufferIt _searchIterator(const typename DataT::ID& id) noexcept
+    iterator _searchIterator(const typename DataT::ID& id) noexcept
     {
         return std::lower_bound(
             _buffer.begin(), _buffer.end(), id,
@@ -37,20 +40,22 @@ private:
         );
     }
 
+    // Checks if iterator is valid and matches with given ID
     [[nodiscard]]
-    bool _isMatchIterator(BufferConstIt it, const typename DataT::ID& id) const noexcept
+    bool _isMatchIterator(const_iterator it, const typename DataT::ID& id) const noexcept
     {
         return it != _buffer.end() && (*it)->getID() == id;
     }
 
 public:
     Buffer() = default;
+    Buffer(size_t reserve) { _buffer.reserve(reserve); }
     ~Buffer() = default;
 
-    Buffer(const Buffer&) = delete;
-    Buffer(Buffer&&) = default;
-    Buffer& operator=(const Buffer&) = delete;
-    Buffer& operator=(Buffer&&) = default;
+    constexpr Buffer(Buffer&&)                 noexcept = default;
+    constexpr Buffer(const Buffer&)            noexcept = default;
+    constexpr Buffer& operator=(Buffer&&)      noexcept = default;
+    constexpr Buffer& operator=(const Buffer&) noexcept = default;
 
     // Insert a new element into the buffer, keeping it sorted by ID
     bool add(std::unique_ptr<DataT> data)
@@ -61,13 +66,13 @@ public:
             return false;
         }
 
-        BufferIt it = _searchIterator(data.getID());
+        iterator it = _searchIterator(data->getID());
 
         if (_isMatchIterator(it, data->getID())) [[unlikely]]
         {
             ZWARN(
                 "Data with ID '{}' already exist in value to Buffer<{}>",
-                data.getID(), typeid(DataT).name()
+                data->getID(), typeid(DataT).name()
             );
             return false;
         }
@@ -79,7 +84,7 @@ public:
     // Remove element by ID
     bool remove(const typename DataT::ID& id)
     {
-        BufferIt it = _searchIterator(id);
+        iterator it = _searchIterator(id);
 
         if (it == _buffer.end() || (*it)->getID() != id)
         {
@@ -95,16 +100,9 @@ public:
     }
 
     // Lookup by ID
-    DataT* findByID(const typename DataT::ID& id) noexcept
+    DataT* find(const typename DataT::ID& id) noexcept
     {
-        BufferIt it = _searchIterator(id);
-        return _isMatchIterator(it, id) ? it->get() : nullptr;
-    }
-
-    // Lookup by ID constant
-    const DataT* findByID(const typename DataT::ID& id) const noexcept
-    {
-        BufferConstIt it = _searchIterator(id);
+        iterator it = _searchIterator(id);
         return _isMatchIterator(it, id) ? it->get() : nullptr;
     }
 
@@ -116,6 +114,7 @@ public:
 
 /// --- Utility ---
     [[nodiscard]] size_t size() const noexcept { return _buffer.size(); }
+    [[nodiscard]] size_t capacity() const noexcept { return _buffer.capacity(); }
     [[nodiscard]] bool empty() const noexcept { return _buffer.empty(); }
     void shrinkToFit() { _buffer.shrink_to_fit(); }
     void clear() { _buffer.clear(); }

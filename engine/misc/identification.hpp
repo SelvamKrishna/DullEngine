@@ -10,17 +10,28 @@ namespace dull::misc {
 template <typename TagT>
 class StrongID {
 public:
-    using NumericT = uint32_t;
-    static constexpr NumericT NumericMax = UINT_MAX;
+    using Raw = uint32_t;
+    static constexpr Raw NumericMax = UINT_MAX;
 
-    const NumericT ID;
+    const Raw ID;
+
+    StrongID(Raw value) : ID {value} {}
+
+    static constexpr StrongID invalid() noexcept { return StrongID {0}; }
 
     [[nodiscard]]
-    constexpr operator NumericT() const noexcept { return ID; }
+    constexpr bool isValid() const noexcept { return ID != 0; }
+
+    [[nodiscard]]
+    constexpr operator Raw() const noexcept { return ID; }
 
 #define _OP_COMP(OPR) \
     [[nodiscard]]     \
     bool operator OPR(const StrongID& other) const noexcept { return ID OPR other.ID; }
+
+#define _OP_COMP_RAW(OPR) \
+    [[nodiscard]]     \
+    bool operator OPR(Raw other) const noexcept { return ID OPR other; }
 
     _OP_COMP(==)
     _OP_COMP(!=)
@@ -29,8 +40,22 @@ public:
     _OP_COMP(>)
     _OP_COMP(>=)
 
+    _OP_COMP_RAW(==)
+    _OP_COMP_RAW(!=)
+    _OP_COMP_RAW(<)
+    _OP_COMP_RAW(<=)
+    _OP_COMP_RAW(>)
+    _OP_COMP_RAW(>=)
+
 #undef _OP_COMP
+#undef _OP_COMP_RAW
 };
+
+template <typename TagT>
+inline std::ostream &operator<<(std::ostream &os, const StrongID<TagT> &id)
+{
+    return os << (uint64_t)id.ID;
+}
 
 template <typename TagT>
 class IDGenerator {
@@ -60,23 +85,31 @@ public:
 
     explicit Identified(std::string name) noexcept
     : _id {IDGenerator<TagT>::generate()}
-    #ifndef NDEBUG
+#ifndef NDEBUG
     , _name {std::move(name)}
-    #endif
+#endif
     { (void)name; }
 
     [[nodiscard]]
     const StrongID<TagT>& getID() const noexcept { return _id; }
 
+#ifndef NDEBUG
     [[nodiscard]]
-    std::string_view getName() const noexcept
-    {
-    #ifndef NDEBUG
-        return _name;
-    #else
-        return "";
-    #endif
-    }
+    std::string_view getName() const noexcept { return _name; }
+#else
+    [[nodiscard]]
+    std::string getName() const noexcept { return std::format("#{}", _id); }
+#endif
 };
 
 } // namespace dull::misc
+
+template <typename TagT>
+struct std::formatter<dull::misc::StrongID<TagT>> {
+    constexpr auto parse(std::format_parse_context &ctx) { return ctx.begin(); }
+
+    auto format(const dull::misc::StrongID<TagT> &id, std::format_context &ctx) const
+    {
+        return std::format_to(ctx.out(), "{}", (uint64_t)id.ID);
+    }
+};

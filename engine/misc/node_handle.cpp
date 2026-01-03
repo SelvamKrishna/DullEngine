@@ -8,6 +8,20 @@ namespace dull::misc {
 
 #define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
 
+[[nodiscard]]
+process::Node* LayerNodeHandle::findNode() noexcept
+{
+    process::Node* node_ptr = _layer.getAllNodes().find(_node_id);
+    ZASSERT(
+        node_ptr != nullptr,
+        "Node with ID '{}' not found in Layer ''", _node_id, _layer.getName()
+    );
+    return node_ptr;
+}
+
+[[nodiscard]]
+process::Node& LayerNodeHandle::getNode() noexcept { return *findNode(); }
+
 void LayerNodeHandle::removeFromLayer() noexcept
 {
     _IF_LOG ZINFO(
@@ -15,7 +29,7 @@ void LayerNodeHandle::removeFromLayer() noexcept
         getNode().getName(), _layer.getName()
     );
 
-    _layer._nodes.erase(_node_it);
+    _layer.getAllNodes().remove(_node_id);
 }
 
 [[nodiscard]]
@@ -26,8 +40,8 @@ std::unique_ptr<process::Node> LayerNodeHandle::extractFromLayer() noexcept
         getNode().getName(), _layer.getName()
     );
 
-    std::unique_ptr<process::Node> node {std::move(_node_it->get())};
-    _layer._disconnect(_node_it);
+    std::unique_ptr<process::Node> node {std::move(findNode())};
+    _layer.getAllNodes().remove(_node_id);
 
     return node;
 }

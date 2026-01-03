@@ -1,47 +1,43 @@
-// #include <engine/config.hpp>
-// #include <engine/core/app.hpp>
+#include <engine/config.hpp>
+#include <engine/core/app.hpp>
 
-// #include <engine/misc/layer_builder.hpp>
-// #include <engine/misc/scene_builder.hpp>
+#include <engine/misc/layer_builder.hpp>
+#include <engine/misc/scene_builder.hpp>
 
-// class Node1 : public dull::process::Node {
-//     void iStart() override {
-//         ZDBG("Hllo World");
+class Node1 : public dull::process::Node {
+    void iStart() override {
+        ZDBG("Hllo World");
 
-//         is_process = false;
-//         is_fixed_process = false;
-//     }
+        is_process = false;
+        is_fixed_process = false;
+    }
 
-//     void iProcess() override { ZDBG("Hello Procees"); }
+    void iProcess() override { ZDBG("Hello Procees"); }
 
-// public:
-//     Node1(std::string name) : Node {std::move(name)} {}
-// };
-
-#include <engine/process/node.hpp>
-#include <engine/misc/buffer.hpp>
+public:
+    Node1(std::string name) : Node {std::move(name)} {}
+};
 
 int main(void)
 {
-    dull::misc::Buffer<dull::process::Node> n_buf = {};
-    // dull::core::App app;
+    dull::core::App app;
 
-    // dull::misc::LayerBuilder{"Layer1"}
-    //     .addNode<Node1>(true, "Node1")
-    //     .pushToBuffer();
+    dull::process::Layer::ID l1 = dull::misc::LayerBuilder{"Layer1"}
+        .addNode<Node1>(true, "Node1")
+        .pushToBuffer();
 
-    // dull::misc::LayerBuilder{"Layer2"}
-    //     .addNode<Node1>(true, "Node1")
-    //     .pushToBuffer();
+    dull::process::Layer::ID l2 = dull::misc::LayerBuilder{"Layer2"}
+        .addNode<Node1>(true, "Node1")
+        .pushToBuffer();
 
-    // dull::misc::SceneBuilder{"Scene1"}
-    //     .addLayers({
-    //         {"Layer1", true},
-    //         {"Layer2", true},
-    //     })
-    //     .pushToBuffer();
+    dull::process::Scene::ID sc1 = dull::misc::SceneBuilder{"Scene1"}
+        .addLayers({
+            {l1, true},
+            {l2, true},
+        })
+        .pushToBuffer();
 
-    // DULL_CTX.processor.setCurrentScene("Scene1");
+    DULL_CTX.processor.setCurrentScene(sc1);
 
-    // app.run();
+    app.run();
 }

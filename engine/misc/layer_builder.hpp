@@ -43,7 +43,7 @@ public:
     std::unique_ptr<process::Layer> build() noexcept;
 
     // Directly pushes `Layer` into the static `LayerBuffer` within `Scene`
-    void pushToBuffer() noexcept;
+    process::Layer::ID pushToBuffer() noexcept;
 };
 
 } // namespace dull::misc

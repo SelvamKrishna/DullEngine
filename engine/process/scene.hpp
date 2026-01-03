@@ -14,29 +14,32 @@ namespace dull::misc { class SceneBuilder; }
 
 namespace dull::process {
 
+struct SceneTag {};
+
 // =======================
 // Manager of all scene related logic
 // =======================
-class Scene final : private misc::INamedProcessor {
+class Scene final : private misc::IProcessor, public misc::Identified<SceneTag> {
     friend core::App;
     friend class World;
-    friend misc::SceneBuilder;
+    friend class misc::SceneBuilder;
 
 public:
-// =======================
-// Configuration of a Layer within Scene
-// =======================
+    // =======================
+    // Configuration of a Layer within Scene
+    // =======================
+    class LayerConfig final {
+    public:
+        Layer::ID::Raw layer_id;  //< Uinque ID of the layer
+        bool           is_active; //< Is the layer active
 
-    struct LayerConfig final {
-        std::string_view layer_name; // Name of the Layer (UNIQUE), String stored within Layer
-        bool             is_active;  // Is the layer active
+        LayerConfig(Layer::ID layer_id, bool is_active)
+        : layer_id {layer_id}, is_active {is_active}
+        {}
     };
-
-    using LayerGroup = std::vector<std::string_view>; //< List of LayerName's
 
 private:
     static misc::Buffer<Layer> s_layer_buf; //< Static owned buffer of all loaded Layers
-    std::string                _name;       //< Name of the scene (UNIQUE)
     std::vector<LayerConfig>   _layers;     //< Ref of Layers within scene
 
     void iStart()        final;
@@ -44,15 +47,19 @@ private:
     void iFixedProcess() final;
 
 public:
-    Scene(std::string name);
+    using LayerGroup = std::vector<Layer::ID>; //< List of Layer's
+
+    static constexpr size_t DEFAULT_NO_OF_LAYERS = 16;
+
+    Scene(std::string name, size_t reserve = DEFAULT_NO_OF_LAYERS);
 
     static misc::Buffer<Layer>& getLayerBuffer() noexcept { return s_layer_buf; }
 
     // Add Layer with given Index(Process Order) and Activity
-    void addLayer(std::string_view layer_name, size_t idx = UINT64_MAX, bool active = true);
+    void addLayer(Layer::ID layer_id, bool active = true, std::optional<size_t> idx = std::nullopt);
 
     // Remove Layer from Scene
-    void removeLayer(std::string_view layer_name);
+    void removeLayer(Layer::ID layer_id);
 
     [[nodiscard]]
     std::vector<LayerConfig>& getLayers() noexcept { return _layers; }
@@ -75,13 +82,10 @@ public:
 
     // Checks wether a Layer is active within a Scene
     [[nodiscard]]
-    bool isLayerActive(std::string_view layer_name) noexcept;
+    bool isLayerActive(Layer::ID layer_id) noexcept;
 
     // Set Layer active also calls Layer::_active() function when made alive
-    void setLayerActive(std::string_view layer_name, bool active) noexcept;
-
-    // DEV: logs all layer context
-    void logStats() const noexcept;
+    void setLayerActive(Layer::ID layer_id, bool active) noexcept;
 };
 
 } // namespace dull::process

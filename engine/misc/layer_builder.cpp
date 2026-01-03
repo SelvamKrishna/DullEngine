@@ -1,14 +1,11 @@
 #include "engine/misc/layer_builder.hpp"
-#include "engine/misc/buffer.hpp"
 #include "engine/process/scene.hpp"
 
 namespace dull::misc {
 
 LayerBuilder:: LayerBuilder(std::string layer_name, size_t reserve)
-: _layer {std::make_unique<process::Layer>(layer_name)}
-{
-    _layer->_nodes.reserve(reserve);
-}
+: _layer {std::make_unique<process::Layer>(layer_name, reserve)}
+{}
 
 [[nodiscard]]
 std::unique_ptr<process::Layer> LayerBuilder::build() noexcept
@@ -17,15 +14,19 @@ std::unique_ptr<process::Layer> LayerBuilder::build() noexcept
     return std::move(_layer);
 }
 
-void LayerBuilder::pushToBuffer() noexcept
+process::Layer::ID LayerBuilder::pushToBuffer() noexcept
 {
+    ZASSERT(_layer != nullptr, "LayerBuilder::{} called more than once", __func__);
+
+    process::Layer::ID layer_id = _layer->getID();
     std::string name_copy = std::string{_layer->getName()};
 
-    ZASSERT(_layer != nullptr, "LayerBuilder::{} called more than once", __func__);
     ZASSERT(
-        process::Scene::getLayerBuffer().loadData(_layer->getName(), std::move(_layer)),
+        process::Scene::getLayerBuffer().add(std::move(_layer)),
         "LayerBuffer failed to load Layer '{}'", name_copy
     );
+
+    return layer_id;
 }
 
 } // namespace dull::misc
