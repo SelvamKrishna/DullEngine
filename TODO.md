@@ -15,9 +15,9 @@ Names can be stored externally for the sake of debugging and completely ignored 
 - [x] Unique ID Generation w/ ID Generator
 - [x] Name property seperation from processors
 - [x] Name property stored within Identified class (auto evict on Release)
-- ~~[ ] Make ID generation a templated trait for Buffer~~
-- ~~[ ] Store Name within a Dynamic List inside respective Buffer~~
-- ~~[ ] Unique ID Generation and assignment logic w/ Buffers~~
+- [x] ~~Make ID generation a templated trait for Buffer~~
+- [x] ~~Store Name within a Dynamic List inside respective Buffer~~
+- [x] ~~Unique ID Generation and assignment logic w/ Buffers~~
 
 **Notes :**
 
