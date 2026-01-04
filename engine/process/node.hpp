@@ -1,13 +1,16 @@
 #pragma once
 
+#include "engine/misc/identification.hpp"
 #include "engine/misc/processor.hpp"
 
 namespace dull::process {
 
+struct NodeTag {};
+
 // =======================
 // Base Node class
 // =======================
-class Node : public misc::INamedProcessor {
+class Node : private misc::IProcessor, public misc::Identified<NodeTag> {
     friend core::App;
     friend class Layer;
 

@@ -22,22 +22,22 @@ int main(void)
 {
     dull::core::App app;
 
-    dull::misc::LayerBuilder{"Layer1"}
+    dull::process::Layer::ID l1 = dull::misc::LayerBuilder{"Layer1"}
         .addNode<Node1>(true, "Node1")
         .pushToBuffer();
 
-    dull::misc::LayerBuilder{"Layer2"}
+    dull::process::Layer::ID l2 = dull::misc::LayerBuilder{"Layer2"}
         .addNode<Node1>(true, "Node1")
         .pushToBuffer();
 
-    dull::misc::SceneBuilder{"Scene1"}
+    dull::process::Scene::ID sc1 = dull::misc::SceneBuilder{"Scene1"}
         .addLayers({
-            {"Layer1", true},
-            {"Layer2", true},
+            {l1, true},
+            {l2, true},
         })
         .pushToBuffer();
 
-    DULL_CTX.processor.setCurrentScene("Scene1");
+    DULL_CTX.processor.setCurrentScene(sc1);
 
     app.run();
 }

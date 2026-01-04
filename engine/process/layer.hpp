@@ -1,12 +1,12 @@
 #pragma once
 
 #include "engine/process/node.hpp"
+#include "engine/misc/buffer.hpp"
 #include "engine/misc/node_handle.hpp"
 #include "engine/misc/processor.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
-#include <vector>
 #include <memory>
 #include <algorithm>
 #include <functional>
@@ -17,19 +17,21 @@ namespace dull::misc { class LayerBuilder; }
 
 namespace dull::process {
 
+struct LayerTag {};
+
 // =======================
 // Collection of all Nodes
 // =======================
-class Layer : private misc::INamedProcessor {
+class Layer : private misc::IProcessor, public misc::Identified<LayerTag> {
     friend core::App;
     friend class Scene;
     friend class misc::LayerNodeHandle;
     friend class misc::LayerBuilder;
 
 private:
-    std::vector<std::unique_ptr<Node>> _nodes; //< Collection of Nodes
+    misc::Buffer<Node> _nodes; //< Collection of Nodes
 
-    using NodeIt = std::vector<std::unique_ptr<Node>>::iterator;
+    using NodeIt = misc::Buffer<Node>::iterator;
 
     void iStart() final;
     void iProcess() final;
@@ -37,21 +39,23 @@ private:
 
     // Detaches node from layer
     // Used by the NodeHandle
-    void _disconnect(NodeIt node_it) noexcept;
+    void _disconnect(Node::ID id) noexcept;
 
 public:
-    Layer(Layer&&)                 = delete;
-    Layer(const Layer&)            = delete;
-    Layer& operator=(Layer&&)      = delete;
-    Layer& operator=(const Layer&) = delete;
+    static constexpr size_t DEFAULT_BUFFER_SIZE { 16 };
 
-    Layer(std::string name);
+    Layer(std::string name, size_t reserve = DEFAULT_BUFFER_SIZE);
     ~Layer() = default;
+
+    constexpr Layer(Layer&&)                 noexcept = delete;
+    constexpr Layer(const Layer&)            noexcept = delete;
+    constexpr Layer& operator=(Layer&&)      noexcept = delete;
+    constexpr Layer& operator=(const Layer&) noexcept = delete;
 
     [[nodiscard]]
     size_t getNodeCount() const noexcept { return _nodes.size(); }
 
-    void shrinkToFit() noexcept { _nodes.shrink_to_fit(); }
+    void shrinkToFit() noexcept { _nodes.shrinkToFit(); }
     void addNode(std::unique_ptr<Node> node, bool is_active = true) noexcept;
     void removeAllNodes() noexcept;
 
@@ -70,29 +74,22 @@ public:
         ZASSERT(
             it != _nodes.end(),
             "Unable to find Node '{}' in Layer '{}'",
-            typeid(NodeT).name(), _name
+            typeid(NodeT).name(), getName()
         );
 
-        return misc::LayerNodeHandle { *this, it };
+        return misc::LayerNodeHandle { *this, (*it)->getID() };
     }
 
     // Get the NodeHandle of a Node using its name (UNIQUE within Layer)
     [[nodiscard]]
-    misc::LayerNodeHandle getNodeHandle(std::string_view name) noexcept;
-
-    // Get the NodeHandle of a Node using its index
-    [[nodiscard]]
-    misc::LayerNodeHandle getNodeHandle(size_t index) noexcept;
+    misc::LayerNodeHandle getNodeHandle(Node::ID node_id) noexcept;
 
     // Read only access to all underlying Nodes
     [[nodiscard]]
-    const std::vector<std::unique_ptr<Node>>& getAllNodes() const noexcept { return _nodes; }
+    misc::Buffer<Node>& getAllNodes() noexcept { return _nodes; }
 
     // Map a function to all Active Layers
     void forAllNodes(const std::function<void(Node&)>& function) noexcept;
-
-    // DEV: Logs name and activity of all underlying nodes
-    void logStats() const noexcept;
 };
 
 } // namespace dull::process

@@ -5,8 +5,6 @@
 #include "engine/process/layer.hpp"
 #include "engine/process/scene.hpp"
 
-#include <string_view>
-
 namespace dull::process {
 
 // =======================
@@ -16,8 +14,8 @@ class World : private misc::IProcessor {
     friend core::App;
 
 private:
-    static misc::Buffer<Scene> s_scene_buf; //< Collection of all loaded Scenes
-    std::string_view _current_scene;        //< Scene currently active
+    static misc::Buffer<Scene> s_scene_buf;               //< Collection of all loaded Scenes
+    Scene::ID::Raw _current_scene = Scene::ID::invalid(); //< Scene currently active
 
     explicit World() = default;
     ~World() = default;
@@ -31,7 +29,7 @@ public:
     static misc::Buffer<Scene>& getSceneBuffer() noexcept { return s_scene_buf; }
 
     // Changes scene using scene_id
-    void setCurrentScene(std::string_view scene_name) noexcept;
+    void setCurrentScene(Scene::ID scene_id) noexcept;
 
     // Returns the active Scene
     [[nodiscard]]
@@ -39,11 +37,8 @@ public:
 
     // Returns true if provided SceneID is the current Scene
     [[nodiscard]]
-    constexpr bool isSceneCurrent(std::string_view scene_name) const noexcept
-    { return _current_scene == scene_name; }
-
-    // DEV: logs LayerBuffer, SceneBuffer and current Scene
-    void logStats() const noexcept;
+    bool isSceneCurrent(Scene::ID scene_id) const noexcept
+    { return _current_scene == scene_id; }
 };
 
 } // namespace dull::process

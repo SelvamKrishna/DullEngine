@@ -24,7 +24,11 @@ public:
     explicit SceneBuilder(std::string scene_name, size_t reserve = DEFAULT_CAPACITY);
 
     // Adds `Layer` to `Scene`
-    SceneBuilder& addLayer(std::string_view layer_name, bool active = true, size_t idx = UINT64_MAX);
+    SceneBuilder& addLayer(
+        process::Layer::ID layer_id,
+        bool active = true,
+        std::optional<size_t> idx = std::nullopt
+    );
 
     // Adds multiple `Layer` to `Scene` in the provided order
     SceneBuilder& addLayers(std::initializer_list<process::Scene::LayerConfig> layers);
@@ -33,7 +37,7 @@ public:
     std::unique_ptr<process::Scene> build() noexcept;
 
     // Directly pushes `Scene` into the static `SceneBuffer` within `World`
-    void pushToBuffer() noexcept;
+    process::Scene::ID pushToBuffer() noexcept;
 };
 
 } // namespace dull::misc

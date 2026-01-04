@@ -463,6 +463,11 @@ inline void assert(
     if (condition) return;
     ZERR(internal::_testFmt(config::ASSERT_TAG, expr, desc, loc));
     config::killProcess();
+#else
+    (void) condition;
+    (void) expr;
+    (void) desc;
+    (void) loc;
 #endif
 }
 
