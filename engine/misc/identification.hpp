@@ -7,28 +7,35 @@
 
 namespace dull::misc {
 
+// =======================
+// Strongly Typed ID
+// =======================
 template <typename TagT>
 class StrongID {
 public:
     using Raw = uint32_t;
     static constexpr Raw NumericMax = UINT_MAX;
 
-    const Raw ID;
+    const Raw ID; //< The raw ID value
 
     StrongID(Raw value) : ID {value} {}
 
+    // Get an invalid ID
     static constexpr StrongID invalid() noexcept { return StrongID {0}; }
 
+    // Check if ID is valid (non-zero)
     [[nodiscard]]
     constexpr bool isValid() const noexcept { return ID != 0; }
 
     [[nodiscard]]
     constexpr operator Raw() const noexcept { return ID; }
 
+// Comparison with another StrongID
 #define _OP_COMP(OPR) \
     [[nodiscard]]     \
     bool operator OPR(const StrongID& other) const noexcept { return ID OPR other.ID; }
 
+// Comparison with raw ID
 #define _OP_COMP_RAW(OPR) \
     [[nodiscard]]     \
     bool operator OPR(Raw other) const noexcept { return ID OPR other; }
@@ -51,32 +58,43 @@ public:
 #undef _OP_COMP_RAW
 };
 
+// Output Stream support for StrongID
 template <typename TagT>
 inline std::ostream &operator<<(std::ostream &os, const StrongID<TagT> &id)
 {
     return os << (uint64_t)id.ID;
 }
 
+// =======================
+// Strong ID Generator
+// =======================
 template <typename TagT>
 class IDGenerator {
 public:
+    // Generate a new unique StrongID
     static StrongID<TagT> generate() noexcept
     {
         static std::atomic<uint32_t> counter {1}; // 0 = invalid
 
         uint32_t value = counter.fetch_add(1, std::memory_order_relaxed);
-        ZASSERT(value != 0 && value != StrongID<TagT>::NumericMax, "NumericIDGenerator exhausted");
+        ZASSERT(
+            value != 0 && value != StrongID<TagT>::NumericMax,
+            "NumericIDGenerator exhausted"
+        );
 
         return StrongID<TagT> {value};
     }
 };
 
+// =======================
+// Identified Base Class
+// =======================
 template <typename TagT>
 class Identified {
 private:
-    StrongID<TagT> _id;
+    StrongID<TagT> _id; //< The unique ID of the object
 #ifndef NDEBUG
-    std::string _name;
+    std::string _name; //< The debug name of the object
 #endif
 
 public:
@@ -84,7 +102,7 @@ public:
     using ID = StrongID<TagT>;
 
     explicit Identified(std::string name) noexcept
-    : _id {IDGenerator<TagT>::generate()}
+    : _id {IDGenerator<TagT>::generate()} // Generate unique ID
 #ifndef NDEBUG
     , _name {std::move(name)}
 #endif
@@ -93,6 +111,7 @@ public:
     [[nodiscard]]
     const StrongID<TagT>& getID() const noexcept { return _id; }
 
+// Debug name access returns Name in debug builds, ID in release builds
 #ifndef NDEBUG
     [[nodiscard]]
     std::string_view getName() const noexcept { return _name; }
