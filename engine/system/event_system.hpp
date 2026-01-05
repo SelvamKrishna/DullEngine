@@ -1,7 +1,7 @@
 #pragma once
 
-#include "engine/system/event.hpp"
 #include "engine/misc/string_view_hashing.hpp"
+#include "engine/system/event.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
@@ -45,11 +45,11 @@ private:
 public:
     // Link Event with Callback function
     // Returns the ID of the created Listener (UNIQUE)
-    uint64_t bind  (std::string_view event_name, Event::Callback callback);
+    uint64_t bind(std::string_view event_name, Event::Callback callback);
 
     // Unlink Event with Callback function using the ListenerID
-    void     unbind(std::string_view event_name, uint64_t callback_id);
-    void     emit(const Event& event) const noexcept;
+    void unbind(std::string_view event_name, uint64_t callback_id);
+    void emit(const Event& event) const noexcept;
 
     // Link Event with Callback function
     // Creates an instant Event with given context
