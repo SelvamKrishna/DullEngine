@@ -6,8 +6,6 @@
 
 namespace dull::misc {
 
-#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
-
 [[nodiscard]]
 process::Node* LayerNodeHandle::findNode() noexcept
 {
@@ -24,7 +22,7 @@ process::Node& LayerNodeHandle::getNode() noexcept { return *findNode(); }
 
 void LayerNodeHandle::removeFromLayer() noexcept
 {
-    _IF_LOG ZINFO(
+    if constexpr (config::SHOULD_LOG_PROCESS_SYS) ZINFO(
         "Node '{}' removed from Layer '{}'",
         getNode().getName(), _layer.getName()
     );
@@ -35,7 +33,7 @@ void LayerNodeHandle::removeFromLayer() noexcept
 [[nodiscard]]
 std::unique_ptr<process::Node> LayerNodeHandle::extractFromLayer() noexcept
 {
-    _IF_LOG ZINFO(
+    if constexpr (config::SHOULD_LOG_PROCESS_SYS) ZINFO(
         "Node '{}' extracted from Layer '{}'",
         getNode().getName(), _layer.getName()
     );

@@ -12,7 +12,7 @@ class Node1 : public dull::process::Node {
         is_fixed_process = false;
     }
 
-    void iProcess() override { ZDBG("Hello Procees"); }
+    void iProcess() override {}
 
 public:
     Node1(std::string name) : Node {std::move(name)} {}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/misc/identification.hpp"
 #include "engine/misc/string_view_hashing.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -9,7 +10,6 @@
 #include <string_view>
 #include <optional>
 #include <functional>
-#include <cstdint>
 
 namespace dull::system {
 
@@ -28,8 +28,19 @@ private:
     std::string _name;
     Event::DataMap _data_map;
 
+    struct EventListenerTag {};
+
 public:
     using Callback = std::function<void(const class Event&)>; // Function to call when emitted
+
+    class Listener : public misc::Identified<EventListenerTag> {
+    public:
+        Callback callback; //< Function to call when Event emitted
+
+        Listener(Callback callback)
+        : misc::Identified<EventListenerTag> {""}, callback {std::move(callback)}
+        {}
+    };
 
     Event() = delete;
 
@@ -47,7 +58,7 @@ public:
     // Used by the Listener to access underlying data
     template <typename DataT>
     [[nodiscard]]
-    std::optional<const DataT&> getData(std::string_view key) const noexcept
+    std::optional<DataT> getData(std::string_view key) const noexcept
     {
         if (
             auto it = _data_map.find(key);
@@ -69,10 +80,10 @@ public:
     }
 
     // Binds Callback function with Event
-    uint64_t bind(Event::Callback callback);
+    Listener::ID bind(Event::Callback callback);
 
     // Unbinds Callback function with Event
-    void unbind(uint64_t callback_id);
+    void unbind(Listener::ID callback_id);
 
     // Emits Event calling all the binded callback function
     void emit() const noexcept;

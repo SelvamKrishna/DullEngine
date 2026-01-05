@@ -14,14 +14,16 @@ void World::setCurrentScene(Scene::ID scene_id) noexcept
 {
     if (scene_id == _current_scene) [[unlikely]] return;
 
-    ZASSERT( // If Scene not laready loaded into buffer
-        s_scene_buf.find(scene_id) != nullptr,
+    Scene* scene_ptr = s_scene_buf.find(scene_id);
+
+    ZASSERT(
+        scene_ptr != nullptr,
         "Scene '{}' not loaded into SceneBuffer", scene_id
     );
 
     if constexpr (config::SHOULD_LOG_PROCESS_SYS) ZINFO(
-        "Current Scene changed from '{}' to '{}'",
-        s_scene_buf.find(_current_scene)->getName(),  s_scene_buf.find(scene_id)->getName()
+        "Current Scene changed to '{}'",
+        scene_ptr->getName()
     );
 
     _current_scene = scene_id;
