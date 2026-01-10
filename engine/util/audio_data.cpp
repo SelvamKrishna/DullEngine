@@ -1,3 +1,4 @@
+#include "engine/core/app.hpp"
 #include "engine/util/audio_data.hpp"
 
 #include <algorithm>
@@ -34,7 +35,13 @@ Music::Music(std::string_view path)
 
 Music::~Music() noexcept { rl::UnloadMusicStream(_music); }
 
-void Music::play()   noexcept { rl::PlayMusicStream(_music); }
+void Music::play() noexcept
+{
+    if (isPlaying()) return;
+    rl::PlayMusicStream(_music);
+    DULL_CTX.audio_sys._addMusicToQueue(getID());
+}
+
 void Music::stop()   noexcept { rl::StopMusicStream(_music); }
 void Music::pause()  noexcept { rl::PauseMusicStream(_music); }
 void Music::resume() noexcept { rl::ResumeMusicStream(_music); }

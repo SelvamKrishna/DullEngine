@@ -48,6 +48,8 @@ App::App(const AppContext& context)
         context.logStats();
         ZINFO("App '{}' initialized", TITLE);
     }
+
+    DULL_CTX.audio_sys._init();
 }
 
 App::~App() noexcept
@@ -69,6 +71,8 @@ void App::run() noexcept
 
     try {
         while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
+            DULL_CTX.audio_sys._update();
+
             if (_time_sys._isFixedProcess()) _processor.iFixedProcess();
             _processor.iProcess();
 
