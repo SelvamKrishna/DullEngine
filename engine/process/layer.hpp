@@ -17,7 +17,7 @@ namespace dull::misc { class LayerBuilder; }
 
 namespace dull::process {
 
-struct LayerTag {};
+struct LayerTag final {};
 
 // =======================
 // Collection of all Nodes

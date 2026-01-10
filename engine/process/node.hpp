@@ -5,7 +5,7 @@
 
 namespace dull::process {
 
-struct NodeTag {};
+struct NodeTag final {};
 
 // =======================
 // Base Node class

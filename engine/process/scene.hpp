@@ -12,7 +12,7 @@ namespace dull::misc { class SceneBuilder; }
 
 namespace dull::process {
 
-struct SceneTag {};
+struct SceneTag final {};
 
 // =======================
 // Manager of all scene related logic

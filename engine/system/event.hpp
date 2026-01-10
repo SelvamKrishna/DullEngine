@@ -18,39 +18,33 @@ namespace dull::system {
 // =======================
 class Event final {
 private:
-    using DataMap = std::unordered_map<
+    std::unordered_map<
         std::string, //< Name of the variable
         std::any,    //< Content of the variable
         misc::StringHash,
         misc::StringEq
-    >;
+    > _data_map;
 
     std::string _name;
-    Event::DataMap _data_map;
 
-    struct EventListenerTag {};
+    struct ListenerTag {};
 
 public:
     using Callback = std::function<void(const class Event&)>; // Function to call when emitted
 
-    class Listener : public misc::Identified<EventListenerTag> {
+    // =======================
+    // Identified wrapper for Event Callback
+    // =======================
+    class Listener : public misc::Identified<ListenerTag> {
     public:
-        Callback callback; //< Function to call when Event emitted
+        Callback callback;
 
         Listener(Callback callback)
-        : misc::Identified<EventListenerTag> {""}, callback {std::move(callback)}
+        : misc::Identified<ListenerTag> {""}, callback {std::move(callback)}
         {}
     };
 
-    Event() = delete;
-
-    Event(Event&&)                 = default;
-    Event(const Event&)            = default;
-    Event& operator=(Event&&)      = default;
-    Event& operator=(const Event&) = default;
-
     explicit Event(std::string_view name) noexcept : _name{name} {}
-    ~Event() = default;
 
     [[nodiscard]]
     std::string_view getName() const noexcept { return _name; }

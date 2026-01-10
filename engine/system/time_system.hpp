@@ -8,7 +8,7 @@ namespace dull::core { class App; }
 namespace dull::system {
 
 // =======================
-// Time systemtem
+// Container for all time related info
 // =======================
 class TimeSystem final {
     friend class dull::core::App;
