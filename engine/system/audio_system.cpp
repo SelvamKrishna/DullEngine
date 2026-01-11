@@ -3,12 +3,6 @@
 
 namespace dull::system {
 
-AudioSystem::~AudioSystem() noexcept
-{
-    rl::CloseAudioDevice();
-    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Audio System shut down");
-}
-
 void AudioSystem::_init() noexcept
 {
     rl::InitAudioDevice();
@@ -26,6 +20,12 @@ void AudioSystem::_update() noexcept
     if (!music.isPlaying()) return;
 
     music.update();
+}
+
+void AudioSystem::_quit() noexcept
+{
+    rl::CloseAudioDevice();
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Audio System shut down");
 }
 
 void AudioSystem::reserveSoundBuffer(size_t reserve) noexcept { _sound_buffer.reserve(reserve); }
@@ -72,6 +72,12 @@ util::Music& AudioSystem::get(util::Music::ID music_id) noexcept
     ZASSERT(music_ptr != nullptr, "Music ID `{}` not found", music_id);
     return *music_ptr;
 }
+
+[[nodiscard]]
+util::Sound* AudioSystem::getSafe(util::Sound::ID sound_id) noexcept { return _sound_buffer.find(sound_id); }
+
+[[nodiscard]]
+util::Music* AudioSystem::getSafe(util::Music::ID music_id) noexcept { return _music_buffer.find(music_id); }
 
 void AudioSystem::setMasterVolume(float volume) noexcept
 {

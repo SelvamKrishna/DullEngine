@@ -2,17 +2,7 @@
 
 ---
 
-## impl: Audio System
-
-**Goal :**
-
-Holds a buffer of sound effects and music streams. Must provide flexibile sound resource loading.
-
----
-
 ## refactor: Event System
-
-**Goal :**
 
 - Typed events
 
@@ -23,7 +13,6 @@ e.setData("amount", 10);
 // Do
 struct DamageEvent {
   int amount;
-  EntityID target;
 };
 // Then
 Event<DamageEvent> onDamage;

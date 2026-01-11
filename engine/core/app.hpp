@@ -35,13 +35,13 @@ class App final {
     friend Handle;
 
 private:
-    system::TimeSystem  _time_sys;
-    system::EventSystem _event_sys;
     system::AudioSystem _audio_sys;
+    system::EventSystem _event_sys;
+    system::TimeSystem  _time_sys;
 
     config::Processor   _processor; //< change in dull::config
 
-    Handle _handle { { _time_sys, _event_sys, _audio_sys, _processor } };
+    Handle _handle { { _audio_sys, _event_sys, _time_sys, _processor } };
 
 public:
     App(App&&)                 = delete;

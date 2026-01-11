@@ -22,10 +22,11 @@ private:
     util::Music::ID::Raw _current_music {0}; //< ID of the current music
 
     explicit AudioSystem() = default;
-    ~AudioSystem() noexcept;
+    ~AudioSystem() = default;
 
     void _init() noexcept;
     void _update() noexcept;
+    void _quit() noexcept;
 
 public:
     constexpr AudioSystem(AudioSystem&&)                 noexcept = delete;
@@ -49,6 +50,12 @@ public:
 
     [[nodiscard]]
     util::Music& get(util::Music::ID music_id) noexcept;
+
+    [[nodiscard]]
+    util::Sound* getSafe(util::Sound::ID sound_id) noexcept;
+
+    [[nodiscard]]
+    util::Music* getSafe(util::Music::ID music_id) noexcept;
 
     void setMasterVolume(float volume) noexcept;
     float getMasterVolume() const noexcept;

@@ -50,6 +50,7 @@ void Music::toggle() noexcept { isPlaying() ? pause() : play(); }
 
 void Music::seek(float position) noexcept { rl::SeekMusicStream(_music, position); }
 
+void Music::setLooping(bool loop)   noexcept { _music.looping = loop; }
 void Music::setVolume(float volume) noexcept { rl::SetMusicVolume(_music, std::clamp(volume, 0.0f, 1.0f)); }
 void Music::setPitch(float pitch)   noexcept { rl::SetMusicPitch(_music, pitch); }
 void Music::setPan(float pan)       noexcept { rl::SetMusicPan(_music, std::clamp(pan, 0.0f, 1.0f)); }

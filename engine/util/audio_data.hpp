@@ -53,6 +53,7 @@ public:
 
     void seek(float position) noexcept; //< Set music position
 
+    void setLooping(bool loop) noexcept;
     void setVolume(float volume) noexcept;
     void setPitch(float pitch) noexcept;
     void setPan(float pan) noexcept;
