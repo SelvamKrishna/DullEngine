@@ -1,23 +1,31 @@
 #include "engine/system/audio_system.hpp"
+#include "engine/config.hpp"
 
 namespace dull::system {
 
-AudioSystem::~AudioSystem() noexcept { rl::CloseAudioDevice(); }
+AudioSystem::~AudioSystem() noexcept
+{
+    rl::CloseAudioDevice();
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Audio System shut down");
+}
 
 void AudioSystem::_init() noexcept
 {
     rl::InitAudioDevice();
     ZVERIFY(rl::IsAudioDeviceReady(), "Failed to initialize audio device");
+
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Audio System initialized");
 }
 
 void AudioSystem::_update() noexcept
 {
-    for (util::Music::ID& music : _music_queue) get(music).update();
-}
+    const util::Music::ID MUSIC_ID = _current_music;
+    if (!MUSIC_ID) return;
 
-void AudioSystem::_addMusicToQueue(util::Music::ID music_id) noexcept
-{
-    _music_queue.push_back(music_id);
+    util::Music& music = get(MUSIC_ID);
+    if (!music.isPlaying()) return;
+
+    music.update();
 }
 
 void AudioSystem::reserveSoundBuffer(size_t reserve) noexcept { _sound_buffer.reserve(reserve); }
@@ -26,18 +34,28 @@ void AudioSystem::reserveMusicBuffer(size_t reserve) noexcept { _music_buffer.re
 [[nodiscard]]
 util::Sound::ID AudioSystem::loadSound(std::string_view path) noexcept
 {
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Loading sound: {}", path);
     return _sound_buffer.add(std::make_unique<util::Sound>(path));
 }
 
-void AudioSystem::unloadSound(util::Sound::ID id) noexcept { _sound_buffer.remove(id); }
+void AudioSystem::unloadSound(util::Sound::ID id) noexcept
+{
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Unloading sound: {}", id);
+    _sound_buffer.remove(id);
+}
 
 [[nodiscard]]
 util::Music::ID AudioSystem::loadMusic(std::string_view path) noexcept
 {
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Loading music: {}", path);
     return _music_buffer.add(std::make_unique<util::Music>(path));
 }
 
-void AudioSystem::unloadMusic(util::Music::ID id) noexcept { _music_buffer.remove(id); }
+void AudioSystem::unloadMusic(util::Music::ID id) noexcept
+{
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Unloading music: {}", id);
+    _music_buffer.remove(id);
+}
 
 [[nodiscard]]
 util::Sound& AudioSystem::get(util::Sound::ID sound_id) noexcept
@@ -55,7 +73,19 @@ util::Music& AudioSystem::get(util::Music::ID music_id) noexcept
     return *music_ptr;
 }
 
-void AudioSystem::setMasterVolume(float volume) noexcept { rl::SetMasterVolume(volume); }
+void AudioSystem::setMasterVolume(float volume) noexcept
+{
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Master volume set to: {}", volume);
+    rl::SetMasterVolume(volume);
+}
+
 float AudioSystem::getMasterVolume() const noexcept { return rl::GetMasterVolume(); }
+
+void AudioSystem::setCurrentMusic(util::Music::ID music_id) noexcept
+{
+    if (_current_music == music_id) return;
+    if constexpr (config::SHOULD_LOG_AUDIO_SYS) ZINFO("Current music set to: {}", music_id);
+    _current_music = music_id;
+}
 
 } // namespace dull::system

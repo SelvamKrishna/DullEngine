@@ -39,13 +39,14 @@ void Music::play() noexcept
 {
     if (isPlaying()) return;
     rl::PlayMusicStream(_music);
-    DULL_CTX.audio_sys._addMusicToQueue(getID());
+    DULL_CTX.audio_sys.setCurrentMusic(getID());
 }
 
 void Music::stop()   noexcept { rl::StopMusicStream(_music); }
 void Music::pause()  noexcept { rl::PauseMusicStream(_music); }
 void Music::resume() noexcept { rl::ResumeMusicStream(_music); }
 void Music::update() noexcept { rl::UpdateMusicStream(_music); }
+void Music::toggle() noexcept { isPlaying() ? pause() : play(); }
 
 void Music::seek(float position) noexcept { rl::SeekMusicStream(_music, position); }
 
@@ -58,4 +59,3 @@ void Music::setPan(float pan)       noexcept { rl::SetMusicPan(_music, std::clam
 [[nodiscard]] float Music::getTimePlayed() const noexcept { return rl::GetMusicTimePlayed(_music); }
 
 } // namespace dull::util
-

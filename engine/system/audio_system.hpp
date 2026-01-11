@@ -8,22 +8,24 @@ namespace dull::core { class App; }
 
 namespace dull::system {
 
+// =======================
+// System to own and manage audio data
+// =======================
 class AudioSystem final {
     friend core::App;
     friend util::Music;
 
 private:
-    misc::Buffer<util::Sound> _sound_buffer;
-    misc::Buffer<util::Music> _music_buffer;
+    misc::Buffer<util::Sound> _sound_buffer; //< Buffer for sounds
+    misc::Buffer<util::Music> _music_buffer; //< Buffer for music
+
+    util::Music::ID::Raw _current_music {0}; //< ID of the current music
 
     explicit AudioSystem() = default;
     ~AudioSystem() noexcept;
 
-    std::vector<util::Music::ID> _music_queue;
-
     void _init() noexcept;
     void _update() noexcept;
-    void _addMusicToQueue(util::Music::ID music_id) noexcept;
 
 public:
     constexpr AudioSystem(AudioSystem&&)                 noexcept = delete;
@@ -50,6 +52,9 @@ public:
 
     void setMasterVolume(float volume) noexcept;
     float getMasterVolume() const noexcept;
+
+    // Set the current music to play
+    void setCurrentMusic(util::Music::ID music_id) noexcept;
 };
 
 } // namespace dull::system

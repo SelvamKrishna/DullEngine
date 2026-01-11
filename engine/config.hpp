@@ -34,10 +34,12 @@ using Processor = process::World;
 #ifdef NDEBUG // Release Mode
 constexpr bool SHOULD_LOG_APP         { false };
 constexpr bool SHOULD_LOG_PROCESS_SYS { false };
+constexpr bool SHOULD_LOG_AUDIO_SYS   { false };
 constexpr bool SHOULD_LOG_EVENT_SYS   { false };
 #else // Debug Mode
 constexpr bool SHOULD_LOG_APP         { true };
 constexpr bool SHOULD_LOG_PROCESS_SYS { true };
+constexpr bool SHOULD_LOG_AUDIO_SYS   { true };
 constexpr bool SHOULD_LOG_EVENT_SYS   { true };
 #endif
 
