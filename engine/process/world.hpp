@@ -14,8 +14,8 @@ class World : private misc::IProcessor {
     friend core::App;
 
 private:
-    static misc::Buffer<Scene> s_scene_buf;               //< Collection of all loaded Scenes
-    Scene::ID::Raw _current_scene = Scene::ID::invalid(); //< Scene currently active
+    static misc::Buffer<Scene> s_scene_buf;          //< Collection of all loaded Scenes
+    Scene::ID _current_scene = Scene::ID::invalid(); //< Scene currently active
 
     explicit World() = default;
     ~World() = default;
