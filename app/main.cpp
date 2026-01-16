@@ -4,6 +4,21 @@
 #include <engine/misc/layer_builder.hpp>
 #include <engine/misc/scene_builder.hpp>
 
+class Node : public dull::process::Node {
+private:
+    void iStart() override {
+
+    }
+
+    void iProcess() override {
+
+    }
+
+    void iFixedProcess() override {
+
+    }
+};
+
 int main(void)
 {
     dull::core::App app;
