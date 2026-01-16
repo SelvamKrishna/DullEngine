@@ -24,7 +24,7 @@ private:
     bool _isFixedProcess() noexcept;
 
 public:
-    static constexpr uint32_t FPS = config::FIXED_PROCESS_FPS;
+    static constexpr uint32_t FPS = config::FIXED_PROCESS_TICK;
     static constexpr double FIXED_PROCESS_INTERVAL = 1.0 / FPS;
 
     constexpr TimeSystem(TimeSystem&&)                 noexcept = delete;

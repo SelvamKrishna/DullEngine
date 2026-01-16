@@ -25,7 +25,7 @@ constexpr util::Vec2i WINDOW_SIZE   { {800, 800} };
 constexpr bool        IS_VSYNC      { false };
 constexpr bool        IS_RESIZEABLE { false };
 
-constexpr uint32_t FIXED_PROCESS_FPS { 60 };
+constexpr uint32_t FIXED_PROCESS_TICK { 60 };
 
 using Processor = process::World;
 
