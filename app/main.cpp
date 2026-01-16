@@ -11,10 +11,11 @@ private:
     void iStart() override {
         is_fixed_process = false;
 
-        DULL_CTX.event_sys.getEventChannel<KeyEvent>()
-            .subscribe([](const KeyEvent& event) {
-                ZINFO("Key Event received! Key Code: {}", event.key_code);
-            });
+        DULL_CTX.event_sys.getChannel<KeyEvent>()
+            .subscribe(
+                [](const KeyEvent& event) { ZINFO("Key Event received! Key Code: {}", event.key_code); },
+                {"node1-key-event-listener"}
+            );
     }
 
     void iProcess() override {

@@ -4,9 +4,12 @@
 
 ## refactor: Event System
 
-- Events are now inherited from Identified making each event object possess a uniqe ID.
-- IEvent is an interface which automates the ID generation property of Events
-- EventSystem now stores Event::ID -> List of all Listeners
+Event System has been refactored to use Event Channels. Event Channels provide better
+abstraction and decoupling between event producers and consumers.
+
+- Improve Event Listener storage.
+
+- Goal:
 
 ---
 

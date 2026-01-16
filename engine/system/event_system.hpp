@@ -18,25 +18,27 @@ class EventSystem final {
     friend class dull::core::App;
 
 private:
-    mutable std::shared_mutex _mutex;
+    mutable std::shared_mutex _mutex; //< Thread safety for event channels
 
     explicit EventSystem() = default;
     ~EventSystem() = default;
 
 public:
+    // Access event channel to subscribe/unsubscribe listeners
     template <typename EventT>
-    misc::EventChannel<EventT>& getEventChannel() noexcept
+    misc::EventChannel<EventT>& getChannel() noexcept
     {
         std::unique_lock lock {_mutex};
         static misc::EventChannel<EventT> channel {};
         return channel;
     }
 
+    // Emit event to all subscribed listeners
     template <typename EventT>
     void emit(const EventT& event) noexcept
     {
-        misc::EventChannel<EventT>& channel = getEventChannel<EventT>();
-        for (auto& listener : channel._listeners) listener->callback(event);
+        misc::EventChannel<EventT>& channel = getChannel<EventT>();
+        for (const auto& LISTENER : channel._listeners) LISTENER.callback(event);
     }
 };
 
