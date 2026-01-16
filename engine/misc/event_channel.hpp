@@ -20,10 +20,9 @@ class EventChannel {
     friend dull::system::EventSystem;
 
     using Callback = std::function<void(const EventT&)>; //< Function to call when emitted
-
-private:
     struct ListenerTag {};
 
+public:
     // =======================
     // Identified wrapper for Event Callback function
     // =======================
@@ -36,7 +35,8 @@ private:
         , callback {std::move(callback)} {}
     };
 
-    std::vector<Listener> _listeners; //< List of all subscribed Listeners
+private:
+    std::vector<std::unique_ptr<Listener>> _listeners; //< List of all subscribed Listeners
 
 public:
     // Subscribe Listener to the Event Channel
@@ -45,27 +45,29 @@ public:
         zlog::internal::ProString desc = std::string_view{}
     ) noexcept
     {
-        _listeners.emplace_back(Listener {desc, callback});
+        _listeners.emplace_back(std::make_unique<Listener>(desc, callback));
 
         if constexpr (config::SHOULD_LOG_EVENT_SYS)
-            ZINFO("Listener '{}' binded to EventChannel", _listeners.back().getName());
+            ZINFO("Listener '{}' binded to EventChannel", _listeners.back()->getName());
 
-        return _listeners.back().getID();
+        return _listeners.back()->getID();
     }
 
     // Unsubscribe Listener from the Event Channel using its ID
     void unsubscribe(Listener::ID listener_id) noexcept
     {
-        typename std::vector<Listener>::iterator it = std::find_if(
+        if (!listener_id.isValid()) return;
+
+        typename std::vector<std::unique_ptr<Listener>>::iterator it = std::find_if(
             _listeners.begin(),
             _listeners.end(),
-            [listener_id](const Listener& listener) { return listener.getID() == listener_id; }
+            [listener_id](const std::unique_ptr<Listener>& listener) { return listener->getID() == listener_id; }
         );
 
         ZASSERT(it != _listeners.end(), "Listener '{}' not found!", listener_id);
 
         if constexpr (config::SHOULD_LOG_EVENT_SYS)
-            ZINFO("Listener '{}' unbinded from EventChannel", it->getName());
+            ZINFO("Listener '{}' unbinded from EventChannel", (*it)->getName());
 
         _listeners.erase(it);
     }

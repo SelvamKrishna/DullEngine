@@ -16,8 +16,9 @@ public:
     using Number = uint32_t;
     static constexpr Number NumericMax = UINT_MAX;
 
-    Number id; //< The raw ID value
+    Number id {0}; //< The raw ID value
 
+    StrongID() = default;
     StrongID(Number value) : id {value} {}
 
     // Get an invalid ID
@@ -88,6 +89,7 @@ public:
 
 // =======================
 // Identified Base Class
+/// WARN: Classes deriving from this are non-copyable and non-movable (INTENTIONAL)
 // =======================
 template <typename TagT>
 class Identified {
@@ -117,7 +119,7 @@ public:
     std::string_view getName() const noexcept { return _name; }
 #else
     [[nodiscard]]
-    std::string getName() const noexcept { return std::format("#{}", _id); }
+    std::string getName() const noexcept { return std::format("#{}", _ID); }
 #endif
 };
 

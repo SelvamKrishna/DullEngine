@@ -38,8 +38,11 @@ public:
     void emit(const EventT& event) noexcept
     {
         misc::EventChannel<EventT>& channel = getChannel<EventT>();
-        for (const auto& LISTENER : channel._listeners) LISTENER.callback(event);
+        for (const auto& LISTENER : channel._listeners) LISTENER->callback(event);
     }
 };
 
 } // namespace dull::system
+
+// Alias for EventChannel Listener
+namespace dull::misc { template <typename EventT> using EventListener = EventChannel<EventT>::Listener; }

@@ -8,10 +8,12 @@ struct KeyEvent { int key_code; };
 
 class Node1 : public dull::process::Node {
 private:
+    dull::misc::EventListener<KeyEvent>::ID key_event_listener;
+
     void iStart() override {
         is_fixed_process = false;
 
-        DULL_CTX.event_sys.getChannel<KeyEvent>()
+        key_event_listener = DULL_CTX.event_sys.getChannel<KeyEvent>()
             .subscribe(
                 [](const KeyEvent& event) { ZINFO("Key Event received! Key Code: {}", event.key_code); },
                 {"node1-key-event-listener"}
@@ -23,10 +25,18 @@ private:
             dull::system::EventSystem& event_sys = DULL_CTX.event_sys;
             event_sys.emit<KeyEvent>({42});
         }
+
+        if (rl::IsKeyPressed(rl::KEY_S)) [[unlikely]] {
+            DULL_CTX.event_sys.getChannel<KeyEvent>().unsubscribe(key_event_listener);
+            key_event_listener = {0};
+        }
     }
 
 public:
     explicit Node1(std::string name) : dull::process::Node {name} {}
+
+    ~Node1() override {
+    }
 };
 
 int main(void)
