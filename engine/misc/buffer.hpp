@@ -120,6 +120,7 @@ public:
     [[nodiscard]] size_t capacity() const noexcept { return _buffer.capacity(); }
     [[nodiscard]] bool empty() const noexcept { return _buffer.empty(); }
     void shrinkToFit() { _buffer.shrink_to_fit(); }
+    void reserve(size_t reserve) { _buffer.reserve(reserve); }
     void clear() { _buffer.clear(); }
 };
 

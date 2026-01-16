@@ -1,10 +1,8 @@
 #pragma once
 
-#include "engine/process/layer.hpp"
 #include "engine/misc/buffer.hpp"
 #include "engine/misc/processor.hpp"
-
-#include <vendor/zlog_v2.hpp>
+#include "engine/process/layer.hpp"
 
 #include <vector>
 #include <functional>
@@ -14,7 +12,7 @@ namespace dull::misc { class SceneBuilder; }
 
 namespace dull::process {
 
-struct SceneTag {};
+struct SceneTag final {};
 
 // =======================
 // Manager of all scene related logic
@@ -42,9 +40,21 @@ private:
     static misc::Buffer<Layer> s_layer_buf; //< Static owned buffer of all loaded Layers
     std::vector<LayerConfig>   _layers;     //< Ref of Layers within scene
 
+    using LayerIt      = std::vector<LayerConfig>::iterator;
+    using LayerConstIt = std::vector<LayerConfig>::const_iterator;
+
     void iStart()        final;
     void iProcess()      final;
     void iFixedProcess() final;
+
+    [[nodiscard]]
+    LayerIt _searchLayer(Layer::ID layer_id) noexcept;
+
+    [[nodiscard]]
+    LayerConstIt _searchLayer(Layer::ID layer_id) const noexcept;
+
+    [[nodiscard]]
+    std::string_view _getLayerName(Layer::ID layer_id) const noexcept;
 
 public:
     using LayerGroup = std::vector<Layer::ID>; //< List of Layer's

@@ -10,8 +10,6 @@
 
 namespace dull::core {
 
-#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_APP)
-
 void AppContext::logStats() const noexcept
 {
     ZTRC_S("Logging AppContext");
@@ -44,16 +42,19 @@ App::App(const AppContext& context)
 
     _handle._setState(ProgramState::Initialization);
 
-    _IF_LOG {
+    if constexpr (config::SHOULD_LOG_APP) {
         context.logStats();
         ZINFO("App '{}' initialized", TITLE);
     }
+
+    _audio_sys._init();
 }
 
 App::~App() noexcept
 {
-    _IF_LOG ZINFO("App shutting down");
     if (_handle.isRunning()) [[likely]] rl::CloseWindow();
+    quit();
+    if constexpr (config::SHOULD_LOG_APP) ZINFO("App shutting down");
 }
 
 [[nodiscard]]
@@ -63,12 +64,14 @@ void App::run() noexcept
 {
     _handle._setState(ProgramState::Processing);
 
-    _IF_LOG ZINFO("App running");
+    if constexpr (config::SHOULD_LOG_APP) ZINFO("App running");
 
     _processor.iStart();
 
     try {
         while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
+            DULL_CTX.audio_sys._update();
+
             if (_time_sys._isFixedProcess()) _processor.iFixedProcess();
             _processor.iProcess();
 
@@ -84,7 +87,11 @@ void App::run() noexcept
     }
 }
 
-void App::quit() noexcept { _handle._setState(ProgramState::ShuttingDown); }
+void App::quit() noexcept
+{
+    _handle._setState(ProgramState::ShuttingDown);
+    _audio_sys._quit();
+}
 
 #undef _IF_LOG
 

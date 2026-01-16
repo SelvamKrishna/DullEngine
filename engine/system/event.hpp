@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/misc/identification.hpp"
 #include "engine/misc/string_view_hashing.hpp"
 
 #include <vendor/zlog_v2.hpp>
@@ -9,7 +10,6 @@
 #include <string_view>
 #include <optional>
 #include <functional>
-#include <cstdint>
 
 namespace dull::system {
 
@@ -18,28 +18,33 @@ namespace dull::system {
 // =======================
 class Event final {
 private:
-    using DataMap = std::unordered_map<
+    std::unordered_map<
         std::string, //< Name of the variable
         std::any,    //< Content of the variable
         misc::StringHash,
         misc::StringEq
-    >;
+    > _data_map;
 
     std::string _name;
-    Event::DataMap _data_map;
+
+    struct ListenerTag {};
 
 public:
     using Callback = std::function<void(const class Event&)>; // Function to call when emitted
 
-    Event() = delete;
+    // =======================
+    // Identified wrapper for Event Callback
+    // =======================
+    class Listener : public misc::Identified<ListenerTag> {
+    public:
+        Callback callback;
 
-    Event(Event&&)                 = default;
-    Event(const Event&)            = default;
-    Event& operator=(Event&&)      = default;
-    Event& operator=(const Event&) = default;
+        Listener(Callback callback)
+        : misc::Identified<ListenerTag> {""}, callback {std::move(callback)}
+        {}
+    };
 
     explicit Event(std::string_view name) noexcept : _name{name} {}
-    ~Event() = default;
 
     [[nodiscard]]
     std::string_view getName() const noexcept { return _name; }
@@ -47,7 +52,7 @@ public:
     // Used by the Listener to access underlying data
     template <typename DataT>
     [[nodiscard]]
-    std::optional<const DataT&> getData(std::string_view key) const noexcept
+    std::optional<DataT> getData(std::string_view key) const noexcept
     {
         if (
             auto it = _data_map.find(key);
@@ -69,10 +74,10 @@ public:
     }
 
     // Binds Callback function with Event
-    uint64_t bind(Event::Callback callback);
+    Listener::ID bind(Event::Callback callback);
 
     // Unbinds Callback function with Event
-    void unbind(uint64_t callback_id);
+    void unbind(Listener::ID callback_id);
 
     // Emits Event calling all the binded callback function
     void emit() const noexcept;

@@ -1,5 +1,5 @@
-#include "engine/config.hpp"
 #include "engine/process/scene.hpp"
+#include "engine/config.hpp"
 
 #include <vendor/zlog_v2.hpp>
 
@@ -7,38 +7,51 @@ namespace dull::process {
 
 misc::Buffer<Layer> Scene::s_layer_buf = {};
 
-#define _IF_LOG  if constexpr (::dull::config::SHOULD_LOG_SCENE_SYS)
-
 Scene::Scene(std::string name, size_t reserve) : misc::Identified<SceneTag> {std::move(name)}
 {
     _layers.reserve(reserve);
 }
 
-void Scene::iStart()
+#define _FOR_ALL_ACTIVE_LAYERS(LAYER_VAR, LAYER_OPR) do {    \
+    forAllActiveLayers([](Layer& LAYER_VAR) { LAYER_OPR; }); \
+} while (0)
+
+void Scene::iStart()        { _FOR_ALL_ACTIVE_LAYERS(layer, layer.iStart()); }
+void Scene::iProcess()      { _FOR_ALL_ACTIVE_LAYERS(layer, layer.iProcess()); }
+void Scene::iFixedProcess() { _FOR_ALL_ACTIVE_LAYERS(layer, layer.iFixedProcess()); }
+
+#undef _FOR_ALL_ACTIVE_LAYERS
+
+[[nodiscard]]
+Scene::LayerIt Scene::_searchLayer(Layer::ID layer_id) noexcept
 {
-    forAllActiveLayers([](Layer& layer) { layer.iStart(); });
+    return std::find_if(
+        _layers.begin(), _layers.end(),
+        [&layer_id](const LayerConfig& layer_cfg) { return layer_cfg.layer_id == layer_id; }
+    );
 }
 
-void Scene::iProcess()
+[[nodiscard]]
+Scene::LayerConstIt Scene::_searchLayer(Layer::ID layer_id) const noexcept
 {
-    forAllActiveLayers([](Layer& layer) { layer.iProcess(); });
+    return std::find_if(
+        _layers.begin(), _layers.end(),
+        [&layer_id](const LayerConfig& layer_cfg) { return layer_cfg.layer_id == layer_id; }
+    );
 }
 
-void Scene::iFixedProcess()
+[[nodiscard]]
+std::string_view Scene::_getLayerName(Layer::ID layer_id) const noexcept
 {
-    forAllActiveLayers([](Layer& layer) { layer.iFixedProcess(); });
+    return s_layer_buf.find(layer_id)->getName();
 }
 
 void Scene::addLayer(Layer::ID layer_id, bool active, std::optional<size_t> idx)
 {
     ZASSERT(
-        std::find_if(
-            _layers.begin(), _layers.end(),
-            [&layer_id](const LayerConfig& scene_layer)
-            { return scene_layer.layer_id == layer_id; }
-        ) == _layers.end(),
+        _searchLayer(layer_id) == _layers.end(),
         "Layer '{}' already exists in Scene '{}'",
-        s_layer_buf.find(layer_id)->getName(), getName()
+        _getLayerName(layer_id), getName()
     );
 
     ZON_DEBUG {
@@ -46,14 +59,13 @@ void Scene::addLayer(Layer::ID layer_id, bool active, std::optional<size_t> idx)
             ZPERFORMANCE("Scene '{}' size exceeding capacity of '{}'", getName(), _layers.size());
     }
 
-    if (!idx) // Default
-        _layers.emplace_back(layer_id, active);
-    else
-        _layers.emplace(_layers.begin() + *idx, layer_id, active);
+    idx
+    ? (void)_layers.emplace(_layers.begin() + *idx, layer_id, active)
+    : (void)_layers.emplace_back(layer_id, active);
 
-    _IF_LOG ZINFO(
+    if constexpr (config::SHOULD_LOG_PROCESS_SYS) ZINFO(
         "Layer '{}' added to Scene '{}'",
-        s_layer_buf.find(layer_id)->getName(), getName()
+        _getLayerName(layer_id), getName()
     );
 }
 
@@ -64,9 +76,9 @@ void Scene::removeLayer(Layer::ID layer_id)
         [&layer_id](const LayerConfig& layer) { return layer.layer_id == layer_id; }
     );
 
-    _IF_LOG ZINFO(
+    if constexpr (config::SHOULD_LOG_PROCESS_SYS) ZINFO(
         "Layer '{}' removed to Scene '{}'",
-        s_layer_buf.find(layer_id)->getName(), getName()
+        _getLayerName(layer_id), getName()
     );
 }
 
@@ -106,35 +118,26 @@ void Scene::forAllActiveLayers(LayerMethod& function) noexcept
 [[nodiscard]]
 bool Scene::isLayerActive(Layer::ID layer_id) noexcept
 {
-    auto it = std::find_if(
-        _layers.begin(), _layers.end(),
-        [&layer_id](const auto& layer) { return layer.layer_id == layer_id; }
-    );
-
+    LayerConstIt it = _searchLayer(layer_id);
     return it != _layers.end() || it->is_active;
 }
 
 void Scene::setLayerActive(Layer::ID layer_id, bool active) noexcept
 {
-    auto it = std::find_if(
-        _layers.begin(), _layers.end(),
-        [&layer_id](const LayerConfig& LAYER) { return LAYER.layer_id == layer_id; }
-    );
+    LayerIt it = _searchLayer(layer_id);
 
     ZASSERT(
         it != _layers.end(),
-        "Layer '{}' Not found in Scene", s_layer_buf.find(layer_id)->getName()
+        "Layer '{}' Not found in Scene", _getLayerName(layer_id)
     );
 
     if (it->is_active == active) return; // No changes
     it->is_active = active;
 
-    _IF_LOG ZINFO(
+    if constexpr (config::SHOULD_LOG_PROCESS_SYS) ZINFO(
         "Layer '{}' made {} in Scene '{}'",
-        s_layer_buf.find(layer_id)->getName(), active ? "active" : "inactive", getName()
+        _getLayerName(layer_id), active ? "active" : "inactive", getName()
     );
 }
-
-#undef _IF_LOG
 
 } // namespace dull::process

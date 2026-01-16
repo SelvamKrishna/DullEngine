@@ -1,15 +1,12 @@
 # Dull Engine
 
-## Overview
-
-**Dull Engine** is a lightweight engine structured around a central application loop and a hierarchical processing model.
-
 ## Workflow
 
-- The `App` class is the main application entry point and lifecycle manager.
-- `App` is responsible for initializing and shutting down all required engine systems.
+- The `core::App` class is the main application entry point and lifecycle manager.
+- `core::App` is responsible for initializing and shutting down all required engine systems.
 - Runtime logic is driven through the `IProcessor` interface, which defines the engine’s update phases.
-- The active processor implementation can be configured via `dull::config::Processor`.
+- The active processor implementation can be configured via `config::Processor`.
+- Create `core::App` class before handling other engine features.
 
 ## Processor
 
@@ -30,20 +27,37 @@ The `IProcessor` interface defines the core update hooks used by the engine.
 - **`Layer`**
   - owns and processes a collection of `Node` instances.
   - Acts as a logical grouping of related nodes.
+  - Use `misc::LayerBuilder` for easier Layer creation.
 
 - **`Scene`**
   - Holds references to a collection of `Layer` objects.
   - Processes only the layers that are currently active.
   - Does not own layers; it only tracks and orchestrates them.
+  - Use `misc::SceneBuilder` for easier Scene creation.
 
 - **`World`**
   - Owns multiple `Scene` instances.
   - Only one scene is processed at any given time.
 
-Any of the above processors can be used in `dull::config::Processor`.
+Any of the above processors can be used in `config::Processor`, except `Node`.
 
-## Development Features
+## AudioSystem
 
-- Use `misc::LayerBuilder` for easier Layer creation.
-- Use `misc::SceneBuilder` for easier Scene creation.
-- Create `core::App` class before handling other engine features.
+Responsible for loading, managing, and updating all sound and music resources in the engine.
+
+- Built on top of **raylib’s audio module**.
+- Manages **Sound** and **Music** resources via ID-based lookup.
+- Centralized access through `DULL_CTX.audio_sys`.
+- Logging can be enabled via `config::SHOULD_LOG_AUDIO_SYS`.
+- For better performance reserve Buffers using `AudioSystem::reserveSoundBuffer()` & `AudioSystem::reserveMusicBuffer()`.
+
+- **`util::Sound`/`util::Music`**
+  - *`util::Sound`:* Fully loaded audio clip (e.g. sound effects).
+  - *`util::Music`:* Streamed audio (e.g. background music).
+  - Wrapper for `rl::Sound` & `rl::Music` respectively.
+  - *Load*, *Unload*, *Access* and *Modify* using `DULL_CTX.audio_sys`.
+
+- **`component::Sound`/`component::Music`**
+  - Handle for `util::Sound` & `util::Music` respectively.
+  - Can be created directly within a Node.
+  - Does the underlying loading (created with path) / copying (created with ID).

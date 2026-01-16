@@ -1,8 +1,9 @@
 #pragma once
 
 #include "engine/core/handle.hpp"
-#include "engine/system/time_system.hpp"
+#include "engine/system/audio_system.hpp"
 #include "engine/system/event_system.hpp"
+#include "engine/system/time_system.hpp"
 #include "engine/util/vec2.hpp"
 
 // Forward Include
@@ -34,11 +35,13 @@ class App final {
     friend Handle;
 
 private:
-    system::TimeSystem  _time_sys;
+    system::AudioSystem _audio_sys;
     system::EventSystem _event_sys;
+    system::TimeSystem  _time_sys;
+
     config::Processor   _processor; //< change in dull::config
 
-    Handle _handle { { _time_sys, _event_sys, _processor } };
+    Handle _handle { { _audio_sys, _event_sys, _time_sys, _processor } };
 
 public:
     App(App&&)                 = delete;
