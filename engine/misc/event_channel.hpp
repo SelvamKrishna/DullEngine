@@ -7,12 +7,17 @@
 
 #include <functional>
 
+// Forward Declaration
+namespace dull::system { class EventSystem; }
+
 namespace dull::misc {
 
 struct EventListenerTag {};
 
 template <typename EventT>
 class EventChannel {
+    friend dull::system::EventSystem;
+
 public:
     using Callback = std::function<void(const EventT&)>; //< Function to call when emitted
 
@@ -33,7 +38,6 @@ private:
     Buffer<Listener> _listeners;
 
 public:
-    [[nodiscard]]
     Listener::ID subscribe(Callback callback) noexcept
     {
         std::unique_ptr<Listener> listener {std::make_unique<Listener>(std::move(callback))};
@@ -48,11 +52,6 @@ public:
             _listeners.remove(listener_id),
             "Event Listener '{}' not found.", listener_id
         );
-    }
-
-    void emit(const EventT& event) noexcept
-    {
-        for (std::unique_ptr<Listener>& listener : _listeners) listener->callback(event);
     }
 };
 
