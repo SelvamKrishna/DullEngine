@@ -4,22 +4,9 @@
 
 ## refactor: Event System
 
-- Typed events
-
-```cpp
-// instead of
-Event e {"OnDamage"};
-e.setData("amount", 10);
-// Do
-struct DamageEvent {
-  int amount;
-};
-// Then
-Event<DamageEvent> onDamage;
-onDamage.bind([](const DamageEvent& e) {
-  ...
-});
-```
+- Events are now inherited from Identified making each event object possess a uniqe ID.
+- IEvent is an interface which automates the ID generation property of Events
+- EventSystem now stores Event::ID -> List of all Listeners
 
 ---
 
