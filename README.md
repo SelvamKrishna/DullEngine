@@ -61,3 +61,15 @@ Responsible for loading, managing, and updating all sound and music resources in
   - Handle for `util::Sound` & `util::Music` respectively.
   - Can be created directly within a Node.
   - Does the underlying loading (created with path) / copying (created with ID).
+
+## EventSystem
+
+Responsible for managing and dispatching events throughout the engine.
+
+- Centralized access through `DULL_CTX.event_sys`.
+- Logging can be enabled via `config::SHOULD_LOG_EVENT_SYS`.
+- Events are identified by types, Any data type can be used as event data.
+- Listeners can be function pointers, functors, or lambda expressions.
+- Listeners can be binded to `EventT` using `EventChannel<EventT>::subscribe()`.
+- Listeners can be unbinded to `EventT` using `EventChannel<EventT>::unsubscribe()`.
+- Events can be dispatched using `EventSystem::emit<EventT>()`.
