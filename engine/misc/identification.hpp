@@ -13,32 +13,33 @@ namespace dull::misc {
 template <typename TagT>
 class StrongID {
 public:
-    using Raw = uint32_t;
-    static constexpr Raw NumericMax = UINT_MAX;
+    using Number = uint32_t;
+    static constexpr Number NumericMax = UINT_MAX;
 
-    const Raw ID; //< The raw ID value
+    Number id {0}; //< The raw ID value
 
-    StrongID(Raw value) : ID {value} {}
+    StrongID() = default;
+    StrongID(Number value) : id {value} {}
 
     // Get an invalid ID
     static constexpr StrongID invalid() noexcept { return StrongID {0}; }
 
     // Check if ID is valid (non-zero)
     [[nodiscard]]
-    constexpr bool isValid() const noexcept { return ID != 0; }
+    constexpr bool isValid() const noexcept { return id != 0; }
 
     [[nodiscard]]
-    constexpr operator Raw() const noexcept { return ID; }
+    constexpr operator Number() const noexcept { return id; }
 
 // Comparison with another StrongID
 #define _OP_COMP(OPR) \
     [[nodiscard]]     \
-    bool operator OPR(const StrongID& other) const noexcept { return ID OPR other.ID; }
+    bool operator OPR(const StrongID& other) const noexcept { return id OPR other.id; }
 
 // Comparison with raw ID
 #define _OP_COMP_RAW(OPR) \
     [[nodiscard]]     \
-    bool operator OPR(Raw other) const noexcept { return ID OPR other; }
+    bool operator OPR(Number other) const noexcept { return id OPR other; }
 
     _OP_COMP(==)
     _OP_COMP(!=)
@@ -62,7 +63,7 @@ public:
 template <typename TagT>
 inline std::ostream &operator<<(std::ostream &os, const StrongID<TagT> &id)
 {
-    return os << (uint64_t)id.ID;
+    return os << (uint64_t)id.id;
 }
 
 // =======================
@@ -88,11 +89,12 @@ public:
 
 // =======================
 // Identified Base Class
+/// WARN: Classes deriving from this are non-copyable and non-movable (INTENTIONAL)
 // =======================
 template <typename TagT>
 class Identified {
 private:
-    StrongID<TagT> _id; //< The unique ID of the object
+    const StrongID<TagT> _ID; //< The unique ID of the object
 #ifndef NDEBUG
     std::string _name; //< The debug name of the object
 #endif
@@ -102,14 +104,14 @@ public:
     using ID = StrongID<TagT>;
 
     explicit Identified(std::string name) noexcept
-    : _id {IDGenerator<TagT>::generate()} // Generate unique ID
+    : _ID {IDGenerator<TagT>::generate()} // Generate unique ID
 #ifndef NDEBUG
     , _name {std::move(name)}
 #endif
     { (void)name; }
 
     [[nodiscard]]
-    const StrongID<TagT>& getID() const noexcept { return _id; }
+    const StrongID<TagT>& getID() const noexcept { return _ID; }
 
 // Debug name access returns Name in debug builds, ID in release builds
 #ifndef NDEBUG
@@ -117,7 +119,7 @@ public:
     std::string_view getName() const noexcept { return _name; }
 #else
     [[nodiscard]]
-    std::string getName() const noexcept { return std::format("#{}", _id); }
+    std::string getName() const noexcept { return std::format("#{}", _ID); }
 #endif
 };
 
@@ -129,6 +131,6 @@ struct std::formatter<dull::misc::StrongID<TagT>> {
 
     auto format(const dull::misc::StrongID<TagT> &id, std::format_context &ctx) const
     {
-        return std::format_to(ctx.out(), "{}", (uint64_t)id.ID);
+        return std::format_to(ctx.out(), "{}", (uint64_t)id.id);
     }
 };

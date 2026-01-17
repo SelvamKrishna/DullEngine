@@ -19,7 +19,7 @@ private:
     misc::Buffer<util::Sound> _sound_buffer; //< Buffer for sounds
     misc::Buffer<util::Music> _music_buffer; //< Buffer for music
 
-    util::Music::ID::Raw _current_music {0}; //< ID of the current music
+    util::Music::ID _current_music {0}; //< ID of the current music
 
     explicit AudioSystem() = default;
     ~AudioSystem() = default;

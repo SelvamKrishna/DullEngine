@@ -28,8 +28,8 @@ public:
     // =======================
     class LayerConfig final {
     public:
-        Layer::ID::Raw layer_id;  //< Uinque ID of the layer
-        bool           is_active; //< Is the layer active
+        Layer::ID layer_id;  //< Uinque ID of the layer
+        bool      is_active; //< Is the layer active
 
         LayerConfig(Layer::ID layer_id, bool is_active)
         : layer_id {layer_id}, is_active {is_active}
