@@ -3,7 +3,6 @@
 #include "engine/misc/render_call.hpp"
 
 #include <vector>
-#include <memory>
 
 // Forward Declaration
 namespace dull::core { class App; }
@@ -14,7 +13,7 @@ class RenderSystem final {
     friend core::App;
 
 private:
-    std::vector<std::unique_ptr<misc::IRenderCall>> _render_calls;
+    std::vector<std::reference_wrapper<misc::IRenderCall>> _render_calls;
 
     explicit RenderSystem() = default;
     ~RenderSystem() = default;
@@ -28,7 +27,7 @@ public:
     RenderSystem& operator=(const RenderSystem&) = delete;
 
     void reserve(size_t reserve) noexcept;
-    void addRenderCall(std::unique_ptr<misc::IRenderCall> render_call) noexcept;
+    void addRenderCall(const std::reference_wrapper<misc::IRenderCall> render_call) noexcept;
 };
 
 } // namespace dull::system

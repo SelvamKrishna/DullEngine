@@ -4,11 +4,31 @@
 #include <engine/misc/layer_builder.hpp>
 #include <engine/misc/scene_builder.hpp>
 
+#include <engine/util/rect.hpp>
+#include <engine/util/color_rgba.hpp>
+
+class Box : public dull::misc::IRenderCall {
+private:
+    void iDraw() const override {
+        rl::DrawRectangleRec(rec, col);
+    }
+
+public:
+    dull::util::Rect rec;
+    dull::util::Color col;
+
+    Box(dull::util::Rect rect, dull::util::Color color) : rec(rect), col(color) {}
+};
+
 class Node1 : public dull::process::Node {
 private:
+    Box b { {10, 10, 25, 25}, {255, 255, 255} };
+
     void iStart() override { is_fixed_process = false; }
 
-    void iProcess() override { }
+    void iProcess() override {
+        DULL_CTX.render_sys.addRenderCall(b);
+    }
 
 public:
     explicit Node1(std::string name) : dull::process::Node {name} {}
