@@ -4,8 +4,9 @@
 
 #include "engine/config.hpp"
 #include "engine/system/audio_system.hpp"
-#include "engine/system/time_system.hpp"
 #include "engine/system/event_system.hpp"
+#include "engine/system/render_system.hpp"
+#include "engine/system/time_system.hpp"
 
 namespace dull::core {
 
@@ -15,10 +16,11 @@ namespace dull::core {
 enum class ProgramState : uint8_t { Initialization, Processing, ShuttingDown, };
 
 struct HandleContext final {
-    system::AudioSystem& audio_sys; //< Handles all audio related logic
-    system::EventSystem& event_sys; //< Handles all event related logic
-    system::TimeSystem&  time_sys;  //< Stores all time related data
-    config::Processor&   processor; //< Handles all logic processing
+    system::AudioSystem&  audio_sys;   //< Handles all audio related logic
+    system::EventSystem&  event_sys;   //< Handles all event related logic
+    system::RenderSystem& render_sys;  //< Handles all rendering logic
+    system::TimeSystem&   time_sys;    //< Stores all time related data
+    config::Processor&    processor;   //< Handles all logic processing
 };
 
 // =======================

@@ -29,10 +29,10 @@ private:
     void _quit() noexcept;
 
 public:
-    constexpr AudioSystem(AudioSystem&&)                 noexcept = delete;
-    constexpr AudioSystem(const AudioSystem&)            noexcept = delete;
-    constexpr AudioSystem& operator=(AudioSystem&&)      noexcept = delete;
-    constexpr AudioSystem& operator=(const AudioSystem&) noexcept = delete;
+    AudioSystem(AudioSystem&&)                 = delete;
+    AudioSystem(const AudioSystem&)            = delete;
+    AudioSystem& operator=(AudioSystem&&)      = delete;
+    AudioSystem& operator=(const AudioSystem&) = delete;
 
     void reserveSoundBuffer(size_t reserve) noexcept;
     void reserveMusicBuffer(size_t reserve) noexcept;

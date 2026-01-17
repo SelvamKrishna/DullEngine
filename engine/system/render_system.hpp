@@ -22,10 +22,10 @@ private:
     void _update() noexcept;
 
 public:
-    constexpr RenderSystem(RenderSystem&&)                 noexcept = delete;
-    constexpr RenderSystem(const RenderSystem&)            noexcept = delete;
-    constexpr RenderSystem& operator=(RenderSystem&&)      noexcept = delete;
-    constexpr RenderSystem& operator=(const RenderSystem&) noexcept = delete;
+    RenderSystem(RenderSystem&&)                 = delete;
+    RenderSystem(const RenderSystem&)            = delete;
+    RenderSystem& operator=(RenderSystem&&)      = delete;
+    RenderSystem& operator=(const RenderSystem&) = delete;
 
     void reserve(size_t reserve) noexcept;
     void addRenderCall(std::unique_ptr<misc::IRenderCall> render_call) noexcept;

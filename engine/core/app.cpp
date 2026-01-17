@@ -69,17 +69,13 @@ void App::run() noexcept
     _processor.iStart();
 
     try {
-        while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
-            DULL_CTX.audio_sys._update();
-
-            if (_time_sys._isFixedProcess()) _processor.iFixedProcess();
+        while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]]
+        {
+            if (_time_sys._isFixedProcess()) [[unlikely]] _processor.iFixedProcess();
             _processor.iProcess();
 
-            /// TODO: Move to render system
-            rl::BeginDrawing();
-            rl::ClearBackground(rl::BLACK);
-            rl::DrawFPS(10, 10);
-            rl::EndDrawing();
+            _audio_sys._update();
+            _render_sys._update();
         }
     }
     catch (const std::exception& ERR) {
