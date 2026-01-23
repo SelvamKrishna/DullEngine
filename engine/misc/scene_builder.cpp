@@ -1,5 +1,5 @@
+#include "engine/core/app.hpp"
 #include "engine/misc/scene_builder.hpp"
-#include "engine/process/world.hpp"
 
 namespace dull::misc {
 
@@ -37,7 +37,7 @@ process::Scene::ID SceneBuilder::pushToBuffer() noexcept
     std::string name_copy = std::string{_scene->getName()};
 
     ZASSERT(
-        process::World::getSceneBuffer().add(std::move(_scene)),
+        DULL_CTX.processor.getSceneBuffer().add(std::move(_scene)),
         "LayerBuffer failed to load Layer '{}'", name_copy
     );
 

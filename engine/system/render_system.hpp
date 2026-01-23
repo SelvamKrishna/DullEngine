@@ -13,13 +13,14 @@ class RenderSystem final {
     friend core::App;
 
 private:
-    std::vector<std::reference_wrapper<misc::IRenderCall>> _one_frame_call;
-    std::vector<std::reference_wrapper<misc::IRenderCall>> _permanent_call;
+    static std::vector<std::reference_wrapper<misc::IRenderCall>> s_one_frame_call;
+    static std::vector<std::reference_wrapper<misc::IRenderCall>> s_permanent_call;
 
     explicit RenderSystem() = default;
     ~RenderSystem() = default;
 
     void _update() noexcept;
+    void _quit() noexcept;
 
 public:
     RenderSystem(RenderSystem&&)                 = delete;

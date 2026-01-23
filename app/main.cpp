@@ -24,19 +24,22 @@ public:
 class Node1 : public dull::process::Node {
 private:
     Box b { {10, 10, 25, 25}, {255, 255, 255} };
+    dull::misc::PermanentRenderCall b_render {b};
 
     void iStart() override {
         is_fixed_process = false;
-        DULL_CTX.render_sys.addPermanentCall(b);
+        b_render.setActive(true);
     }
 
     void iProcess() override {
         if (rl::IsKeyDown(rl::KEY_S)) b.rec.y += 50 * DULL_CTX.time_sys.getDeltaTime();
+        if (rl::IsKeyPressed(rl::KEY_D)) b_render.setActive(true);
+        if (rl::IsKeyPressed(rl::KEY_A)) b_render.setActive(false);
     }
 
 public:
     explicit Node1(std::string name) : dull::process::Node {name} {}
-    ~Node1() override { DULL_CTX.render_sys.removePermanentCall(b); }
+    ~Node1() override { b_render.setActive(false); }
 };
 
 int main(void)
