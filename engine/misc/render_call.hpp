@@ -5,13 +5,14 @@ namespace dull::system { class RenderSystem; }
 
 namespace dull::misc {
 
-struct RenderCallTag final {};
-
+// =======================
+// Interface for render calls
+// =======================
 class IRenderCall {
   friend class system::RenderSystem;
 
 protected:
-    virtual void iDraw() const = 0;
+    virtual void iDraw() const = 0; //< Draw's the render call
 
 public:
     virtual ~IRenderCall() = default;
@@ -19,8 +20,8 @@ public:
 
 class PermanentRenderCall {
 private:
-    IRenderCall& _render_call;
-    bool _is_active {false};
+    IRenderCall& _render_call; //< Render call to be called permanently
+    bool _is_active {false};   //< Whether the render call is active
 
 public:
     explicit PermanentRenderCall(IRenderCall& render_call) noexcept;

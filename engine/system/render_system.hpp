@@ -9,17 +9,23 @@ namespace dull::core { class App; }
 
 namespace dull::system {
 
+// =======================
+// System to manage render calls
+// =======================
 class RenderSystem final {
     friend core::App;
 
 private:
-    static std::vector<std::reference_wrapper<misc::IRenderCall>> s_one_frame_call;
-    static std::vector<std::reference_wrapper<misc::IRenderCall>> s_permanent_call;
+    static std::vector<std::reference_wrapper<misc::IRenderCall>> s_one_frame_call; //< Render calls that are only called once
+    static std::vector<std::reference_wrapper<misc::IRenderCall>> s_permanent_call; //< Permanent render calls
 
     explicit RenderSystem() = default;
     ~RenderSystem() = default;
 
+    // Draw's all render calls & clear's one frame calls
     void _update() noexcept;
+
+    // Clear's all render calls
     void _quit() noexcept;
 
 public:

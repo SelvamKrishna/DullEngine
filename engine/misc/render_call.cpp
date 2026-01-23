@@ -11,7 +11,6 @@ bool PermanentRenderCall::isActive() const noexcept { return _is_active; }
 
 void PermanentRenderCall::setActive(bool active_flag) noexcept
 {
-
     if (_is_active == active_flag) [[unlikely]] return;
     _is_active = active_flag;
 

@@ -1,7 +1,5 @@
 # Dull Engine
 
-## Workflow
-
 - The `core::App` class is the main application entry point and lifecycle manager.
 - `core::App` is responsible for initializing and shutting down all required engine systems.
 - Runtime logic is driven through the `IProcessor` interface, which defines the engine’s update phases.
@@ -73,3 +71,27 @@ Responsible for managing and dispatching events throughout the engine.
 - Listeners can be binded to `EventT` using `EventChannel<EventT>::subscribe()`.
 - Listeners can be unbinded to `EventT` using `EventChannel<EventT>::unsubscribe()`.
 - Events can be dispatched using `EventSystem::emit<EventT>()`.
+
+## RenderSystem
+
+Responsible for managing and updating all render calls throughout the engine.
+
+- Centralized access through `DULL_CTX.render_sys`.
+- For better performance reserve Buffers using `RenderSystem::reserveOneFrameBuffer()` & `RenderSystem::reservePermanentBuffer()`.
+
+- **`misc::IRenderCall`**
+  - Interface for render calls.
+  - Must be inherited to add custom render calls.
+  - `misc::IRenderCall::iDraw()` is called every frame.
+
+- **Permanent/One-Frame Render Calls**
+  - Permanent render calls are stored until removed.
+  - One frame render calls are removed after each frame.
+  - `RenderSystem::addPermanentCall()` & `RenderSystem::addOneFrameCall()` are used to add render calls.
+  - Remove permanent render calls using `RenderSystem::removePermanentCall()`.
+
+- **`misc::PermanentRenderCall`**
+  - Wrapper for `misc::IRenderCall` reference.
+  - Manages the active state of a render call.
+  - `misc::PermanentRenderCall::setActive(bool)` can be used to bind the render call to the render system.
+  - *Warning*: The underlying render call must outlive the `misc::PermanentRenderCall`.
