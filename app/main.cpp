@@ -17,17 +17,24 @@ public:
     dull::util::Rect rec;
     dull::util::Color col;
 
-    Box(dull::util::Rect rect, dull::util::Color color) : rec(rect), col(color) {}
+    Box(dull::util::Rect rect, dull::util::Color color)
+        : dull::misc::IRenderCall {true}
+        , rec(rect)
+        , col(color)
+    {}
 };
 
 class Node1 : public dull::process::Node {
 private:
     Box b { {10, 10, 25, 25}, {255, 255, 255} };
 
-    void iStart() override { is_fixed_process = false; }
+    void iStart() override {
+        is_fixed_process = false;
+        // DULL_CTX.render_sys.addRenderCall(b);
+    }
 
     void iProcess() override {
-        DULL_CTX.render_sys.addRenderCall(b);
+        if (rl::IsKeyDown(rl::KEY_S)) b.rec.y += 5;
     }
 
 public:
