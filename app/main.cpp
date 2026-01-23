@@ -9,17 +9,14 @@
 
 class Box : public dull::misc::IRenderCall {
 private:
-    void iDraw() const override {
-        rl::DrawRectangleRec(rec, col);
-    }
+    void iDraw() const override { rl::DrawRectangleRec(rec, col); }
 
 public:
     dull::util::Rect rec;
     dull::util::Color col;
 
     Box(dull::util::Rect rect, dull::util::Color color)
-        : dull::misc::IRenderCall {true}
-        , rec(rect)
+        : rec(rect)
         , col(color)
     {}
 };
@@ -30,16 +27,16 @@ private:
 
     void iStart() override {
         is_fixed_process = false;
-        // DULL_CTX.render_sys.addRenderCall(b);
+        DULL_CTX.render_sys.addPermanentCall(b);
     }
 
     void iProcess() override {
-        if (rl::IsKeyDown(rl::KEY_S)) b.rec.y += 5;
+        if (rl::IsKeyDown(rl::KEY_S)) b.rec.y += 50 * DULL_CTX.time_sys.getDeltaTime();
     }
 
 public:
     explicit Node1(std::string name) : dull::process::Node {name} {}
-    ~Node1() override {}
+    ~Node1() override { DULL_CTX.render_sys.removePermanentCall(b); }
 };
 
 int main(void)

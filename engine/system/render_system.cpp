@@ -12,39 +12,37 @@ void RenderSystem::_update() noexcept
 
     ZON_DEBUG rl::DrawFPS(10, 10);
 
-    for (const std::reference_wrapper<misc::IRenderCall>& RENDER_CALL : _permanent_render_calls)
-        RENDER_CALL.get().iDraw();
-
-    for (const std::reference_wrapper<misc::IRenderCall>& RENDER_CALL : _render_calls)
-        RENDER_CALL.get().iDraw();
-
-    _render_calls.clear();
+    for (misc::IRenderCall& call: _one_frame_call) call.iDraw();
+    for (misc::IRenderCall& call: _permanent_call) call.iDraw();
 
     rl::EndDrawing();
+    _one_frame_call.clear();
 }
 
-void RenderSystem::reserve(size_t reserve) noexcept { _render_calls.reserve(reserve); }
+void RenderSystem::reserveOneFrameBuffer(size_t reserve) noexcept { _one_frame_call.reserve(reserve); }
+void RenderSystem::reservePermanentBuffer(size_t reserve) noexcept { _permanent_call.reserve(reserve); }
 
-void RenderSystem::addRenderCall(const std::reference_wrapper<misc::IRenderCall> render_call) noexcept
+void RenderSystem::addPermanentCall(misc::IRenderCall& render_call) noexcept
 {
-    (render_call.get().PERMANENT_CALL)
-        ? _permanent_render_calls.emplace_back(render_call)
-        : _render_calls.emplace_back(render_call);
+    _permanent_call.emplace_back(render_call);
 }
 
-void RenderSystem::removeRenderCall(const std::reference_wrapper<misc::IRenderCall> render_call) noexcept
+void RenderSystem::removePermanentCall(misc::IRenderCall& render_call) noexcept
 {
-    if (!render_call.get().PERMANENT_CALL) return;
+    using RenderCallRef = std::reference_wrapper<misc::IRenderCall>;
 
-    auto it = std::remove_if(
-        _permanent_render_calls.begin(),
-        _permanent_render_calls.end(),
-        [&render_call](const std::reference_wrapper<misc::IRenderCall>& rc) {
-            return &rc.get() == &render_call.get();
-        }
+    std::vector<RenderCallRef>::iterator it = std::remove_if(
+        _permanent_call.begin(),
+        _permanent_call.end(),
+        [&render_call](RenderCallRef& call) { return &call.get() == &render_call; }
     );
 
-    _permanent_render_calls.erase(it, _permanent_render_calls.end());
+    _permanent_call.erase(it);
+}
+
+void RenderSystem::addOneFrameCall(misc::IRenderCall& render_call) noexcept
+{
+    _one_frame_call.emplace_back(render_call);
 }
 
 } // namespace dull::system
