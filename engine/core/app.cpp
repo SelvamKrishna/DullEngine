@@ -50,12 +50,7 @@ App::App(const AppContext& context)
     _audio_sys._init();
 }
 
-App::~App() noexcept
-{
-    if (_handle.isRunning()) [[likely]] rl::CloseWindow();
-    quit();
-    if constexpr (config::SHOULD_LOG_APP) ZINFO("App shutting down");
-}
+App::~App() noexcept { quit(); }
 
 [[nodiscard]]
 App& App::instance() noexcept { return *s_instance; }
@@ -69,17 +64,13 @@ void App::run() noexcept
     _processor.iStart();
 
     try {
-        while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]] {
-            DULL_CTX.audio_sys._update();
-
-            if (_time_sys._isFixedProcess()) _processor.iFixedProcess();
+        while (!rl::WindowShouldClose() && _handle.isRunning()) [[likely]]
+        {
+            if (_time_sys._isFixedProcess()) [[unlikely]] _processor.iFixedProcess();
             _processor.iProcess();
 
-            /// TODO: Move to render system
-            rl::BeginDrawing();
-            rl::ClearBackground(rl::BLACK);
-            rl::DrawFPS(10, 10);
-            rl::EndDrawing();
+            _audio_sys._update();
+            _render_sys._update();
         }
     }
     catch (const std::exception& ERR) {
@@ -89,8 +80,13 @@ void App::run() noexcept
 
 void App::quit() noexcept
 {
+    if (_handle.isQuitting()) [[unlikely]] return;
+
     _handle._setState(ProgramState::ShuttingDown);
+    rl::CloseWindow();
     _audio_sys._quit();
+    _render_sys._quit();
+    if constexpr (config::SHOULD_LOG_APP) ZINFO("App shutting down");
 }
 
 #undef _IF_LOG

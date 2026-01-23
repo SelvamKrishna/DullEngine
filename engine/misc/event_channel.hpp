@@ -16,7 +16,7 @@ namespace dull::misc {
 // Event Channel for a specific Event Type
 // =======================
 template <typename EventT>
-class EventChannel {
+class EventChannel final {
     friend dull::system::EventSystem;
 
     using Callback = std::function<void(const EventT&)>; //< Function to call when emitted

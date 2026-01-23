@@ -4,39 +4,42 @@
 #include <engine/misc/layer_builder.hpp>
 #include <engine/misc/scene_builder.hpp>
 
-struct KeyEvent { int key_code; };
+#include <engine/util/rect.hpp>
+#include <engine/util/color_rgba.hpp>
+
+class Box : public dull::misc::IRenderCall {
+private:
+    void iDraw() const override { rl::DrawRectangleRec(rec, col); }
+
+public:
+    dull::util::Rect rec;
+    dull::util::Color col;
+
+    Box(dull::util::Rect rect, dull::util::Color color)
+        : rec(rect)
+        , col(color)
+    {}
+};
 
 class Node1 : public dull::process::Node {
 private:
-    dull::misc::EventListener<KeyEvent>::ID key_event_listener;
+    Box b { {10, 10, 25, 25}, {255, 255, 255} };
+    dull::misc::PermanentRenderCall b_render {b};
 
     void iStart() override {
         is_fixed_process = false;
-
-        key_event_listener = DULL_CTX.event_sys.getChannel<KeyEvent>()
-            .subscribe(
-                [](const KeyEvent& event) { ZINFO("Key Event received! Key Code: {}", event.key_code); },
-                {"node1-key-event-listener"}
-            );
+        b_render.setActive(true);
     }
 
     void iProcess() override {
-        if (rl::IsKeyPressed(rl::KEY_W)) [[unlikely]] {
-            dull::system::EventSystem& event_sys = DULL_CTX.event_sys;
-            event_sys.emit<KeyEvent>({42});
-        }
-
-        if (rl::IsKeyPressed(rl::KEY_S)) [[unlikely]] {
-            DULL_CTX.event_sys.getChannel<KeyEvent>().unsubscribe(key_event_listener);
-            key_event_listener = {0};
-        }
+        if (rl::IsKeyDown(rl::KEY_S)) b.rec.y += 50 * DULL_CTX.time_sys.getDeltaTime();
+        if (rl::IsKeyPressed(rl::KEY_D)) b_render.setActive(true);
+        if (rl::IsKeyPressed(rl::KEY_A)) b_render.setActive(false);
     }
 
 public:
     explicit Node1(std::string name) : dull::process::Node {name} {}
-
-    ~Node1() override {
-    }
+    ~Node1() override { b_render.setActive(false); }
 };
 
 int main(void)
