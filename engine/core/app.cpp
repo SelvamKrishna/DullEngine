@@ -18,7 +18,7 @@ App::App(const AppContext& context) : zutil::Logger {
     }
 }
 {
-    if (sInstance != nullptr) return;
+    zutil::Assert(sInstance == nullptr, "App can only be created once");
 
     sInstance = this;
 
@@ -41,17 +41,16 @@ App::~App() noexcept { this->Quit(); }
 
 void App::Run() noexcept
 {
-    _handle._SetState(ProgramState::Running);
-
+    this->_handle._SetState(ProgramState::Running);
     this->Log(zutil::INFO, "Running");
 
     // Start();
 
-    while (!rl::WindowShouldClose() && _handle.IsRunning()) [[likely]]
+    while (!rl::WindowShouldClose() && this->_handle.IsRunning()) [[likely]]
     {
         try
         {
-            // if (_time_sys._isFixedProcess()) [[unlikely]] FixedProcess();
+            if (this->_timeSystem._IsFixedProcess()) [[unlikely]] { /* FixedProcess(); */ }
             // Process();
 
             rl::ClearBackground(rl::BLACK);
@@ -71,9 +70,9 @@ void App::Run() noexcept
 
 void App::Quit() noexcept
 {
-    if (_handle.IsClosing()) [[unlikely]] return;
+    if (this->_handle.IsClosing()) [[unlikely]] return;
 
-    _handle._SetState(ProgramState::Closing);
+    this->_handle._SetState(ProgramState::Closing);
     this->Log(zutil::INFO, "Closing\n\n");
 
     rl::CloseWindow();

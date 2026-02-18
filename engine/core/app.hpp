@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/core/handle.hpp"
+#include "engine/system/time_system.hpp"
 #include "engine/util/vec2.hpp"
 
 #include <vendor/zutil/zutil.hpp>
@@ -26,7 +27,13 @@ struct App final : public zutil::Logger {
     friend Handle;
 
 private:
-    Handle _handle { {} };
+    system::TimeSystem _timeSystem;
+
+    Handle _handle {
+        {
+            .timeSystem = _timeSystem,
+        }
+    };
 
 public:
     App(App&&)                 = delete;

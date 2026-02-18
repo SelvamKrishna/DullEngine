@@ -3,6 +3,5 @@
 int main(void)
 {
     dull::core::App app {};
-
     app.Run();
 }

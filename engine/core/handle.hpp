@@ -1,5 +1,7 @@
 #pragma once
 
+#include "engine/system/time_system.hpp"
+
 #include <cstdint>
 
 namespace dull::core {
@@ -13,7 +15,7 @@ enum struct ProgramState : uint8_t { Opening, Running, Closing, };
 // Contains references of all application systems
 // ---
 struct HandleContext final {
-    int example = 1;
+    system::TimeSystem& timeSystem;
 };
 
 // ---
