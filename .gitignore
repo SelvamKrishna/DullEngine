@@ -1,0 +1,8 @@
+# Build Artifacts
+build/
+.cache/
+Makefile
+
+# IDE Settings
+.vscode/
+compile_flags.txt
