@@ -10,7 +10,7 @@
 namespace dull::core {
 
 static inline App* sInstance = nullptr;
-static process::VoidProcessor sVoidProcessor {};
+static process::_VoidProcessor sVoidProcessor {};
 
 App::App(
     const WindowContext& windowContext,
