@@ -7,8 +7,6 @@
 #include <format>
 #include <string>
 
-#include "engine/component/timer.hpp" // test
-
 namespace dull::core {
 
 static inline App* sInstance = nullptr;
@@ -47,7 +45,6 @@ void App::Run() noexcept
     this->Log(zutil::INFO, "Running");
 
     // Start();
-    component::Timer timer { 5 }; // test
 
     while (!rl::WindowShouldClose() && this->_handle.IsRunning()) [[likely]]
     {
@@ -55,9 +52,6 @@ void App::Run() noexcept
         {
             if (this->_timeSystem._IsFixedProcess()) [[unlikely]] { /* FixedProcess(); */ }
             // Process();
-
-            if (!timer.IsActive()) timer.Start(); // test
-            if (timer.IsOver()) { this->Log(zutil::DBG, "Timer testing"); } // test
 
             rl::ClearBackground(rl::BLACK);
             rl::BeginDrawing();

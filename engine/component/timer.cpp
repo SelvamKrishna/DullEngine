@@ -4,27 +4,49 @@
 
 namespace dull::component {
 
-Timer::Timer(double timeToMeasure) noexcept : _measureTime {timeToMeasure} {}
+Timer::Timer(double measureTime, bool isLooping) noexcept
+    : _measureTime {measureTime}, _isLooping {isLooping}
+{}
 
-void Timer::Start() noexcept { this->_startedTime = rl::GetTime(); }
-void Timer::Stop() noexcept { this->_startedTime = -1.0; }
+void Timer::Start() noexcept
+{
+    this->_isActive    = true;
+    this->_startedTime = rl::GetTime();
+}
 
-[[nodiscard]] bool Timer::IsActive() const noexcept { return this->_startedTime >= 0.0; }
+void Timer::Stop() noexcept { this->_isActive = false; }
+
+[[nodiscard]] double Timer::GetElapsed() const noexcept
+{
+    return this->IsActive() ? rl::GetTime() - this->_startedTime : 0.0;
+}
 
 [[nodiscard]] bool Timer::IsOver() noexcept
 {
     if (!this->IsActive()) return true;
 
-    double currentTime = rl::GetTime();
-    double elapsedTime = currentTime - this->_startedTime;
+    double elapsedTime = rl::GetTime() - this->_startedTime;
 
-    if (elapsedTime > _measureTime)
+    if (elapsedTime > this->_measureTime)
     {
-        this->Stop();
+        this->IsLooping() ? this->Start() : this->Stop();
         return true;
     }
 
     return false;
+}
+
+void Timer::SetLooping(bool isLooping) noexcept
+{
+    if (this->IsLooping() == isLooping) return;
+    this->Stop();
+    this->_isLooping = isLooping;
+}
+
+void Timer::SetMeasureTime(double measureTime) noexcept
+{
+    this->Stop();
+    this->_measureTime = measureTime;
 }
 
 } // namespace dull::component
