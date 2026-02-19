@@ -10,19 +10,10 @@
 namespace dull::core {
 
 static inline App* sInstance = nullptr;
-static process::_VoidProcessor sVoidProcessor {};
 
-App::App(
-    const WindowContext& windowContext,
-    process::IProcessor* processorPtr
-)
-: zutil::Logger {
-    {
-        config::DULL_TAG,
-        {"[APP]", zutil::ANSI::EX_Black}
-    }
-}
-, _processor {processorPtr == nullptr ? sVoidProcessor : *processorPtr}
+App::App(const system::SystemContext& systemContext, const WindowContext& windowContext)
+    : zutil::Logger { { config::DULL_TAG, {"[APP]", zutil::ANSI::EX_Black} } }
+    , systems {systemContext}
 {
     zutil::Assert(sInstance == nullptr, "App can only be created once");
 
@@ -42,7 +33,7 @@ App::App(
 
 App::~App() noexcept
 {
-    this->_processor.IShutdown();
+    this->systems.processorRef.IShutdown();
     this->Log(zutil::INFO, "Closing\n\n");
     rl::CloseWindow();
 }
@@ -54,13 +45,14 @@ void App::Run() noexcept
     this->_isRunning = true;
     this->Log(zutil::INFO, "Running");
 
-    this->_processor.IInit();
+    this->systems.processorRef.IInit();
 
     while (!rl::WindowShouldClose() && this->IsRunning()) [[likely]]
     {
-        if (this->_timeSystem._IsFixedProcess()) [[unlikely]] this->_processor.IFixedUpdate();
+        this->systems.processorRef.IUpdate();
 
-        this->_processor.IUpdate();
+        if (this->systems.timeSystem._IsFixedProcess()) [[unlikely]]
+            this->systems.processorRef.IFixedUpdate();
 
         rl::BeginDrawing();
         rl::ClearBackground(rl::BLACK);

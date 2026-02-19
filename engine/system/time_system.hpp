@@ -3,7 +3,8 @@
 #include "engine/config.hpp"
 
 // Forward Declaration
-namespace dull::core { struct App; }
+namespace dull::core   { struct App;          }
+namespace dull::system { struct SystemHandle; }
 
 namespace dull::system {
 
@@ -11,7 +12,8 @@ namespace dull::system {
 // Provides time related data
 // ---
 struct TimeSystem final {
-    friend dull::core::App;
+    friend core::App;
+    friend SystemHandle;
 
 private:
     static double _sDeltaTime;
