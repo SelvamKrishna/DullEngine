@@ -7,10 +7,16 @@
 
 namespace dull::system {
 
+// ---
+// Context for creating SystemHandle
+// ---
 struct SystemContext final {
     process::IProcessor* processorPtr = nullptr;
 };
 
+// ---
+// Global accessors for application systems
+// ---
 struct SystemHandle final {
     system::TimeSystem timeSystem;
     process::IProcessor& processorRef;

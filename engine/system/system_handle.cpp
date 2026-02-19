@@ -2,7 +2,6 @@
 
 namespace dull::system {
 
-
 static process::_VoidProcessor sVoidProcessor {};
 
 SystemHandle::SystemHandle(const SystemContext& systemContext) noexcept
