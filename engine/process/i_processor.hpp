@@ -25,7 +25,7 @@ protected:
 // Note: mainly used for place holder
 // ---
 struct _VoidProcessor final : public IProcessor {
-protected:
+private:
     void IInit       () final {}
     void IUpdate     () final {}
     void IFixedUpdate() final {}

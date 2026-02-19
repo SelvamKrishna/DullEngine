@@ -1,23 +1,34 @@
 #include "engine/config.hpp"
 #include "engine/core/app.hpp"
-#include "engine/util/vec2.hpp"
+#include "engine/util/window_context.hpp"
 
 #include <vendor/raylib.h>
-
-#include <format>
-#include <string>
 
 namespace dull::core {
 
 static inline App* sInstance = nullptr;
+static inline process::IProcessor* sProcessorPtr = nullptr;
 
-App::App(const system::SystemContext& systemContext, const WindowContext& windowContext)
-    : zutil::Logger { { config::DULL_TAG, {"[APP]", zutil::ANSI::EX_Black} } }
-    , systems {systemContext}
+App::App() : zutil::Logger { { config::DULL_TAG, {"[APP]", zutil::ANSI::EX_Black} } }
 {
     zutil::Assert(sInstance == nullptr, "App can only be created once");
-
     sInstance = this;
+}
+
+App::~App()
+{
+    sProcessorPtr->IShutdown();
+
+    this->Log(zutil::INFO, "Closing\n\n");
+
+    rl::CloseWindow();
+}
+
+[[nodiscard]] App& App::GetInstance() noexcept { return *sInstance; }
+
+void App::Init(const util::WindowContext& windowContext) noexcept
+{
+    zutil::Assert(sInstance != nullptr, "App instance not yet created");
 
     int configFlags = {
         (windowContext.isVsyncEnabled ? rl::FLAG_VSYNC_HINT       : 0) |
@@ -28,31 +39,31 @@ App::App(const system::SystemContext& systemContext, const WindowContext& window
     rl::InitWindow(windowContext.dimension.x, windowContext.dimension.y, windowContext.title.c_str());
     rl::SetExitKey(rl::KEY_NULL);
 
-    this->Log(zutil::INFO, {"'{}' Opening", windowContext.title});
+    sInstance->Log(zutil::INFO, {"'{}' Opening", windowContext.title});
 }
 
-App::~App() noexcept
+void App::_InitSystems(process::IProcessor* processorPtr) noexcept
 {
-    this->systems.processorRef.IShutdown();
-    this->Log(zutil::INFO, "Closing\n\n");
-    rl::CloseWindow();
+    zutil::Assert(sInstance != nullptr, "App instance not yet created");
+    sInstance->_isRunning = true;
+
+    sProcessorPtr = (processorPtr != nullptr)
+        ? processorPtr
+        : static_cast<process::IProcessor*>(new process::_VoidProcessor {});
+    ;
+
+    sProcessorPtr->IInit();
 }
 
-[[nodiscard]] App& App::GetInstance() noexcept { return *sInstance; }
-
-void App::Run() noexcept
+void App::Run(process::IProcessor* processorPtr) noexcept
 {
-    this->_isRunning = true;
-    this->Log(zutil::INFO, "Running");
+    App::_InitSystems(processorPtr);
+    sInstance->Log(zutil::INFO, "Running");
 
-    this->systems.processorRef.IInit();
-
-    while (!rl::WindowShouldClose() && this->IsRunning()) [[likely]]
+    while (!rl::WindowShouldClose() && sInstance->IsRunning()) [[likely]]
     {
-        this->systems.processorRef.IUpdate();
-
-        if (this->systems.timeSystem._IsFixedProcess()) [[unlikely]]
-            this->systems.processorRef.IFixedUpdate();
+        sProcessorPtr->IUpdate();
+        if (sInstance->timeSystem._IsFixedProcess()) [[unlikely]] sProcessorPtr->IFixedUpdate();
 
         rl::BeginDrawing();
         rl::ClearBackground(rl::BLACK);
@@ -60,9 +71,9 @@ void App::Run() noexcept
         rl::EndDrawing();
     }
 
-    this->_isRunning = false;
+    App::Quit();
 }
 
-void App::Quit() noexcept { this->_isRunning = false; }
+void App::Quit() noexcept { sInstance->_isRunning = false; }
 
 } // namespace dull::core
