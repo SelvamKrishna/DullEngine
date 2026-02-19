@@ -42,7 +42,7 @@ App::App(
 
 App::~App() noexcept
 {
-    this->_processor.OnShutdown();
+    this->_processor.IShutdown();
     this->Log(zutil::INFO, "Closing\n\n");
     rl::CloseWindow();
 }
@@ -54,12 +54,13 @@ void App::Run() noexcept
     this->_isRunning = true;
     this->Log(zutil::INFO, "Running");
 
-    this->_processor.OnInit();
+    this->_processor.IInit();
 
     while (!rl::WindowShouldClose() && this->IsRunning()) [[likely]]
     {
-        if (this->_timeSystem._IsFixedProcess()) [[unlikely]] this->_processor.OnFixedUpdate();
-        this->_processor.OnUpdate();
+        if (this->_timeSystem._IsFixedProcess()) [[unlikely]] this->_processor.IFixedUpdate();
+
+        this->_processor.IUpdate();
 
         rl::BeginDrawing();
         rl::ClearBackground(rl::BLACK);

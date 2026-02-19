@@ -14,10 +14,10 @@ struct IProcessor {
 protected:
     virtual ~IProcessor() = default;
 
-    virtual void OnInit       () {}
-    virtual void OnUpdate     () {}
-    virtual void OnFixedUpdate() {}
-    virtual void OnShutdown   () {}
+    virtual void IInit       () {}
+    virtual void IUpdate     () {}
+    virtual void IFixedUpdate() {}
+    virtual void IShutdown   () {}
 };
 
 // ---
@@ -26,10 +26,10 @@ protected:
 // ---
 struct _VoidProcessor final : public IProcessor {
 protected:
-    void OnInit       () final {}
-    void OnUpdate     () final {}
-    void OnFixedUpdate() final {}
-    void OnShutdown   () final {}
+    void IInit       () final {}
+    void IUpdate     () final {}
+    void IFixedUpdate() final {}
+    void IShutdown   () final {}
 };
 
 } // namespace dull::process
