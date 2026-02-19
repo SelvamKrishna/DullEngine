@@ -10,72 +10,67 @@
 namespace dull::core {
 
 static inline App* sInstance = nullptr;
+static process::_VoidProcessor sVoidProcessor {};
 
-App::App(const AppContext& context) : zutil::Logger {
+App::App(
+    const WindowContext& windowContext,
+    process::IProcessor* processorPtr
+)
+: zutil::Logger {
     {
         config::DULL_TAG,
         {"[APP]", zutil::ANSI::EX_Black}
     }
 }
+, _processor {processorPtr == nullptr ? sVoidProcessor : *processorPtr}
 {
     zutil::Assert(sInstance == nullptr, "App can only be created once");
 
     sInstance = this;
 
     int configFlags = {
-        (context.isVsyncEnabled ? rl::FLAG_VSYNC_HINT       : 0) |
-        (context.isResizeable   ? rl::FLAG_WINDOW_RESIZABLE : 0)
+        (windowContext.isVsyncEnabled ? rl::FLAG_VSYNC_HINT       : 0) |
+        (windowContext.isResizeable   ? rl::FLAG_WINDOW_RESIZABLE : 0)
     };
 
     rl::SetConfigFlags(configFlags);
-    rl::InitWindow(context.windowDimension.x, context.windowDimension.y, context.title.c_str());
+    rl::InitWindow(windowContext.dimension.x, windowContext.dimension.y, windowContext.title.c_str());
     rl::SetExitKey(rl::KEY_NULL);
 
-    this->_handle._SetState(ProgramState::Opening);
-    this->Log(zutil::INFO, {"'{}' Opening", context.title});
+    this->Log(zutil::INFO, {"'{}' Opening", windowContext.title});
 }
 
-App::~App() noexcept { this->Quit(); }
+App::~App() noexcept
+{
+    this->_processor.IShutdown();
+    this->Log(zutil::INFO, "Closing\n\n");
+    rl::CloseWindow();
+}
 
 [[nodiscard]] App& App::GetInstance() noexcept { return *sInstance; }
 
 void App::Run() noexcept
 {
-    this->_handle._SetState(ProgramState::Running);
+    this->_isRunning = true;
     this->Log(zutil::INFO, "Running");
 
-    // Start();
+    this->_processor.IInit();
 
-    while (!rl::WindowShouldClose() && this->_handle.IsRunning()) [[likely]]
+    while (!rl::WindowShouldClose() && this->IsRunning()) [[likely]]
     {
-        try
-        {
-            if (this->_timeSystem._IsFixedProcess()) [[unlikely]] { /* FixedProcess(); */ }
-            // Process();
+        if (this->_timeSystem._IsFixedProcess()) [[unlikely]] this->_processor.IFixedUpdate();
 
-            rl::ClearBackground(rl::BLACK);
-            rl::BeginDrawing();
-            rl::DrawText("Hello", 100, 100, 24, rl::WHITE);
-            rl::EndDrawing();
-        }
-        catch (const std::exception& ERR)
-        {
-            this->Log(zutil::ERR, {"Unhandled: {}", ERR.what()});
-            break;
-        }
+        this->_processor.IUpdate();
+
+        rl::BeginDrawing();
+        rl::ClearBackground(rl::BLACK);
+        rl::DrawFPS(10, 10);
+        rl::EndDrawing();
     }
 
-    this->Quit();
+    this->_isRunning = false;
 }
 
-void App::Quit() noexcept
-{
-    if (this->_handle.IsClosing()) [[unlikely]] return;
-
-    this->_handle._SetState(ProgramState::Closing);
-    this->Log(zutil::INFO, "Closing\n\n");
-
-    rl::CloseWindow();
-}
+void App::Quit() noexcept { this->_isRunning = false; }
 
 } // namespace dull::core
