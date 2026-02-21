@@ -25,6 +25,7 @@ App::~App()
 }
 
 [[nodiscard]] App& App::GetInstance() noexcept { return *sInstance; }
+[[nodiscard]] bool App::IsRunning()   noexcept { return sInstance->_isRunning; }
 
 void App::Init(const util::WindowContext& windowContext) noexcept
 {

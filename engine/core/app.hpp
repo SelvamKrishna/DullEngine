@@ -29,7 +29,7 @@ public:
     ~App();
 
     [[nodiscard]] static App& GetInstance() noexcept;
-    [[nodiscard]] bool IsRunning() const noexcept { return this->_isRunning; }
+    [[nodiscard]] static bool IsRunning() noexcept;
 
     static void Init(const util::WindowContext& windowContext) noexcept;
     static void Run(process::IProcessor* processorPtr) noexcept;
