@@ -7,7 +7,7 @@
 namespace dull::core {
 
 static inline App* sInstance = nullptr;
-static inline process::IProcessor* sProcessorPtr = nullptr;
+static inline IProcessor* sProcessorPtr = nullptr;
 
 App::App() : zutil::Logger { { config::DULL_TAG, {"[APP]", zutil::ANSI::EX_Black} } }
 {
@@ -43,20 +43,20 @@ void App::Init(const util::WindowContext& windowContext) noexcept
     sInstance->Log(zutil::INFO, {"'{}' Opening", windowContext.title});
 }
 
-void App::_InitSystems(process::IProcessor* processorPtr) noexcept
+void App::_InitSystems(IProcessor* processorPtr) noexcept
 {
     zutil::Assert(sInstance != nullptr, "App instance not yet created");
     sInstance->_isRunning = true;
 
     sProcessorPtr = (processorPtr != nullptr)
         ? processorPtr
-        : static_cast<process::IProcessor*>(new process::_VoidProcessor {});
+        : static_cast<IProcessor*>(new _VoidProcessor {});
     ;
 
     sProcessorPtr->IInit();
 }
 
-void App::Run(process::IProcessor* processorPtr) noexcept
+void App::Run(IProcessor* processorPtr) noexcept
 {
     App::_InitSystems(processorPtr);
     sInstance->Log(zutil::INFO, "Running");
@@ -68,7 +68,7 @@ void App::Run(process::IProcessor* processorPtr) noexcept
 
         rl::BeginDrawing();
         rl::ClearBackground(rl::BLACK);
-        rl::DrawFPS(10, 10);
+        sProcessorPtr->IDraw();
         rl::EndDrawing();
     }
 

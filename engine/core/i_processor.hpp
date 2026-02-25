@@ -3,7 +3,7 @@
 // Forward Declaration
 namespace dull::core { struct App; }
 
-namespace dull::process {
+namespace dull::core {
 
 // ---
 // Interface for all logic processing elements of application
@@ -17,6 +17,7 @@ protected:
     virtual void IInit       () {}
     virtual void IUpdate     () {}
     virtual void IFixedUpdate() {}
+    virtual void IDraw       () {}
     virtual void IShutdown   () {}
 };
 
@@ -29,7 +30,8 @@ private:
     void IInit       () final {}
     void IUpdate     () final {}
     void IFixedUpdate() final {}
+    void IDraw       () final {}
     void IShutdown   () final {}
 };
 
-} // namespace dull::process
+} // namespace dull::core

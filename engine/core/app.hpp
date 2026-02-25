@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/process/i_processor.hpp"
+#include "engine/core/i_processor.hpp"
 #include "engine/system/time_system.hpp"
 #include "engine/util/window_context.hpp"
 
@@ -15,7 +15,7 @@ struct App final : public zutil::Logger {
 private:
     bool _isRunning = false;
 
-    static void _InitSystems(process::IProcessor* processorPtr) noexcept;
+    static void _InitSystems(IProcessor* processorPtr) noexcept;
 
 public:
     system::TimeSystem timeSystem;
@@ -32,7 +32,7 @@ public:
     [[nodiscard]] static bool IsRunning() noexcept;
 
     static void Init(const util::WindowContext& windowContext) noexcept;
-    static void Run(process::IProcessor* processorPtr) noexcept;
+    static void Run(IProcessor* processorPtr) noexcept;
     static void Quit() noexcept;
 };
 
