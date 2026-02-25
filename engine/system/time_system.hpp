@@ -11,7 +11,7 @@ namespace dull::system {
 // Provides time related data
 // ---
 struct TimeSystem final {
-    friend dull::core::App;
+    friend core::App;
 
 private:
     static double _sDeltaTime;
