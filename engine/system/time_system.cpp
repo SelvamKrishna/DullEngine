@@ -2,24 +2,25 @@
 
 #include <vendor/raylib.h>
 
-namespace dull::system {
-
-double TimeSystem::_sDeltaTime = 0.0;
-
-bool TimeSystem::_IsFixedProcess() noexcept
+namespace dull::system
 {
-    static double sAccumulatedTime = 0;
 
-    TimeSystem::_sDeltaTime = rl::GetFrameTime();
-    sAccumulatedTime += TimeSystem::_sDeltaTime;
+    double TimeSystem::_sDeltaTime = 0.0;
 
-    if (sAccumulatedTime > TimeSystem::FIXED_TICK_INTERVAL) [[unlikely]]
+    bool TimeSystem::_IsFixedProcess() noexcept
     {
-        sAccumulatedTime -= TimeSystem::FIXED_TICK_INTERVAL;
-        return true;
-    }
+        static double sAccumulatedTime = 0;
 
-    return false;
-}
+        TimeSystem::_sDeltaTime = rl::GetFrameTime();
+        sAccumulatedTime += TimeSystem::_sDeltaTime;
+
+        if (sAccumulatedTime > TimeSystem::FIXED_TICK_INTERVAL) [[unlikely]]
+        {
+            sAccumulatedTime -= TimeSystem::FIXED_TICK_INTERVAL;
+            return true;
+        }
+
+        return false;
+    }
 
 } // namespace dull::system

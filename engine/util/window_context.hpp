@@ -6,14 +6,15 @@
 
 namespace dull::util {
 
-// ---
-// Window configuration
-// ---
-struct WindowContext final {
-    std::string title;
-    util::Vec2i dimension;
-    bool        isVsyncEnabled;
-    bool        isResizeable;
-};
+    // ---
+    // Window configuration
+    // ---
+    struct WindowContext final
+    {
+        std::string title;
+        util::Vec2i dimension;
+        bool        isVsyncEnabled;
+        bool        isResizeable;
+    };
 
 } // namespace dull::util
