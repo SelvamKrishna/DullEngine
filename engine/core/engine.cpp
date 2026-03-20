@@ -1,5 +1,8 @@
 #include "engine/config.hpp"
-#include "engine/core/app.hpp"
+#include "engine/core/engine.hpp"
+#include "engine/core/processor.hpp"
+#include "engine/system/time_system.hpp"
+#include "engine/system/audio_system.hpp"
 #include "engine/util/window_context.hpp"
 
 #include <vendor/raylib.h>
@@ -7,23 +10,23 @@
 
 namespace dull::core {
 
-    static inline App* sInstance = nullptr;
+    static inline Engine* sInstance = nullptr;
     static inline IProcessor* sProcessorPtr = nullptr;
 
-    App::App() : zen::core::Logger { { config::DULL_TAG, {"[APP]", zen::core::ANSI::EX_Black} } }
+    Engine::Engine() : zen::core::Logger { { config::DULL_TAG, {"[APP]", zen::core::ANSI::EX_Black} } }
     {
-        zen::core::Assert(sInstance == nullptr, "App can only be created once");
+        zen::core::Assert(sInstance == nullptr, "Engine can only be created once");
         sInstance = this;
     }
 
-    App::~App() { App::_ShutdownSystems(); }
+    Engine::~Engine() { Engine::_ShutdownSystems(); }
 
-    [[nodiscard]] App& App::GetInstance() noexcept { return *sInstance; }
-    [[nodiscard]] bool App::IsRunning()   noexcept { return sInstance->_isRunning; }
+    [[nodiscard]] Engine& Engine::GetInstance() noexcept { return *sInstance; }
+    [[nodiscard]] bool Engine::IsRunning()   noexcept { return sInstance->_isRunning; }
 
-    void App::Init(const util::WindowContext& windowContext, IProcessor* processorPtr) noexcept
+    void Engine::Init(const util::WindowContext& windowContext, IProcessor* processorPtr) noexcept
     {
-        zen::core::Assert(sInstance != nullptr, "App instance not yet created");
+        zen::core::Assert(sInstance != nullptr, "Engine instance not yet created");
 
         int configFlags = {
             (windowContext.isVsyncEnabled ? rl::FLAG_VSYNC_HINT       : 0) |
@@ -36,12 +39,12 @@ namespace dull::core {
 
         sInstance->Log(zen::core::INFO, {"'{}' Opening", windowContext.title});
 
-        App::_InitSystems(processorPtr);
+        Engine::_InitSystems(processorPtr);
     }
 
-    void App::_InitSystems(IProcessor* processorPtr) noexcept
+    void Engine::_InitSystems(IProcessor* processorPtr) noexcept
     {
-        zen::core::Assert(sInstance != nullptr, "App instance not yet created");
+        zen::core::Assert(sInstance != nullptr, "Engine instance not yet created");
         sInstance->_isRunning = true;
 
         sProcessorPtr = (processorPtr != nullptr)
@@ -52,21 +55,28 @@ namespace dull::core {
         sProcessorPtr->IInit();
     }
 
-    void App::_ShutdownSystems() noexcept
+    void Engine::_ShutdownSystems() noexcept
     {
         sProcessorPtr->IShutdown();
         sInstance->Log(zen::core::INFO, "Closing\n\n");
         rl::CloseWindow();
     }
 
-    void App::Run() noexcept
+    void Engine::Run() noexcept
     {
         sInstance->Log(zen::core::INFO, "Running");
 
         while (!rl::WindowShouldClose() && sInstance->IsRunning()) [[likely]]
         {
+            sInstance->timeSystem._UpdateDeltaTime(rl::GetFrameTime());
+
             sProcessorPtr->IUpdate();
-            if (sInstance->timeSystem._IsFixedProcess()) [[unlikely]] sProcessorPtr->IFixedUpdate();
+
+            while (sInstance->timeSystem._TryConsumeAccumulated())
+            {
+                sProcessorPtr->IFixedUpdate();
+                Z_TODO("Physics Logic goes here");
+            }
 
             rl::BeginDrawing();
             rl::ClearBackground(rl::BLACK);
@@ -74,9 +84,9 @@ namespace dull::core {
             rl::EndDrawing();
         }
 
-        App::Quit();
+        Engine::Quit();
     }
 
-    void App::Quit() noexcept { sInstance->_isRunning = false; }
+    void Engine::Quit() noexcept { sInstance->_isRunning = false; }
 
 } // namespace dull::core

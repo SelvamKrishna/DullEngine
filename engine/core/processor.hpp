@@ -1,12 +1,12 @@
 #pragma once
 
 // Forward Declaration
-namespace dull::core { struct App; }
+namespace dull::core { struct Engine; }
 
 namespace dull::core {
 
     struct IProcessor {
-        friend core::App;
+        friend core::Engine;
 
     protected:
         virtual ~IProcessor() = default;

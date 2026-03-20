@@ -1,15 +1,18 @@
-#include <engine/core/app.hpp>
+#include <engine/core/engine.hpp>
+#include <engine/config.hpp>
 
 int main(void)
 {
-    dull::core::App app;
+    dull::core::Engine _ {};
 
-    dull::core::App::Init({
+    dull::core::Engine::Init({
         .title          = "Application",
         .dimension      = {800, 600},
         .isVsyncEnabled = false,
         .isResizeable   = false,
     });
 
-    dull::core::App::Run();
+    zen::core::Log(zen::core::DBG, {"DullEngine-{}", dull::config::GetVersionString()});
+
+    dull::core::Engine::Run();
 }

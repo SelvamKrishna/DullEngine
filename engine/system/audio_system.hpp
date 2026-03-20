@@ -1,23 +1,22 @@
 #pragma once
 
 // Forward Declaration
-namespace dull::core { struct App; }
+namespace dull::core { struct Engine; }
 
 namespace dull::system {
 
     struct AudioSystem {
-        friend core::App;
+        friend core::Engine;
 
     private:
         explicit AudioSystem() = default;
         ~AudioSystem() = default;
 
     public:
-        constexpr AudioSystem(AudioSystem&&)                 noexcept = delete;
-        constexpr AudioSystem(const AudioSystem&)            noexcept = delete;
-        constexpr AudioSystem& operator=(AudioSystem&&)      noexcept = delete;
-        constexpr AudioSystem& operator=(const AudioSystem&) noexcept = delete;
-
+        AudioSystem(AudioSystem&&)                 = delete;
+        AudioSystem(const AudioSystem&)            = delete;
+        AudioSystem& operator=(AudioSystem&&)      = delete;
+        AudioSystem& operator=(const AudioSystem&) = delete;
     };
 
 } // namespace dull::system

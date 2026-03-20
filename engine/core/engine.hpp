@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/core/i_processor.hpp"
+#include "engine/core/processor.hpp"
 #include "engine/system/time_system.hpp"
 #include "engine/system/audio_system.hpp"
 #include "engine/util/window_context.hpp"
@@ -9,7 +9,7 @@
 
 namespace dull::core {
 
-    struct App final : public zen::core::Logger {
+    struct Engine final : public zen::core::Logger {
     private:
         bool _isRunning = false;
 
@@ -20,15 +20,15 @@ namespace dull::core {
         system::TimeSystem timeSystem;
         system::AudioSystem audioSystem;
 
-        App();
-        ~App();
+        Engine();
+        ~Engine();
 
-        App(App&&)                 = delete;
-        App(const App&)            = delete;
-        App& operator=(App&&)      = delete;
-        App& operator=(const App&) = delete;
+        Engine(Engine&&)                 = delete;
+        Engine(const Engine&)            = delete;
+        Engine& operator=(Engine&&)      = delete;
+        Engine& operator=(const Engine&) = delete;
 
-        [[nodiscard]] static App& GetInstance() noexcept;
+        [[nodiscard]] static Engine& GetInstance() noexcept;
         [[nodiscard]] static bool IsRunning() noexcept;
 
         static void Init(const util::WindowContext& windowContext, IProcessor* processorPtr = nullptr) noexcept;
