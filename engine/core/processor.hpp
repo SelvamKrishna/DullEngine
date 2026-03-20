@@ -1,5 +1,7 @@
 #pragma once
 
+#include "engine/render/draw_handle.hpp"
+
 // Forward Declaration
 namespace dull::core { struct Engine; }
 
@@ -14,7 +16,7 @@ namespace dull::core {
         virtual void IInit       () {}
         virtual void IUpdate     () {}
         virtual void IFixedUpdate() {}
-        virtual void IDraw       () {}
+        virtual void IDraw       (const render::DrawHandle&) {}
         virtual void IShutdown   () {}
     };
 
@@ -23,7 +25,7 @@ namespace dull::core {
         void IInit       () final {}
         void IUpdate     () final {}
         void IFixedUpdate() final {}
-        void IDraw       () final {}
+        void IDraw       (const render::DrawHandle&) final {}
         void IShutdown   () final {}
     };
 

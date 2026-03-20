@@ -1,6 +1,8 @@
 #include <engine/core/engine.hpp>
 #include <engine/config.hpp>
 
+#include <engine/util/direct_processor.hpp>
+
 int main(void)
 {
     dull::core::Engine _ {};
@@ -8,7 +10,7 @@ int main(void)
     dull::core::Engine::Init({
         .title          = "Application",
         .dimension      = {800, 600},
-        .isVsyncEnabled = false,
+        .isVsync        = false,
         .isResizeable   = false,
     });
 

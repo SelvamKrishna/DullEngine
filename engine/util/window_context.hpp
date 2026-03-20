@@ -10,10 +10,10 @@
 namespace dull::util {
 
     struct WindowContext final {
-        std::string title          = config::GetConfigString();
-        util::Vec2i dimension      = {640, 640};
-        bool        isVsyncEnabled = false;
-        bool        isResizeable   = false;
+        std::string title        = config::GetConfigString();
+        util::Vec2i dimension    = {640, 640};
+        bool        isVsync      = false;
+        bool        isResizeable = false;
     };
 
 } // namespace dull::util

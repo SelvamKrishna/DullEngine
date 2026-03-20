@@ -1,6 +1,7 @@
 #include "engine/config.hpp"
 #include "engine/core/engine.hpp"
 #include "engine/core/processor.hpp"
+#include "engine/render/draw_handle.hpp"
 #include "engine/system/time_system.hpp"
 #include "engine/system/audio_system.hpp"
 #include "engine/util/window_context.hpp"
@@ -29,7 +30,7 @@ namespace dull::core {
         zen::core::Assert(sInstance != nullptr, "Engine instance not yet created");
 
         int configFlags = {
-            (windowContext.isVsyncEnabled ? rl::FLAG_VSYNC_HINT       : 0) |
+            (windowContext.isVsync ? rl::FLAG_VSYNC_HINT       : 0) |
             (windowContext.isResizeable   ? rl::FLAG_WINDOW_RESIZABLE : 0)
         };
 
@@ -69,7 +70,6 @@ namespace dull::core {
         while (!rl::WindowShouldClose() && sInstance->IsRunning()) [[likely]]
         {
             sInstance->timeSystem._UpdateDeltaTime(rl::GetFrameTime());
-
             sProcessorPtr->IUpdate();
 
             while (sInstance->timeSystem._TryConsumeAccumulated())
@@ -78,10 +78,8 @@ namespace dull::core {
                 Z_TODO("Physics Logic goes here");
             }
 
-            rl::BeginDrawing();
-            rl::ClearBackground(rl::BLACK);
-            sProcessorPtr->IDraw();
-            rl::EndDrawing();
+            render::DrawHandle drawHandle;
+            sProcessorPtr->IDraw(drawHandle);
         }
 
         Engine::Quit();
