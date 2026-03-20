@@ -5,14 +5,9 @@
 // Forward Declaration
 namespace dull::core { struct App; }
 
-namespace dull::system
-{
+namespace dull::system {
 
-    // ---
-    // Provides time related data
-    // ---
-    struct TimeSystem final
-    {
+    struct TimeSystem final {
         friend core::App;
 
     private:
@@ -24,7 +19,6 @@ namespace dull::system
         [[nodiscard]] bool _IsFixedProcess() noexcept;
 
     public:
-        // --- Time interval b/w each fixed frame ---
         static constexpr double FIXED_TICK_INTERVAL = 1.0 / config::TICKS_PER_SECOND;
 
         constexpr TimeSystem(TimeSystem&&)                 noexcept = delete;
@@ -32,7 +26,6 @@ namespace dull::system
         constexpr TimeSystem& operator=(TimeSystem&&)      noexcept = delete;
         constexpr TimeSystem& operator=(const TimeSystem&) noexcept = delete;
 
-        // --- Time interval b/w each frame ---
         [[nodiscard]] double GetDeltaTime() const noexcept { return _sDeltaTime; }
     };
 

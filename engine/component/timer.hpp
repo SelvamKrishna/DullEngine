@@ -2,11 +2,7 @@
 
 namespace dull::component {
 
-    // ---
-    // Timer component
-    // ---
-    struct Timer
-    {
+    struct Timer {
     private:
         double _measureTime = 1.0;
         double _startedTime = 0.0;

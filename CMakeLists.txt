@@ -24,7 +24,7 @@ endif()
 # Vendor Dependencies
 # ============================================================
 
-add_subdirectory(vendor/zutil)
+add_subdirectory(vendor/zenutil)
 
 # ============================================================
 # Dull Engine (Static Library)
@@ -42,7 +42,7 @@ target_include_directories(dull_engine
 )
 
 target_link_libraries(dull_engine
-    PUBLIC zutil
+    PUBLIC zenutil
 )
 
 target_compile_options(dull_engine PRIVATE

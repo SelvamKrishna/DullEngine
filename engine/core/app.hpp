@@ -5,16 +5,11 @@
 #include "engine/system/audio_system.hpp"
 #include "engine/util/window_context.hpp"
 
-#include <vendor/zutil/zutil.hpp>
+#include <vendor/zenutil/zen_prelude.hpp>
 
-namespace dull::core
-{
+namespace dull::core {
 
-    // ---
-    // Main application
-    // ---
-    struct App final : public zutil::Logger
-    {
+    struct App final : public zen::core::Logger {
     private:
         bool _isRunning = false;
 
@@ -22,7 +17,7 @@ namespace dull::core
         static void _ShutdownSystems() noexcept;
 
     public:
-        system::TimeSystem  timeSystem;
+        system::TimeSystem timeSystem;
         system::AudioSystem audioSystem;
 
         App();

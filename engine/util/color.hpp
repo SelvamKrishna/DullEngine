@@ -4,20 +4,13 @@
 
 #include <cstdint>
 
-namespace dull::util
-{
+namespace dull::util {
 
-    // ---
-    // Struct to store the RGBA values of a color
-    // ---
-    struct Color
-    {
+    struct Color {
         uint8_t r {0};
         uint8_t g {0};
         uint8_t b {0};
         uint8_t a {255};
-
-    // --- Constructors ---
 
         constexpr Color() noexcept = default;
 
@@ -28,8 +21,6 @@ namespace dull::util
         constexpr Color(const rl::Color& rlColor) noexcept
             : r {rlColor.r}, g {rlColor.g}, b {rlColor.b}, a {rlColor.a}
         {}
-
-    // --- Pre-defined Colors ---
 
         [[nodiscard]] static constexpr Color White  () noexcept { return { 255, 255, 255, 255 }; }
         [[nodiscard]] static constexpr Color Red    () noexcept { return { 255, 0  , 0  , 255 }; }
@@ -44,8 +35,6 @@ namespace dull::util
         {
             return {scalar, scalar, scalar, alpha};
         }
-
-    // --- Hex conversions ---
 
         [[nodiscard]] static constexpr Color FromHex(uint32_t hexValue) noexcept
         {
@@ -75,8 +64,6 @@ namespace dull::util
             ;
         }
 
-    // --- Color utilities ---
-
         [[nodiscard]] constexpr Color Inverted() const noexcept
         {
             return {
@@ -95,9 +82,6 @@ namespace dull::util
 
             return Color::Gray(static_cast<uint8_t>(r * R_LUMINOSITY + g * G_LUMINOSITY + b * B_LUMINOSITY), a);
         }
-
-    // --- Operators
-    // -> Color (op) Color
 
         constexpr Color operator + (const Color& other) const noexcept
         {
@@ -144,8 +128,6 @@ namespace dull::util
         constexpr Color& operator*=(const Color& other) noexcept { return *this = *this * other; }
         constexpr Color& operator/=(const Color& other) noexcept { return *this = *this / other; }
 
-    // -> Color (op) Scalar
-
         constexpr Color operator + (uint8_t scalar) const noexcept { return *this + Color::Gray(scalar); }
         constexpr Color operator - (uint8_t scalar) const noexcept { return *this - Color::Gray(scalar); }
         constexpr Color operator * (uint8_t scalar) const noexcept { return *this * Color::Gray(scalar); }
@@ -156,12 +138,8 @@ namespace dull::util
         constexpr Color& operator *= (uint8_t scalar) noexcept { return *this = *this * scalar; }
         constexpr Color& operator /= (uint8_t scalar) noexcept { return *this = *this / scalar; }
 
-    // --- Comparison ---
-
         constexpr bool operator == (const Color& other) const noexcept = default;
         constexpr bool operator != (const Color& other) const noexcept = default;
-
-    // --- Conversion ---
 
         constexpr operator rl::Color() const noexcept { return {this->r, this->g, this->b, this->a}; }
     };

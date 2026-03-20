@@ -2,8 +2,7 @@
 
 #include <vendor/raylib.h>
 
-namespace dull::system
-{
+namespace dull::system {
 
     double TimeSystem::_sDeltaTime = 0.0;
 

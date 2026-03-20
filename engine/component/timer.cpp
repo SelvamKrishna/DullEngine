@@ -2,8 +2,7 @@
 
 #include <vendor/raylib.h>
 
-namespace dull::component
-{
+namespace dull::component {
 
     Timer::Timer(double measureTime, bool isLooping) noexcept
         : _measureTime {measureTime}, _isLooping {isLooping}

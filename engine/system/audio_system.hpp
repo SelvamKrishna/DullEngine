@@ -3,14 +3,9 @@
 // Forward Declaration
 namespace dull::core { struct App; }
 
-namespace dull::system
-{
+namespace dull::system {
 
-    // ---
-    // Singleton System to store and manage all audio related data
-    // ---
-    struct AudioSystem
-    {
+    struct AudioSystem {
         friend core::App;
 
     private:

@@ -6,11 +6,7 @@
 
 namespace dull::util {
 
-    // ---
-    // Window configuration
-    // ---
-    struct WindowContext final
-    {
+    struct WindowContext final {
         std::string title;
         util::Vec2i dimension;
         bool        isVsyncEnabled;

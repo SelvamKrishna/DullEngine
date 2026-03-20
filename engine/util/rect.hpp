@@ -4,20 +4,13 @@
 
 #include <vendor/raylib.h>
 
-namespace dull::util
-{
+namespace dull::util {
 
-    // ---
-    // Data representation of a Rectangle
-    // ---
-    struct Rect
-    {
+    struct Rect {
         float x {0.0F};
         float y {0.0F};
         float w {1.0F};
         float h {1.0F};
-
-    // --- Constructors ---
 
         constexpr Rect() noexcept = default;
 
@@ -33,16 +26,11 @@ namespace dull::util
             : x {rlRect.x}, y {rlRect.y}, w {rlRect.width}, h {rlRect.height}
         {}
 
-    // --- Accessors ---
-
         [[nodiscard]] constexpr Vec2f GetPosition () const noexcept { return {this->x, this->y}; }
         [[nodiscard]] constexpr Vec2f GetDimension() const noexcept { return {this->w, this->h}; }
 
-    // --- Modifiers ---
-
         constexpr void Move(const Vec2f& positionOffset) noexcept
         {
-
             this->x += positionOffset.x;
             this->y += positionOffset.y;
         }
@@ -53,8 +41,6 @@ namespace dull::util
             this->h *= scaleMulitplier.y;
         }
 
-    // --- Collision ---
-
         [[nodiscard]] bool CollidesWith(const Vec2f& point) const noexcept
         {
             return rl::CheckCollisionPointRec(point, *this);
@@ -64,8 +50,6 @@ namespace dull::util
         {
             return rl::CheckCollisionRecs(*this, other);
         }
-
-    // --- Conversion ---
 
         [[nodiscard]] constexpr operator rl::Rectangle() const noexcept
         {

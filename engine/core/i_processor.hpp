@@ -3,14 +3,9 @@
 // Forward Declaration
 namespace dull::core { struct App; }
 
-namespace dull::core
-{
+namespace dull::core {
 
-    // ---
-    // Interface for all logic processing elements of application
-    // ---
-    struct IProcessor
-    {
+    struct IProcessor {
         friend core::App;
 
     protected:
@@ -23,12 +18,7 @@ namespace dull::core
         virtual void IShutdown   () {}
     };
 
-    // ---
-    // Processor which does nothing
-    // Note: mainly used for place holder
-    // ---
-    struct _VoidProcessor final : public IProcessor
-    {
+    struct _VoidProcessor final : public IProcessor {
     private:
         void IInit       () final {}
         void IUpdate     () final {}
