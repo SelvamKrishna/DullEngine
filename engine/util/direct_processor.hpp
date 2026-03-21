@@ -10,22 +10,23 @@ namespace dull::util {
     public:
         struct Context final {
             static constexpr void _FnVoid() noexcept {}
+            static constexpr void _FnDrawVoid(const render::DrawHandle&) noexcept {}
 
-            std::function<void()> fnInit        = Context::_FnVoid;
-            std::function<void()> fnUpdate      = Context::_FnVoid;
+            std::function<void()> fnInit = Context::_FnVoid;
+            std::function<void()> fnUpdate = Context::_FnVoid;
             std::function<void()> fnFixedUpdate = Context::_FnVoid;
-            std::function<void()> fnDraw        = Context::_FnVoid;
-            std::function<void()> fnShutdown    = Context::_FnVoid;
+            std::function<void(const render::DrawHandle&)> fnDraw = Context::_FnDrawVoid;
+            std::function<void()> fnShutdown = Context::_FnVoid;
         };
 
     private:
         Context _processContext;
 
-        void IInit()        final { this->_processContext.fnInit(); }
-        void IUpdate()      final { this->_processContext.fnUpdate(); }
+        void IInit() final { this->_processContext.fnInit(); }
+        void IUpdate() final { this->_processContext.fnUpdate(); }
         void IFixedUpdate() final { this->_processContext.fnFixedUpdate(); }
-        void IDraw()        final { this->_processContext.fnDraw(); }
-        void IShutdown()    final { this->_processContext.fnShutdown(); }
+        void IDraw(const render::DrawHandle& drawHandle) final { this->_processContext.fnDraw(drawHandle); }
+        void IShutdown() final { this->_processContext.fnShutdown(); }
 
     public:
         explicit DirectProcessor(const Context& processContext)

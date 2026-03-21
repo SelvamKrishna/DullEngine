@@ -4,7 +4,6 @@
 #include "engine/render/draw_handle.hpp"
 #include "engine/system/time_system.hpp"
 #include "engine/system/audio_system.hpp"
-#include "engine/util/window_context.hpp"
 
 #include <vendor/raylib.h>
 #include <vendor/zenutil/zen_prelude.hpp>
@@ -23,9 +22,9 @@ namespace dull::core {
     Engine::~Engine() { Engine::_ShutdownSystems(); }
 
     [[nodiscard]] Engine& Engine::GetInstance() noexcept { return *sInstance; }
-    [[nodiscard]] bool Engine::IsRunning()   noexcept { return sInstance->_isRunning; }
+    [[nodiscard]] bool Engine::IsRunning() noexcept { return sInstance->_isRunning; }
 
-    void Engine::Init(const util::WindowContext& windowContext, IProcessor* processorPtr) noexcept
+    void Engine::Init(const util::WindowContext& windowContext) noexcept
     {
         zen::core::Assert(sInstance != nullptr, "Engine instance not yet created");
 
@@ -39,17 +38,15 @@ namespace dull::core {
         rl::SetExitKey(rl::KEY_NULL);
 
         sInstance->Log(zen::core::INFO, {"'{}' Opening", windowContext.title});
-
-        Engine::_InitSystems(processorPtr);
     }
 
-    void Engine::_InitSystems(IProcessor* processorPtr) noexcept
+    void Engine::_InitSystems(const util::ProcessContext& processContext) noexcept
     {
         zen::core::Assert(sInstance != nullptr, "Engine instance not yet created");
         sInstance->_isRunning = true;
 
-        sProcessorPtr = (processorPtr != nullptr)
-            ? processorPtr
+        sProcessorPtr = (processContext.processorPtr != nullptr)
+            ? processContext.processorPtr
             : static_cast<IProcessor*>(new _VoidProcessor {})
         ;
 
@@ -63,8 +60,9 @@ namespace dull::core {
         rl::CloseWindow();
     }
 
-    void Engine::Run() noexcept
+    void Engine::Run(const util::ProcessContext& processContext) noexcept
     {
+        Engine::_InitSystems(processContext);
         sInstance->Log(zen::core::INFO, "Running");
 
         while (!rl::WindowShouldClose() && sInstance->IsRunning()) [[likely]]

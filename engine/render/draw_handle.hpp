@@ -13,6 +13,12 @@ namespace dull::render {
         ~DrawHandle();
 
     public:
+        DrawHandle(DrawHandle&&)                 = delete;
+        DrawHandle(const DrawHandle&)            = delete;
+        DrawHandle& operator=(DrawHandle&&)      = delete;
+        DrawHandle& operator=(const DrawHandle&) = delete;
+
+        void DrawShape();
     };
 
 } // namespace dull::render

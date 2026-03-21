@@ -123,10 +123,10 @@ namespace dull::util {
             };
         }
 
-        constexpr Color& operator+=(const Color& other) noexcept { return *this = *this + other; }
-        constexpr Color& operator-=(const Color& other) noexcept { return *this = *this - other; }
-        constexpr Color& operator*=(const Color& other) noexcept { return *this = *this * other; }
-        constexpr Color& operator/=(const Color& other) noexcept { return *this = *this / other; }
+        constexpr Color& operator += (const Color& other) noexcept { return *this = *this + other; }
+        constexpr Color& operator -= (const Color& other) noexcept { return *this = *this - other; }
+        constexpr Color& operator *= (const Color& other) noexcept { return *this = *this * other; }
+        constexpr Color& operator /= (const Color& other) noexcept { return *this = *this / other; }
 
         constexpr Color operator + (uint8_t scalar) const noexcept { return *this + Color::Gray(scalar); }
         constexpr Color operator - (uint8_t scalar) const noexcept { return *this - Color::Gray(scalar); }

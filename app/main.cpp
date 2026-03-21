@@ -16,5 +16,5 @@ int main(void)
 
     zen::core::Log(zen::core::DBG, {"DullEngine-{}", dull::config::GetVersionString()});
 
-    dull::core::Engine::Run();
+    dull::core::Engine::Run({});
 }
