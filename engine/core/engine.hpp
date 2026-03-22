@@ -20,6 +20,11 @@ namespace dull::util {
         core::IProcessor* processorPtr = nullptr;
     };
 
+    struct GlobalAccessor final {
+        system::TimeSystem& timeRef;
+        system::AudioSystem& audioRef;
+    };
+
 } // namespace dull::util
 
 namespace dull::core {

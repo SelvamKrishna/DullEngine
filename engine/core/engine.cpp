@@ -29,8 +29,8 @@ namespace dull::core {
         zen::core::Assert(sInstance != nullptr, "Engine instance not yet created");
 
         int configFlags = {
-            (windowContext.isVsync ? rl::FLAG_VSYNC_HINT       : 0) |
-            (windowContext.isResizeable   ? rl::FLAG_WINDOW_RESIZABLE : 0)
+            (windowContext.isVsync      ? rl::FLAG_VSYNC_HINT       : 0) |
+            (windowContext.isResizeable ? rl::FLAG_WINDOW_RESIZABLE : 0)
         };
 
         rl::SetConfigFlags(configFlags);
@@ -47,7 +47,7 @@ namespace dull::core {
 
         sProcessorPtr = (processContext.processorPtr != nullptr)
             ? processContext.processorPtr
-            : static_cast<IProcessor*>(new _VoidProcessor {})
+            : static_cast<IProcessor*>(new DirectProcessor { {} })
         ;
 
         sProcessorPtr->IInit();
@@ -65,14 +65,19 @@ namespace dull::core {
         Engine::_InitSystems(processContext);
         sInstance->Log(zen::core::INFO, "Running");
 
+        util::GlobalAccessor globalAccessor {
+            .timeRef  = sInstance->timeSystem,
+            .audioRef = sInstance->audioSystem
+        };
+
         while (!rl::WindowShouldClose() && sInstance->IsRunning()) [[likely]]
         {
             sInstance->timeSystem._UpdateDeltaTime(rl::GetFrameTime());
-            sProcessorPtr->IUpdate();
+            sProcessorPtr->IUpdate(globalAccessor);
 
             while (sInstance->timeSystem._TryConsumeAccumulated())
             {
-                sProcessorPtr->IFixedUpdate();
+                sProcessorPtr->IFixedUpdate(globalAccessor);
                 Z_TODO("Physics Logic goes here");
             }
 

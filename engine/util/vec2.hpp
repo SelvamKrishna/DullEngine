@@ -18,6 +18,15 @@ namespace dull::util {
         {
             return {static_cast<float>(this->x), static_cast<float>(this->y)};
         }
+
+        constexpr Vec2(const zen::math::Vec2<ValueT>& zenVec) noexcept
+            : Base {static_cast<ValueT>(zenVec.x), static_cast<ValueT>(zenVec.y)}
+        {}
+
+        [[nodiscard]] constexpr operator zen::math::Vec2<ValueT>() const noexcept
+        {
+            return {static_cast<float>(this->x), static_cast<float>(this->y)};
+        }
     };
 
     using Vec2f = Vec2<float>;
