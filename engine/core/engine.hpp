@@ -1,27 +1,29 @@
 #pragma once
 
+#include "engine/config.hpp"
 #include "engine/core/processor.hpp"
 #include "engine/system/time_system.hpp"
 #include "engine/system/audio_system.hpp"
-#include "engine/util/vec2.hpp"
 
-#include <vendor/zenutil/zen_prelude.hpp>
+#include <zen/log.hpp>
+
+#include <utility>
 
 namespace dull::util {
 
     struct WindowContext final {
-        std::string title        = config::GetConfigString();
-        util::Vec2i dimension    = {640, 640};
-        bool        isVsync      = false;
-        bool        isResizeable = false;
+        std::string         title        {config::GetConfigString()};
+        std::pair<int, int> dimension    {640, 640};
+        bool                isVsync      {false};
+        bool                isResizeable {false};
     };
 
     struct ProcessContext final {
-        core::IProcessor* processorPtr = nullptr;
+        core::IProcessor* processorPtr {nullptr};
     };
 
     struct GlobalAccessor final {
-        system::TimeSystem& timeRef;
+        system::TimeSystem&  timeRef;
         system::AudioSystem& audioRef;
     };
 
@@ -29,9 +31,15 @@ namespace dull::util {
 
 namespace dull::core {
 
-    struct Engine final : public zen::core::Logger {
+    struct Engine final {
     private:
-        bool _isRunning = false;
+        bool _isRunning {false};
+
+        zen::log_tag _logTag {
+            "[DULL]",
+            zen::ansi_color::BG_BLACK,
+            const_cast<zen::log_tag*>(&config::DULL_TAG)
+        };
 
         static void _InitSystems(const util::ProcessContext& processContext) noexcept;
         static void _ShutdownSystems() noexcept;

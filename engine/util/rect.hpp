@@ -1,7 +1,8 @@
 #pragma once
 
-#include "engine/util/vec2.hpp"
+#include "engine/util/adapter.hpp"
 
+#include <zen/math/vec2.hpp>
 #include <vendor/raylib.h>
 
 namespace dull::util {
@@ -18,7 +19,7 @@ namespace dull::util {
             : x {x}, y {y}, w {width}, h {height}
         {}
 
-        constexpr Rect(const Vec2f& position, const Vec2f& dimension) noexcept
+        constexpr Rect(const zen::vec2& position, const zen::vec2& dimension) noexcept
             : x {position.x}, y {position.y}, w {dimension.x}, h {dimension.y}
         {}
 
@@ -26,24 +27,24 @@ namespace dull::util {
             : x {rlRect.x}, y {rlRect.y}, w {rlRect.width}, h {rlRect.height}
         {}
 
-        [[nodiscard]] constexpr Vec2f GetPosition () const noexcept { return {this->x, this->y}; }
-        [[nodiscard]] constexpr Vec2f GetDimension() const noexcept { return {this->w, this->h}; }
+        [[nodiscard]] constexpr zen::vec2 GetPosition () const noexcept { return {this->x, this->y}; }
+        [[nodiscard]] constexpr zen::vec2 GetDimension() const noexcept { return {this->w, this->h}; }
 
-        constexpr void Move(const Vec2f& positionOffset) noexcept
+        constexpr void Move(const zen::vec2& positionOffset) noexcept
         {
             this->x += positionOffset.x;
             this->y += positionOffset.y;
         }
 
-        constexpr void Scale(const Vec2f& scaleMulitplier) noexcept
+        constexpr void Scale(const zen::vec2& scaleMulitplier) noexcept
         {
             this->w *= scaleMulitplier.x;
             this->h *= scaleMulitplier.y;
         }
 
-        [[nodiscard]] bool CollidesWith(const Vec2f& point) const noexcept
+        [[nodiscard]] bool CollidesWith(const zen::vec2& point) const noexcept
         {
-            return rl::CheckCollisionPointRec(point, *this);
+            return rl::CheckCollisionPointRec(rl_cast(point), *this);
         }
 
         [[nodiscard]] bool CollidesWith(const Rect& other) const noexcept

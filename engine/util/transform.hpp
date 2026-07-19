@@ -1,16 +1,14 @@
 #pragma once
 
-#include "engine/util/vec2.hpp"
-
-#include <vendor/zenutil/zen/core/macros.hpp>
-#include <vendor/zenutil/zen/math/angle.hpp>
+#include <zen/math/angle.hpp>
+#include <zen/math/vec2.hpp>
 
 namespace dull::util {
 
     struct Transform2D final {
-        util::Vec2f      position = util::Vec2f::Zero();
-        zen::math::Angle rotation = zen::math::Angle::FromDegrees(0);
-        util::Vec2f      scale = util::Vec2f::One();
+        zen::vec2  position {0};
+        zen::angle rotation {zen::angle::from_deg(0)};
+        zen::vec2  scale    {1};
     };
 
     static constexpr Transform2D DEFAULT_TRANSFORM_2D = {};

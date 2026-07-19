@@ -1,42 +1,65 @@
 #include "engine/render/draw_handle.hpp"
+#include "engine/util/adapter.hpp"
+
+#include <zen/log.hpp>
+#include <zen/math/vec2.hpp>
 
 #include <vendor/raylib.h>
-#include <vendor/zenutil/zen_prelude.hpp>
 
 namespace dull::render {
 
     DrawHandle::DrawHandle()
     {
         rl::BeginDrawing();
-        rl::ClearBackground(rl::BLACK);
-        Z_ON_DBG { rl::DrawFPS(10, 10); }
+        rl::ClearBackground(rl::RL_BLACK);
     }
 
-    DrawHandle::~DrawHandle() { rl::EndDrawing(); }
-
-    const util::Transform2D& DrawHandle::_GetValidTransform(const util::Transform2D* transformPtr) noexcept
+    DrawHandle::~DrawHandle()
     {
-        return transformPtr == nullptr ? util::DEFAULT_TRANSFORM_2D : *transformPtr;
+        rl::DrawFPS(10, 10);
+        rl::EndDrawing();
     }
 
-    void DrawHandle::DrawRectangle(const util::Rect& rectangle, const DrawContext& drawContext) const
+    void DrawHandle::DrawRectangle(
+        const util::Rect& rectangle,
+        zen::angle rotation,
+        const ShapeContext& shapeContext
+    ) const
     {
-        const auto& TRANSFORM = DrawHandle::_GetValidTransform(drawContext.TRANSFORM_PTR);
-
         rl::DrawRectanglePro(
-            util::Rect {
-                TRANSFORM.position + drawContext.TRANSFORM_PTR->position,
-                rectangle.GetDimension() * TRANSFORM.scale
-            },
-            (util::Vec2f) (rectangle.GetDimension() * 0.5f),
-            TRANSFORM.rotation.AsDegrees(),
-            drawContext.tintOverlay
+            rectangle,
+            rl_cast(rectangle.GetDimension() * 0.5f),
+            rotation.as_deg(),
+            shapeContext.fillColor
         );
+
+        if (!shapeContext.HasOutline()) return;
+        rl::DrawRectangleLinesEx(rectangle, shapeContext.outlineThinkness, shapeContext.outlineColor);
     }
 
-    void DrawHandle::DrawCircle(float radius, const util::Vec2f& position, const util::Color& color, float scale) const
+    void DrawHandle::DrawCircle(
+        const zen::vec2& position,
+        float radius,
+        const ShapeContext& shapeContext
+    ) const
     {
-        rl::DrawCircleV(position, radius * scale, color);
+        if (shapeContext.HasOutline()) rl::DrawCircleV(
+            rl_cast(position), radius + shapeContext.outlineThinkness, shapeContext.outlineColor
+        );
+
+        rl::DrawCircleV(rl_cast(position), radius, shapeContext.fillColor);
+    }
+
+    void DrawHandle::DrawLine(
+        const zen::vec2& pointA,
+        const zen::vec2& pointB,
+        const ShapeContext& shapeContext
+    ) const
+    {
+        rl::DrawLineEx(
+            rl_cast(pointA), rl_cast(pointB),
+            shapeContext.outlineThinkness, shapeContext.fillColor
+        );
     }
 
 } // namespace dull::render

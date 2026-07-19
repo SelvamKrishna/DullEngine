@@ -1,12 +1,12 @@
 #include "engine/system/time_system.hpp"
 
-#include <vendor/zenutil/zen/math/utils.hpp>
+#include <zen/math/utility.hpp>
 
 namespace dull::system {
 
     void TimeSystem::_UpdateDeltaTime(double frameTime) noexcept
     {
-        frameTime = zen::math::Clamp(frameTime, 0.0, 0.25);
+        frameTime = zen::clamp(frameTime, 0.0, 0.25);
         this->_deltaTime = frameTime;
         this->_accumulator += frameTime;
     }

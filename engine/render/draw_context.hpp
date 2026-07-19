@@ -13,4 +13,14 @@ namespace dull::render {
 
     static constexpr DrawContext DEFAULT_DRAW_CONTEXT = {};
 
+    struct ShapeContext {
+        util::Color fillColor        = util::Color::White();
+        util::Color outlineColor     = util::Color::Black();
+        float       outlineThinkness = 0.0F;
+
+        [[nodiscard]] bool HasOutline() const noexcept { return outlineThinkness > 0; }
+    };
+
+    static constexpr ShapeContext DEFAULT_SHAPE_CONTEXT = {};
+
 } // namespace dull::render

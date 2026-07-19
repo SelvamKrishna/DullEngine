@@ -26,8 +26,23 @@ namespace dull::render {
         DrawHandle& operator=(DrawHandle&&)      = delete;
         DrawHandle& operator=(const DrawHandle&) = delete;
 
-        void DrawRectangle(const util::Rect& rectangle, const DrawContext& = DEFAULT_DRAW_CONTEXT) const;
-        void DrawCircle(float radius, const util::Vec2f& position, const util::Color& color = DEFAULT_COLOR, float scale = 1.0F) const;
+        void DrawRectangle(
+            const util::Rect& rectangle,
+            zen::angle rotation = zen::angle::from_deg(0),
+            const ShapeContext& shapeContext = DEFAULT_SHAPE_CONTEXT
+        ) const;
+
+        void DrawCircle(
+            const zen::vec2& position,
+            float radius,
+            const ShapeContext& shapeContext = DEFAULT_SHAPE_CONTEXT
+        ) const;
+
+        void DrawLine(
+            const zen::vec2& pointA,
+            const zen::vec2& pointB,
+            const ShapeContext& shapeContext = DEFAULT_SHAPE_CONTEXT
+        ) const;
     };
 
 } // namespace dull::render
