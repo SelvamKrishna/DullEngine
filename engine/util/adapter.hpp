@@ -6,13 +6,21 @@
 #include <vendor/raylib.h>
 
 namespace dull::util {
-    #define RL_CONVERSION(_from, _to) \
+
+    #define _RL_CONV_FN(_from, _to) \
         [[nodiscard]] inline constexpr _to toRL(const _from& e)
 
-    RL_CONVERSION(zen::vec2, rl::Vector2) { return {e.x, e.y}; }
-    RL_CONVERSION(zen::vec3, rl::Vector3) { return {e.x, e.y, e.z}; }
+    _RL_CONV_FN(zen::vec2, rl::Vector2) { return {e.x, e.y}; }
+    _RL_CONV_FN(zen::vec3, rl::Vector3) { return {e.x, e.y, e.z}; }
 
-    #undef RL_CONVERSION
-}
+    #undef _RL_CONV_FN
+
+} // namespace dull::util
 
 #define rl_cast ::dull::util::toRL
+
+#ifdef NDEBUG
+#define ON_DBG if constexpr (false)
+#else
+#define ON_DBG if constexpr (true)
+#endif

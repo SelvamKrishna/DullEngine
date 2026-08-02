@@ -22,15 +22,6 @@ namespace dull::util {
             : r {rlColor.r}, g {rlColor.g}, b {rlColor.b}, a {rlColor.a}
         {}
 
-        [[nodiscard]] static constexpr Color White  () noexcept { return { 255, 255, 255, 255 }; }
-        [[nodiscard]] static constexpr Color Red    () noexcept { return { 255, 0  , 0  , 255 }; }
-        [[nodiscard]] static constexpr Color Green  () noexcept { return { 0  , 255, 0  , 255 }; }
-        [[nodiscard]] static constexpr Color Blue   () noexcept { return { 0  , 0  , 255, 255 }; }
-        [[nodiscard]] static constexpr Color Cyan   () noexcept { return { 0  , 255, 255, 255 }; }
-        [[nodiscard]] static constexpr Color Magenta() noexcept { return { 255, 0  , 255, 255 }; }
-        [[nodiscard]] static constexpr Color Yellow () noexcept { return { 255, 255, 0  , 255 }; }
-        [[nodiscard]] static constexpr Color Black  () noexcept { return { 0  , 0  , 0  , 255 }; }
-
         [[nodiscard]] static constexpr Color Gray(uint8_t scalar = 255 / 2, uint8_t alpha = 255) noexcept
         {
             return {scalar, scalar, scalar, alpha};
@@ -145,3 +136,16 @@ namespace dull::util {
     };
 
 } // namespace dull::util
+
+namespace dull::color {
+
+    static inline constexpr dull::util::Color WHITE  { 255, 255, 255, 255 };
+    static inline constexpr dull::util::Color RED    { 255, 0  , 0  , 255 };
+    static inline constexpr dull::util::Color GREEN  { 0  , 255, 0  , 255 };
+    static inline constexpr dull::util::Color BLUE   { 0  , 0  , 255, 255 };
+    static inline constexpr dull::util::Color CYAN   { 0  , 255, 255, 255 };
+    static inline constexpr dull::util::Color MAGENt { 255, 0  , 255, 255 };
+    static inline constexpr dull::util::Color YELLOw { 255, 255, 0  , 255 };
+    static inline constexpr dull::util::Color BLACK  { 0  , 0  , 0  , 255 };
+
+} // namespace dull::color

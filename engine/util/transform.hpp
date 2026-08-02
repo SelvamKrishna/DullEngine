@@ -11,6 +11,6 @@ namespace dull::util {
         zen::vec2  scale    {1};
     };
 
-    static constexpr Transform2D DEFAULT_TRANSFORM_2D = {};
+    static constexpr Transform2D DEFAULT_TRANSFORM_2D {};
 
 } // namespace dull::util

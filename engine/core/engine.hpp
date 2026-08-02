@@ -1,13 +1,15 @@
 #pragma once
 
 #include "engine/config.hpp"
-#include "engine/core/processor.hpp"
 #include "engine/system/time_system.hpp"
 #include "engine/system/audio_system.hpp"
 
 #include <zen/log.hpp>
 
 #include <utility>
+
+// Forward Declaration
+namespace dull::core { class IProcessor; }
 
 namespace dull::util {
 
@@ -23,6 +25,7 @@ namespace dull::util {
     };
 
     struct GlobalAccessor final {
+        const std::pair<int, int> WINDOW_SIZE;
         system::TimeSystem&  timeRef;
         system::AudioSystem& audioRef;
     };
@@ -33,23 +36,17 @@ namespace dull::core {
 
     struct Engine final {
     private:
+        static inline const zen::log_tag _LOG {"APP", zen::ansi_color::BLUE, &config::DULL_TAG};
         bool _isRunning {false};
-
-        zen::log_tag _logTag {
-            "[DULL]",
-            zen::ansi_color::BG_BLACK,
-            const_cast<zen::log_tag*>(&config::DULL_TAG)
-        };
 
         static void _InitSystems(const util::ProcessContext& processContext) noexcept;
         static void _ShutdownSystems() noexcept;
 
+        explicit Engine();
+
     public:
         system::TimeSystem timeSystem;
         system::AudioSystem audioSystem;
-
-        explicit Engine();
-        ~Engine();
 
         Engine(Engine&&)                 = delete;
         Engine(const Engine&)            = delete;
@@ -60,11 +57,12 @@ namespace dull::core {
         [[nodiscard]] static bool IsRunning() noexcept;
 
         static void Init(const util::WindowContext& windowContext) noexcept;
-        static void Run(const util::ProcessContext& processContext) noexcept;
+        static void Run(util::ProcessContext processContext) noexcept;
         static void Quit() noexcept;
     };
 
 } // namespace dull::core
 
-#define DULL_APP_INST \
+#define DULL_INST \
     ::dull::core::Engine::GetInstance()
+

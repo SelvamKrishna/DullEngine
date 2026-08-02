@@ -4,10 +4,10 @@ namespace dull::component {
 
     struct Timer {
     private:
-        double _measureTime = 1.0;
-        double _startedTime = 0.0;
-        bool   _isActive    = false;
-        bool   _isLooping   = false;
+        double _measureTime {1.0};
+        double _startedTime {0.0};
+        bool   _isActive    {false};
+        bool   _isLooping   {false};
 
     public:
         explicit Timer(double measureTime, bool isLooping = false) noexcept;

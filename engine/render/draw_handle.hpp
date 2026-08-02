@@ -18,8 +18,6 @@ namespace dull::render {
         [[nodiscard]]
         static const util::Transform2D& _GetValidTransform(const util::Transform2D* transformPtr) noexcept;
 
-        static constexpr util::Color DEFAULT_COLOR = util::Color::White();
-
     public:
         DrawHandle(DrawHandle&&)                 = delete;
         DrawHandle(const DrawHandle&)            = delete;

@@ -11,12 +11,12 @@ namespace dull::render {
     DrawHandle::DrawHandle()
     {
         rl::BeginDrawing();
-        rl::ClearBackground(rl::RL_BLACK);
+        rl::ClearBackground(color::BLACK);
     }
 
     DrawHandle::~DrawHandle()
     {
-        rl::DrawFPS(10, 10);
+        ON_DBG { rl::DrawFPS(10, 10); }
         rl::EndDrawing();
     }
 

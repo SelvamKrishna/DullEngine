@@ -13,7 +13,7 @@ namespace dull::config {
 
     inline constexpr uint32_t TICKS_PER_SECOND {30};
 
-    inline const zen::log_tag DULL_TAG {"[DULL]", zen::ansi_color::BLUE};
+    inline const zen::log_tag DULL_TAG {"DULL", zen::ansi_color::BLUE};
 
     [[nodiscard]] inline std::string GetVersionString() noexcept
     {

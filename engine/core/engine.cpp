@@ -1,8 +1,8 @@
 #include "engine/core/engine.hpp"
 #include "engine/core/processor.hpp"
-#include "engine/render/draw_handle.hpp"
 #include "engine/system/time_system.hpp"
 #include "engine/system/audio_system.hpp"
+#include "engine/render/draw_handle.hpp"
 
 #include <zen/log.hpp>
 #include <vendor/raylib.h>
@@ -14,21 +14,22 @@ namespace dull::core {
 
     Engine::Engine()
     {
-        zen::ansi_gaurd _logOSGaurd {std::cout};
-        zen::ansi_gaurd _errOSGaurd {std::cerr};
+        static const zen::ansi_gaurd _OUT_GAURD {std::cout};
+        static const zen::ansi_gaurd _ERR_GAURD {std::cerr};
 
-        // zen::assert(sInstance == nullptr, "Engine can only be created once");
+        zen::assert(sInstance == nullptr, "Engine can only be created once");
         sInstance = this;
     }
-
-    Engine::~Engine() { Engine::_ShutdownSystems(); }
 
     [[nodiscard]] Engine& Engine::GetInstance() noexcept { return *sInstance; }
     [[nodiscard]] bool Engine::IsRunning() noexcept { return sInstance->_isRunning; }
 
     void Engine::Init(const util::WindowContext& windowContext) noexcept
     {
-        // zen::assert(sInstance != nullptr, "Engine instance not yet created");
+        if (sInstance != nullptr) { return; }
+
+        static Engine _engine;
+        sInstance = &_engine;
 
         int configFlags {
             (windowContext.isVsync      ? rl::FLAG_VSYNC_HINT       : 0) |
@@ -42,37 +43,39 @@ namespace dull::core {
         rl::InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, windowContext.title.c_str());
         rl::SetExitKey(rl::KEY_NULL);
 
-        // zen::info() << sInstance->_logTag << "Opening " << windowContext.title;
+        Engine::_LOG.info() << "Opening " << windowContext.title;
     }
 
     void Engine::_InitSystems(const util::ProcessContext& processContext) noexcept
     {
-        // zen::assert(sInstance != nullptr, "Engine instance not yet created");
-        sInstance->_isRunning = true;
+        zen::assert(rl::IsWindowReady(), "Window is not ready", Engine::_LOG);
+        zen::assert(sInstance != nullptr, "Engine instance not yet created", Engine::_LOG);
+        zen::assert(sInstance->_isRunning == false, "Engine is already running", Engine::_LOG);
 
-        sProcessorPtr = (processContext.processorPtr != nullptr)
-            ? processContext.processorPtr
-            : static_cast<IProcessor*>(new DirectProcessor { {} })
-        ;
+        sInstance->_isRunning = true;
+        sProcessorPtr = (processContext.processorPtr == nullptr)
+            ? new DirectProcessor { {} }
+            : processContext.processorPtr;
 
         sProcessorPtr->IInit();
     }
 
     void Engine::_ShutdownSystems() noexcept
     {
-        sProcessorPtr->IShutdown();
-        // sInstance->Log(zen::core::INFO, "Closing\n\n");
+        Engine::_LOG.info() << "Exiting...\n";
         rl::CloseWindow();
+        sProcessorPtr->IShutdown();
     }
 
-    void Engine::Run(const util::ProcessContext& processContext) noexcept
+    void Engine::Run(util::ProcessContext processContext) noexcept
     {
         Engine::_InitSystems(processContext);
-        // sInstance->Log(zen::core::INFO, "Running");
+        Engine::_LOG.info() << "Running";
 
         util::GlobalAccessor globalAccessor {
-            .timeRef  = sInstance->timeSystem,
-            .audioRef = sInstance->audioSystem
+            .WINDOW_SIZE {rl::GetScreenWidth(), rl::GetScreenHeight()},
+            .timeRef  {sInstance->timeSystem},
+            .audioRef {sInstance->audioSystem},
         };
 
         while (!rl::WindowShouldClose() && sInstance->IsRunning()) [[likely]]
@@ -83,12 +86,14 @@ namespace dull::core {
             while (sInstance->timeSystem._TryConsumeAccumulated())
             {
                 sProcessorPtr->IFixedUpdate(globalAccessor);
-                // Z_TODO("Physics Logic goes here");
+                #warning "Physics Logic goes here"
             }
 
-            render::DrawHandle drawHandle;
+            render::DrawHandle drawHandle {};
             sProcessorPtr->IDraw(drawHandle);
         }
+
+        Engine::_ShutdownSystems();
     }
 
     void Engine::Quit() noexcept { sInstance->_isRunning = false; }

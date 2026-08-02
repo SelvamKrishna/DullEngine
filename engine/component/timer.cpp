@@ -25,7 +25,7 @@ namespace dull::component {
     {
         if (!this->IsActive()) return true;
 
-        double elapsedTime = rl::GetTime() - this->_startedTime;
+        double elapsedTime {rl::GetTime() - this->_startedTime};
 
         if (elapsedTime > this->_measureTime)
         {
