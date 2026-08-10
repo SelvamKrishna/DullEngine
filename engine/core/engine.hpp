@@ -6,6 +6,7 @@
 
 #include <zen/log.hpp>
 
+#include <memory>
 #include <utility>
 
 // Forward Declaration
@@ -21,7 +22,7 @@ namespace dull::util {
     };
 
     struct ProcessContext final {
-        core::IProcessor* processorPtr {nullptr};
+        std::unique_ptr<core::IProcessor> processor;
     };
 
     struct GlobalAccessor final {
@@ -36,17 +37,23 @@ namespace dull::core {
 
     struct Engine final {
     private:
-        static inline const zen::log_tag _LOG {"APP", zen::ansi_color::BLUE, &config::DULL_TAG};
+        static const zen::log_tag _LOG;
         bool _isRunning {false};
+        bool _isInitialized {false};
 
-        static void _InitSystems(const util::ProcessContext& processContext) noexcept;
+        std::unique_ptr<util::WindowContext> _windowContext;
+        std::unique_ptr<util::ProcessContext> _processContext;
+
+        Engine() = default;
+        ~Engine();
+
+        static void _InitWindow(const util::WindowContext&& windowContext) noexcept;
+        static void _InitSystems(const util::ProcessContext&& processContext) noexcept;
         static void _ShutdownSystems() noexcept;
 
-        explicit Engine();
-
     public:
-        system::TimeSystem timeSystem;
-        system::AudioSystem audioSystem;
+        system::TimeSystem  timeSys;
+        system::AudioSystem audioSys;
 
         Engine(Engine&&)                 = delete;
         Engine(const Engine&)            = delete;
@@ -54,9 +61,10 @@ namespace dull::core {
         Engine& operator=(const Engine&) = delete;
 
         [[nodiscard]] static Engine& GetInstance() noexcept;
-        [[nodiscard]] static bool IsRunning() noexcept;
+        [[nodiscard]] static bool IsRunning() noexcept { return GetInstance()._isRunning; }
+        [[nodiscard]] static bool IsInitialized() noexcept { return GetInstance()._isInitialized; }
 
-        static void Init(const util::WindowContext& windowContext) noexcept;
+        static void Init(const util::WindowContext&& windowContext) noexcept;
         static void Run(util::ProcessContext processContext) noexcept;
         static void Quit() noexcept;
     };
@@ -65,4 +73,3 @@ namespace dull::core {
 
 #define DULL_INST \
     ::dull::core::Engine::GetInstance()
-

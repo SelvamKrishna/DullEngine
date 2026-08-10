@@ -12,9 +12,10 @@ namespace dull::core {
     struct IProcessor {
         friend core::Engine;
 
-    protected:
+    public:
         virtual ~IProcessor() = default;
 
+    protected:
         virtual void IInit() = 0;
         virtual void IUpdate(const util::GlobalAccessor&) = 0;
         virtual void IFixedUpdate(const util::GlobalAccessor&) = 0;
@@ -23,10 +24,12 @@ namespace dull::core {
     };
 
     struct ProcessingFunctions final {
+    private:
         static constexpr void _FnVoid() noexcept {}
         static constexpr void _FnDrawVoid(const render::DrawHandle&) noexcept {}
         static constexpr void _FnUpdateVoid(const util::GlobalAccessor&) noexcept {}
 
+    public:
         std::function<void()> fnInit = ProcessingFunctions::_FnVoid;
         std::function<void(const util::GlobalAccessor&)> fnUpdate = ProcessingFunctions::_FnUpdateVoid;
         std::function<void(const util::GlobalAccessor&)> fnFixedUpdate = ProcessingFunctions::_FnUpdateVoid;
@@ -35,8 +38,6 @@ namespace dull::core {
     };
 
     struct DirectProcessor final : public dull::core::IProcessor {
-    public:
-
     private:
         ProcessingFunctions _processFn;
 
@@ -57,7 +58,7 @@ namespace dull::core {
         void IShutdown() final { this->_processFn.fnShutdown(); }
 
     public:
-        explicit DirectProcessor(const ProcessingFunctions& processContext)
+        explicit DirectProcessor(const ProcessingFunctions&& processContext = {})
             : _processFn {std::move(processContext)}
         {}
 
