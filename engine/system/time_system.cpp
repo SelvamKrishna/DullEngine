@@ -1,25 +1,21 @@
 #include "engine/system/time_system.hpp"
 
-#include <vendor/raylib.h>
+#include <zen/math/utility.hpp>
 
 namespace dull::system {
 
-double TimeSystem::_sDeltaTime = 0.0;
-
-bool TimeSystem::_IsFixedProcess() noexcept
-{
-    static double sAccumulatedTime = 0;
-
-    TimeSystem::_sDeltaTime = rl::GetFrameTime();
-    sAccumulatedTime += TimeSystem::_sDeltaTime;
-
-    if (sAccumulatedTime > TimeSystem::FIXED_TICK_INTERVAL) [[unlikely]]
+    void TimeSystem::_UpdateDeltaTime(double frameTime) noexcept
     {
-        sAccumulatedTime -= TimeSystem::FIXED_TICK_INTERVAL;
-        return true;
+        frameTime = zen::clamp(frameTime, 0.0, 0.25);
+        this->_deltaTime = frameTime;
+        this->_accumulator += frameTime;
     }
 
-    return false;
-}
+    bool TimeSystem::_TryConsumeAccumulated() noexcept
+    {
+        if (this->_accumulator < TimeSystem::FIXED_TICK_INTERVAL) return false;
+        this->_accumulator -= TimeSystem::FIXED_TICK_INTERVAL;
+        return true;
+    }
 
 } // namespace dull::system

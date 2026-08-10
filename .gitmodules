@@ -1,3 +1,9 @@
-[submodule "vendor/zutil"]
-	path = vendor/zutil
-	url = https://github.com/SelvamKrishna/ZUtil.git
+[submodule "vendor/zen-log"]
+	path = vendor/zen-log
+	url = https://github.com/SelvamKrishna/zen-log.git
+[submodule "vendor/zen-math"]
+	path = vendor/zen-math
+	url = https://github.com/SelvamKrishna/zen-math.git
+[submodule "pycraft"]
+	path = pycraft
+	url = https://github.com/SelvamKrishna/pycraft.git
