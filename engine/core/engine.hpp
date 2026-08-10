@@ -22,7 +22,7 @@ namespace dull::util {
     };
 
     struct ProcessContext final {
-        std::unique_ptr<core::IProcessor> processor;
+        core::IProcessor* processorPtr;
     };
 
     struct GlobalAccessor final {

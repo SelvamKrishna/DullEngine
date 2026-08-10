@@ -66,12 +66,12 @@ namespace dull::core {
         process.log_panic_if(Engine::IsRunning(), "Engine Is Already Running");
         inst._processContext = std::make_unique<util::ProcessContext>();
 
-        inst._processContext->processor = (processContext.processor == nullptr)
-            ? std::make_unique<core::DirectProcessor>()
-            : std::move(const_cast<std::unique_ptr<core::IProcessor>&>(processContext.processor));
+        inst._processContext->processorPtr = (processContext.processorPtr == nullptr)
+            ? new core::DirectProcessor {}
+            : processContext.processorPtr;
 
         inst._isRunning = true;
-        inst._processContext->processor->IInit();
+        inst._processContext->processorPtr->IInit();
 
         process.log_success();
     }
@@ -83,8 +83,7 @@ namespace dull::core {
 
         if (!Engine::IsRunning() && !Engine::IsInitialized()) return;
 
-        inst._processContext->processor->IShutdown();
-        inst._processContext->processor.reset();
+        inst._processContext->processorPtr->IShutdown();
 
         if (rl::IsWindowReady()) rl::CloseWindow();
 
@@ -117,16 +116,16 @@ namespace dull::core {
         while (!rl::WindowShouldClose() && inst.IsRunning()) [[likely]]
         {
             timeSystem._UpdateDeltaTime(rl::GetFrameTime());
-            inst._processContext->processor->IUpdate(globalAccessor);
+            inst._processContext->processorPtr->IUpdate(globalAccessor);
 
             while (timeSystem._TryConsumeAccumulated())
             {
-                inst._processContext->processor->IFixedUpdate(globalAccessor);
+                inst._processContext->processorPtr->IFixedUpdate(globalAccessor);
                 #warning "TODO: Physics logic goes here"
             }
 
             render::DrawHandle drawHandle {};
-            inst._processContext->processor->IDraw(drawHandle);
+            inst._processContext->processorPtr->IDraw(drawHandle);
         }
 
         inst._ShutdownSystems();
