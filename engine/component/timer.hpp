@@ -16,10 +16,8 @@ namespace dull::component {
         void Stop() noexcept;
 
         [[nodiscard]] double GetElapsed() const noexcept;
-
-        [[nodiscard]] bool IsActive () const noexcept { return this->_isActive;  }
-        [[nodiscard]] bool IsLooping() const noexcept { return this->_isLooping; }
-
+        [[nodiscard]] constexpr bool IsActive () const noexcept { return this->_isActive;  }
+        [[nodiscard]] constexpr bool IsLooping() const noexcept { return this->_isLooping; }
         [[nodiscard]] bool IsOver() noexcept;
 
         void SetLooping(bool isLooping) noexcept;

@@ -115,10 +115,10 @@ namespace dull::core {
         Engine::_LOG.info() << "Running Application...";
         while (!rl::WindowShouldClose() && inst.IsRunning()) [[likely]]
         {
-            timeSystem._UpdateDeltaTime(rl::GetFrameTime());
+            timeSystem._Update(rl::GetFrameTime());
             inst._processContext->processorPtr->IUpdate(globalAccessor);
 
-            while (timeSystem._TryConsumeAccumulated())
+            while (timeSystem._ShouldFixedUpdate())
             {
                 inst._processContext->processorPtr->IFixedUpdate(globalAccessor);
                 #warning "TODO: Physics logic goes here"
