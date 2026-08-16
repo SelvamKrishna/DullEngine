@@ -1,13 +1,13 @@
 #pragma once
 
 #include "engine/config.hpp"
-#include "engine/system/time_system.hpp"
+#include "engine/core/window.hpp"
 #include "engine/system/audio_system.hpp"
+#include "engine/system/time_system.hpp"
 
 #include <zen/log.hpp>
 
 #include <memory>
-#include <utility>
 
 // Forward Declaration
 namespace dull::core { class IProcessor; }
@@ -15,10 +15,10 @@ namespace dull::core { class IProcessor; }
 namespace dull::util {
 
     struct WindowContext final {
-        std::string         title        {config::GetConfigString()};
-        std::pair<int, int> dimension    {640, 640};
-        bool                isVsync      {false};
-        bool                isResizeable {false};
+        std::string title {config::GetConfigString()};
+        core::Window::Dimension dimension {600, 800};
+        bool isVsync {false};
+        bool isResizeable {false};
     };
 
     struct ProcessContext final {
@@ -26,9 +26,9 @@ namespace dull::util {
     };
 
     struct GlobalAccessor final {
-        const std::pair<int, int> WINDOW_SIZE;
-        system::TimeSystem&  timeRef;
-        system::AudioSystem& audioRef;
+        core::Window&        refWindow;
+        system::TimeSystem&  refTime;
+        system::AudioSystem& refAudio;
     };
 
 } // namespace dull::util
@@ -54,6 +54,7 @@ namespace dull::core {
     public:
         system::TimeSystem  timeSys;
         system::AudioSystem audioSys;
+        core::Window        window;
 
         Engine(Engine&&)                 = delete;
         Engine(const Engine&)            = delete;

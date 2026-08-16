@@ -26,19 +26,15 @@ namespace dull::core {
     {
         zen::log_process process {"Initializing Window", &Engine::_LOG};
 
-        int configFlags {
+        rl::SetConfigFlags(static_cast<unsigned int>(
             (windowContext.isVsync      ? rl::FLAG_VSYNC_HINT       : 0) |
             (windowContext.isResizeable ? rl::FLAG_WINDOW_RESIZABLE : 0)
-        };
+        ));
 
-        const int32_t WINDOW_WIDTH  {windowContext.dimension.first};
-        const int32_t WINDOW_HEIGHT {windowContext.dimension.second};
-
-        rl::SetConfigFlags(configFlags);
-        rl::InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, windowContext.title.c_str());
-
-        process.log_panic_if(!rl::IsWindowReady(), "Window Not Ready");
+        rl::InitWindow(windowContext.dimension[0], windowContext.dimension[1], windowContext.title.c_str());
         rl::SetExitKey(rl::KEY_NULL);
+
+        process.log_panic_if(!rl::IsWindowReady(), "Initialization Failed");
     }
 
     void Engine::Init(const util::WindowContext&& windowContext) noexcept
@@ -89,9 +85,6 @@ namespace dull::core {
 
         inst._isRunning = false;
         inst._isInitialized = false;
-        inst._processContext.reset();
-        inst._windowContext.reset();
-
         process.log_success();
     }
 
@@ -107,9 +100,9 @@ namespace dull::core {
         process.log_panic_if(!Engine::IsRunning(), "Engine Not Running");
 
         util::GlobalAccessor globalAccessor {
-            .WINDOW_SIZE {rl::GetScreenWidth(), rl::GetScreenHeight()},
-            .timeRef     {timeSystem},
-            .audioRef    {audioSystem},
+            .refWindow {inst.window},
+            .refTime   {timeSystem},
+            .refAudio  {audioSystem},
         };
 
         Engine::_LOG.info() << "Running Application...";

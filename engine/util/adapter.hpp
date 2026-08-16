@@ -19,10 +19,12 @@
 namespace dull::util {
 
     #define _RL_CONV_FN(_from, _to) \
-        [[nodiscard]] inline constexpr _to toRL(const _from& e)
+        [[nodiscard]] inline constexpr _to CastRL(const _from& e)
 
     _RL_CONV_FN(zen::vec2, rl::Vector2) { return {e.x, e.y}; }
     _RL_CONV_FN(zen::vec3, rl::Vector3) { return {e.x, e.y, e.z}; }
+    _RL_CONV_FN(rl::Vector2, zen::vec2) { return {e.x, e.y}; }
+    _RL_CONV_FN(rl::Vector3, zen::vec3) { return {e.x, e.y, e.z}; }
 
     #undef _RL_CONV_FN
 
@@ -65,4 +67,4 @@ namespace dull::util {
 
 } // namespace dull::util
 
-#define rl_cast ::dull::util::toRL
+#define rl_cast ::dull::util::CastRL
