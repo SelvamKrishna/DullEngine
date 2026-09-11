@@ -10,7 +10,7 @@
 #include <memory>
 
 // Forward Declaration
-namespace dull::core { class IProcessor; }
+namespace dull::core { struct IProcessor; }
 
 namespace dull::util {
 
@@ -22,7 +22,7 @@ namespace dull::util {
     };
 
     struct ProcessContext final {
-        core::IProcessor* processorPtr;
+        core::IProcessor* ptrProcessor {nullptr};
     };
 
     struct GlobalAccessor final {
@@ -41,14 +41,14 @@ namespace dull::core {
         bool _isRunning {false};
         bool _isInitialized {false};
 
-        std::unique_ptr<util::WindowContext> _windowContext;
-        std::unique_ptr<util::ProcessContext> _processContext;
+        std::unique_ptr<util::WindowContext> _ctxWindow;
+        std::unique_ptr<util::ProcessContext> _ctxProcess;
 
         Engine() = default;
         ~Engine();
 
-        static void _InitWindow(const util::WindowContext&& windowContext) noexcept;
-        static void _InitSystems(const util::ProcessContext&& processContext) noexcept;
+        static void _InitWindow(const util::WindowContext&& ctxWindow) noexcept;
+        static void _InitSystems(const util::ProcessContext&& ctxProcess) noexcept;
         static void _ShutdownSystems() noexcept;
 
     public:
@@ -65,8 +65,8 @@ namespace dull::core {
         [[nodiscard]] static bool IsRunning() noexcept { return GetInstance()._isRunning; }
         [[nodiscard]] static bool IsInitialized() noexcept { return GetInstance()._isInitialized; }
 
-        static void Init(const util::WindowContext&& windowContext) noexcept;
-        static void Run(util::ProcessContext processContext) noexcept;
+        static void Init(const util::WindowContext&& ctxWindow) noexcept;
+        static void Run(util::ProcessContext ctxProcess) noexcept;
         static void Quit() noexcept;
     };
 

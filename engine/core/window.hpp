@@ -91,7 +91,6 @@ namespace dull::core {
                 static_cast<uint32_t>(rl::GetMonitorPhysicalHeight(monitor))
             };
         }
-
     };
 
 } // namespace dull::core

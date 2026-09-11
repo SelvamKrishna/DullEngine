@@ -5,6 +5,7 @@
 #include <zen/math/vec3.hpp>
 #include <zen/log/core.hpp>
 #include <zen/log/tools.hpp>
+#include <zen/log/debug.hpp>
 
 #include <vendor/raylib.h>
 
@@ -41,7 +42,7 @@ namespace dull::util {
             va_list args_copy;
             va_copy(args_copy, args);
 
-            int size = vsnprintf(nullptr, 0, text, args_copy);
+            int size {vsnprintf(nullptr, 0, text, args_copy)};
             va_end(args_copy);
 
             if (size > 0)
@@ -51,13 +52,9 @@ namespace dull::util {
                 formatted = buffer;
             }
         }
-        catch (...) { formatted = "FAILED TO FORMAT RAYLIB LOG MESSAGE"; }
+        catch (...) { formatted = "<message could not be formatted>"; }
 
-        if (logLevel == rl::LOG_FATAL)
-        {
-            zen::panic(formatted, &TAG);
-            return;
-        }
+        if (logLevel == rl::LOG_FATAL) zen::panic(formatted, &TAG);
 
         TAG.log((logLevel <= rl::LOG_DEBUG)
             ? zen::log_lvl::DBG

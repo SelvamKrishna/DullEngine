@@ -22,7 +22,8 @@ namespace dull::system {
 
     void TimeSystem::SetTimeScale(double scale)
     {
-        this->_timeScale = zen::clamp(scale, 0.0, 10.0);
+        static constexpr double MAX_TIME_SCALE {10.0};
+        this->_timeScale = zen::clamp(scale, 0.0, MAX_TIME_SCALE);
     }
 
 } // namespace dull::system

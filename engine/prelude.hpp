@@ -22,9 +22,9 @@
 #include <engine/util/rect.hpp>
 #include <engine/util/transform.hpp>
 
-// External -> Zen
+// External: Zenlib
 #include <zen/log.hpp>
 #include <zen/math.hpp>
 
-// External -> Raylib
+// External: Raylib
 #include <vendor/raylib.h>

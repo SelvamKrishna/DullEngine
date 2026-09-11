@@ -4,8 +4,8 @@ namespace dull::component {
 
     struct Timer {
     private:
-        double _measureTime {1.0};
-        double _startedTime {0.0};
+        double _timeMeasure {1.0};
+        double _timeStarted {0.0};
         bool   _isActive    {false};
         bool   _isLooping   {false};
 

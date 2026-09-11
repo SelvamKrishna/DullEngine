@@ -8,58 +8,68 @@
 
 namespace dull::render {
 
-    DrawHandle::DrawHandle()
-    {
-        rl::BeginDrawing();
-        rl::ClearBackground(color::BLACK);
-    }
-
-    DrawHandle::~DrawHandle()
-    {
-        ON_DBG { rl::DrawFPS(10, 10); }
-        rl::EndDrawing();
-    }
+    DrawHandle::DrawHandle()  { rl::BeginDrawing(); rl::ClearBackground(color::BLACK); }
+    DrawHandle::~DrawHandle() { rl::EndDrawing(); }
 
     void DrawHandle::DrawRectangle(
         const util::Rect& rectangle,
         zen::angle rotation,
-        const ShapeContext& shapeContext
+        const ShapeContext& shapeCtx
     ) const
     {
         rl::DrawRectanglePro(
             rectangle,
             rl_cast(rectangle.GetDimension() * 0.5f),
             rotation.as_deg(),
-            shapeContext.fillColor
+            shapeCtx.fillColor
         );
 
-        if (!shapeContext.HasOutline()) return;
-        rl::DrawRectangleLinesEx(rectangle, shapeContext.outlineThinkness, shapeContext.outlineColor);
+        if (!shapeCtx.HasOutline()) return;
+        rl::DrawRectangleLinesEx(rectangle, shapeCtx.outlineThinkness, shapeCtx.outlineColor);
     }
 
     void DrawHandle::DrawCircle(
         const zen::vec2& position,
         float radius,
-        const ShapeContext& shapeContext
+        const ShapeContext& shapeCtx
     ) const
     {
-        if (shapeContext.HasOutline()) rl::DrawCircleV(
-            rl_cast(position), radius + shapeContext.outlineThinkness, shapeContext.outlineColor
+        if (shapeCtx.HasOutline()) rl::DrawCircleV(
+            rl_cast(position), radius + shapeCtx.outlineThinkness, shapeCtx.outlineColor
         );
 
-        rl::DrawCircleV(rl_cast(position), radius, shapeContext.fillColor);
+        rl::DrawCircleV(rl_cast(position), radius, shapeCtx.fillColor);
     }
 
     void DrawHandle::DrawLine(
         const zen::vec2& pointA,
         const zen::vec2& pointB,
-        const ShapeContext& shapeContext
+        const ShapeContext& shapeCtx
     ) const
     {
         rl::DrawLineEx(
             rl_cast(pointA), rl_cast(pointB),
-            shapeContext.outlineThinkness, shapeContext.fillColor
+            shapeCtx.outlineThinkness, shapeCtx.fillColor
         );
     }
+
+    void DrawHandle::DrawText(std::string_view text, const TextContext& textCtx) const
+    {
+        thread_local std::string buffer {text};
+        buffer.assign(text.data(), text.size());
+
+        rl::DrawTextPro(
+            textCtx.font,
+            text.data(),
+            rl_cast(textCtx.position),
+            rl_cast(textCtx.origin),
+            textCtx.rotation.as_rad(),
+            textCtx.fontSize,
+            textCtx.spacing,
+            textCtx.color
+        );
+    }
+
+    void DrawHandle::DrawFPS(int posX, int posY) const { rl::DrawFPS(posX, posY); }
 
 } // namespace dull::render
