@@ -1,8 +1,8 @@
 #include "engine/core/engine.hpp"
 #include "engine/core/processor.hpp"
+#include "engine/core/time_system.hpp"
+#include "engine/core/audio_system.hpp"
 #include "engine/render/draw_handle.hpp"
-#include "engine/system/time_system.hpp"
-#include "engine/system/audio_system.hpp"
 
 #include <zen/log.hpp>
 #include <vendor/raylib.h>
@@ -63,11 +63,16 @@ namespace dull::core {
         inst._ctxProcess = std::make_unique<util::ProcessContext>();
 
         inst._ctxProcess->ptrProcessor = (ctxProcess.ptrProcessor == nullptr)
-            ? new core::DirectProcessor {}
+            ? new DirectProcessor {}
             : ctxProcess.ptrProcessor;
+
+        inst._ctxProcess->ptrRenderSys = (ctxProcess.ptrRenderSys == nullptr)
+            ? new IRenderSystem {}
+            : ctxProcess.ptrRenderSys;
 
         inst._isRunning = true;
         inst._ctxProcess->ptrProcessor->IInit();
+        inst._ctxProcess->ptrRenderSys->IInit();
 
         process.log_success();
     }
@@ -80,6 +85,7 @@ namespace dull::core {
         if (!Engine::IsRunning() && !Engine::IsInitialized()) return;
 
         inst._ctxProcess->ptrProcessor->IShutdown();
+        inst._ctxProcess->ptrRenderSys->IShutdown();
 
         if (rl::IsWindowReady()) rl::CloseWindow();
 
@@ -92,8 +98,8 @@ namespace dull::core {
     {
         zen::log_process process {"Running Application", &Engine::_LOG};
         Engine& inst {DULL_INST};
-        system::TimeSystem& timeSystem {inst.timeSys};
-        system::AudioSystem& audioSystem {inst.audioSys};
+        TimeSystem& timeSystem {inst.timeSys};
+        AudioSystem& audioSystem {inst.audioSys};
 
         process.log_panic_if(!Engine::IsInitialized(), "Engine Un-Initialized");
         Engine::_InitSystems(std::move(ctxProcess));
@@ -117,8 +123,9 @@ namespace dull::core {
                 #warning "TODO: Physics logic goes here"
             }
 
-            render::DrawHandle drawHandle {};
+            render::DrawHandle drawHandle {*inst._ctxProcess->ptrRenderSys};
             inst._ctxProcess->ptrProcessor->IDraw(drawHandle);
+            inst._ctxProcess->ptrRenderSys->IDraw();
         }
 
         inst._ShutdownSystems();

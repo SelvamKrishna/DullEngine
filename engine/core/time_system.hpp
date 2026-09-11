@@ -5,7 +5,7 @@
 // Forward Declaration
 namespace dull::core { struct Engine; }
 
-namespace dull::system {
+namespace dull::core {
 
     struct TimeSystem final {
         friend core::Engine;
@@ -39,4 +39,4 @@ namespace dull::system {
         void SetTimeScale(double scale);
     };
 
-} // namespace dull::system
+} // namespace dull::core

@@ -3,7 +3,7 @@
 // Forward Declaration
 namespace dull::core { struct Engine; }
 
-namespace dull::system {
+namespace dull::core {
 
     struct AudioSystem {
         friend core::Engine;
@@ -19,4 +19,4 @@ namespace dull::system {
         AudioSystem& operator=(const AudioSystem&) = delete;
     };
 
-} // namespace dull::system
+} // namespace dull::core

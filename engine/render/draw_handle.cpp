@@ -8,7 +8,9 @@
 
 namespace dull::render {
 
-    DrawHandle::DrawHandle()  { rl::BeginDrawing(); rl::ClearBackground(color::BLACK); }
+    DrawHandle::DrawHandle(core::IRenderSystem& refRenderSys) : _refRenderSys {refRenderSys}
+    { rl::BeginDrawing(); rl::ClearBackground(color::BLACK); }
+
     DrawHandle::~DrawHandle() { rl::EndDrawing(); }
 
     void DrawHandle::DrawRectangle(

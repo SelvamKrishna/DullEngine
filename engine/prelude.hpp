@@ -12,9 +12,9 @@
 #include <engine/render/draw_context.hpp>
 
 // System
-#include <engine/system/audio_system.hpp>
-#include <engine/system/render_system.hpp>
-#include <engine/system/audio_system.hpp>
+#include <engine/core/audio_system.hpp>
+#include <engine/core/render_system.hpp>
+#include <engine/core/audio_system.hpp>
 
 // Util
 #include <engine/util/adapter.hpp>

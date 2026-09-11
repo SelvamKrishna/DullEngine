@@ -1,8 +1,8 @@
-#include "engine/system/time_system.hpp"
+#include "engine/core/time_system.hpp"
 
 #include <zen/math/utility.hpp>
 
-namespace dull::system {
+namespace dull::core {
 
     void TimeSystem::_Update(double frameTime) noexcept
     {
@@ -26,4 +26,4 @@ namespace dull::system {
         this->_timeScale = zen::clamp(scale, 0.0, MAX_TIME_SCALE);
     }
 
-} // namespace dull::system
+} // namespace dull::core

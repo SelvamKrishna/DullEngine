@@ -2,8 +2,9 @@
 
 #include "engine/config.hpp"
 #include "engine/core/window.hpp"
-#include "engine/system/audio_system.hpp"
-#include "engine/system/time_system.hpp"
+#include "engine/core/audio_system.hpp"
+#include "engine/core/time_system.hpp"
+#include "engine/core/render_system.hpp"
 
 #include <zen/log.hpp>
 
@@ -22,13 +23,14 @@ namespace dull::util {
     };
 
     struct ProcessContext final {
-        core::IProcessor* ptrProcessor {nullptr};
+        core::IProcessor*    ptrProcessor {nullptr};
+        core::IRenderSystem* ptrRenderSys {nullptr};
     };
 
     struct GlobalAccessor final {
-        core::Window&        refWindow;
-        system::TimeSystem&  refTime;
-        system::AudioSystem& refAudio;
+        core::Window&      refWindow;
+        core::TimeSystem&  refTime;
+        core::AudioSystem& refAudio;
     };
 
 } // namespace dull::util
@@ -52,9 +54,9 @@ namespace dull::core {
         static void _ShutdownSystems() noexcept;
 
     public:
-        system::TimeSystem  timeSys;
-        system::AudioSystem audioSys;
-        core::Window        window;
+        TimeSystem  timeSys;
+        AudioSystem audioSys;
+        Window      window;
 
         Engine(Engine&&)                 = delete;
         Engine(const Engine&)            = delete;

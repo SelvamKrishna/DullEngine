@@ -1,5 +1,6 @@
 #pragma once
 
+#include "engine/core/render_system.hpp"
 #include "engine/render/draw_context.hpp"
 #include "engine/util/rect.hpp"
 
@@ -14,7 +15,9 @@ namespace dull::render {
         friend core::Engine;
 
     private:
-        explicit DrawHandle();
+        core::IRenderSystem& _refRenderSys;
+
+        explicit DrawHandle(core::IRenderSystem& refRenderSys);
         ~DrawHandle();
 
     public:
@@ -22,6 +25,8 @@ namespace dull::render {
         DrawHandle(const DrawHandle&)            = delete;
         DrawHandle& operator=(DrawHandle&&)      = delete;
         DrawHandle& operator=(const DrawHandle&) = delete;
+
+        [[nodiscard]] const core::IRenderSystem& GetRenderSystem() const { return this->_refRenderSys; }
 
         void DrawRectangle(
             const util::Rect& rectangle,
