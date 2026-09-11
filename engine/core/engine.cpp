@@ -22,26 +22,22 @@ namespace dull::core {
         return instance;
     }
 
-    void Engine::_InitWindow(const util::WindowContext&& windowContext) noexcept
+    void Engine::_InitWindow(const util::WindowContext&& ctxWindow) noexcept
     {
         zen::log_process process {"Initializing Window", &Engine::_LOG};
 
-        int configFlags {
-            (windowContext.isVsync      ? rl::FLAG_VSYNC_HINT       : 0) |
-            (windowContext.isResizeable ? rl::FLAG_WINDOW_RESIZABLE : 0)
-        };
+        rl::SetConfigFlags(static_cast<unsigned int>(
+            (ctxWindow.isVsync      ? rl::FLAG_VSYNC_HINT       : 0) |
+            (ctxWindow.isResizeable ? rl::FLAG_WINDOW_RESIZABLE : 0)
+        ));
 
-        const int32_t WINDOW_WIDTH  {windowContext.dimension.first};
-        const int32_t WINDOW_HEIGHT {windowContext.dimension.second};
-
-        rl::SetConfigFlags(configFlags);
-        rl::InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, windowContext.title.c_str());
-
-        process.log_panic_if(!rl::IsWindowReady(), "Window Not Ready");
+        rl::InitWindow(ctxWindow.dimension[0], ctxWindow.dimension[1], ctxWindow.title.c_str());
         rl::SetExitKey(rl::KEY_NULL);
+
+        process.log_panic_if(!rl::IsWindowReady(), "Initialization Failed");
     }
 
-    void Engine::Init(const util::WindowContext&& windowContext) noexcept
+    void Engine::Init(const util::WindowContext&& ctxWindow) noexcept
     {
         rl::SetTraceLogCallback(util::_RLTraceLogCallBack);
 
@@ -51,27 +47,27 @@ namespace dull::core {
         if (Engine::IsInitialized())
             return process.log_fallback("Engine Already Initialized");
 
-        inst._InitWindow(std::move(windowContext));
-        inst._windowContext = std::make_unique<util::WindowContext>(windowContext);
+        inst._InitWindow(std::move(ctxWindow));
+        inst._ctxWindow = std::make_unique<util::WindowContext>(ctxWindow);
         inst._isInitialized = true;
 
         process.log_success();
     }
 
-    void Engine::_InitSystems(const util::ProcessContext&& processContext) noexcept
+    void Engine::_InitSystems(const util::ProcessContext&& ctxProcess) noexcept
     {
         zen::log_process process {"Initializing Systems", &Engine::_LOG};
         Engine& inst {DULL_INST};
 
         process.log_panic_if(Engine::IsRunning(), "Engine Is Already Running");
-        inst._processContext = std::make_unique<util::ProcessContext>();
+        inst._ctxProcess = std::make_unique<util::ProcessContext>();
 
-        inst._processContext->processorPtr = (processContext.processorPtr == nullptr)
+        inst._ctxProcess->ptrProcessor = (ctxProcess.ptrProcessor == nullptr)
             ? new core::DirectProcessor {}
-            : processContext.processorPtr;
+            : ctxProcess.ptrProcessor;
 
         inst._isRunning = true;
-        inst._processContext->processorPtr->IInit();
+        inst._ctxProcess->ptrProcessor->IInit();
 
         process.log_success();
     }
@@ -83,49 +79,46 @@ namespace dull::core {
 
         if (!Engine::IsRunning() && !Engine::IsInitialized()) return;
 
-        inst._processContext->processorPtr->IShutdown();
+        inst._ctxProcess->ptrProcessor->IShutdown();
 
         if (rl::IsWindowReady()) rl::CloseWindow();
 
         inst._isRunning = false;
         inst._isInitialized = false;
-        inst._processContext.reset();
-        inst._windowContext.reset();
-
         process.log_success();
     }
 
-    void Engine::Run(util::ProcessContext processContext) noexcept
+    void Engine::Run(util::ProcessContext ctxProcess) noexcept
     {
         zen::log_process process {"Running Application", &Engine::_LOG};
         Engine& inst {DULL_INST};
-        system::TimeSystem& timeSystem = inst.timeSys;
-        system::AudioSystem& audioSystem = inst.audioSys;
+        system::TimeSystem& timeSystem {inst.timeSys};
+        system::AudioSystem& audioSystem {inst.audioSys};
 
         process.log_panic_if(!Engine::IsInitialized(), "Engine Un-Initialized");
-        Engine::_InitSystems(std::move(processContext));
+        Engine::_InitSystems(std::move(ctxProcess));
         process.log_panic_if(!Engine::IsRunning(), "Engine Not Running");
 
         util::GlobalAccessor globalAccessor {
-            .WINDOW_SIZE {rl::GetScreenWidth(), rl::GetScreenHeight()},
-            .timeRef     {timeSystem},
-            .audioRef    {audioSystem},
+            .refWindow {inst.window},
+            .refTime   {timeSystem},
+            .refAudio  {audioSystem},
         };
 
         Engine::_LOG.info() << "Running Application...";
         while (!rl::WindowShouldClose() && inst.IsRunning()) [[likely]]
         {
-            timeSystem._UpdateDeltaTime(rl::GetFrameTime());
-            inst._processContext->processorPtr->IUpdate(globalAccessor);
+            timeSystem._Update(rl::GetFrameTime());
+            inst._ctxProcess->ptrProcessor->IUpdate(globalAccessor);
 
-            while (timeSystem._TryConsumeAccumulated())
+            while (timeSystem._ShouldFixedUpdate())
             {
-                inst._processContext->processorPtr->IFixedUpdate(globalAccessor);
+                inst._ctxProcess->ptrProcessor->IFixedUpdate(globalAccessor);
                 #warning "TODO: Physics logic goes here"
             }
 
             render::DrawHandle drawHandle {};
-            inst._processContext->processorPtr->IDraw(drawHandle);
+            inst._ctxProcess->ptrProcessor->IDraw(drawHandle);
         }
 
         inst._ShutdownSystems();

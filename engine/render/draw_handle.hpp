@@ -3,6 +3,8 @@
 #include "engine/render/draw_context.hpp"
 #include "engine/util/rect.hpp"
 
+#include <zen/math/vec2.hpp>
+
 // Forward Declaration
 namespace dull::core { struct Engine; }
 
@@ -15,9 +17,6 @@ namespace dull::render {
         explicit DrawHandle();
         ~DrawHandle();
 
-        [[nodiscard]]
-        static const util::Transform2D& _GetValidTransform(const util::Transform2D* transformPtr) noexcept;
-
     public:
         DrawHandle(DrawHandle&&)                 = delete;
         DrawHandle(const DrawHandle&)            = delete;
@@ -27,20 +26,25 @@ namespace dull::render {
         void DrawRectangle(
             const util::Rect& rectangle,
             zen::angle rotation = zen::angle::from_deg(0),
-            const ShapeContext& shapeContext = DEFAULT_SHAPE_CONTEXT
+            const ShapeContext& ctxShape = {}
         ) const;
 
         void DrawCircle(
             const zen::vec2& position,
             float radius,
-            const ShapeContext& shapeContext = DEFAULT_SHAPE_CONTEXT
+            const ShapeContext& ctxShape = {}
         ) const;
 
         void DrawLine(
             const zen::vec2& pointA,
             const zen::vec2& pointB,
-            const ShapeContext& shapeContext = DEFAULT_SHAPE_CONTEXT
+            const ShapeContext& ctxShape = {}
         ) const;
+
+        #warning "TODO: `rl::Font` wrapper class"
+        void DrawText(std::string_view text, const TextContext& ctxText = {}) const;
+
+        void DrawFPS(int posX, int posY) const;
     };
 
 } // namespace dull::render

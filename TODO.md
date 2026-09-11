@@ -2,16 +2,27 @@
 
 ## Time System
 
-- Real and Game delta time accessors
-- Time scaling
-- Timer auto logic updating
-- Move ticks per second outside engine impl
+- [ ] **Game Time Management:**
+  - [ ] **Time Scale** Control
+  - [ ] **Frame rate** and **Fixed Time Step**
+
+## Input Handling
+
+- [ ] **Input Management:**
+  - [ ] Centralized input handling
+  - [ ] Configurable input mapping
+  - [ ] Input Processing API
 
 ## Audio System
 
-- Centralized Sound and Music track buffers
-- ID based accessing of sounds
-- Audio outputing features
+- [ ] **Central Audio DB:**
+  - [ ] Load **sounds** and **music** from file to buffer
+  - [ ] Provide **ID** based accessors
+
+- [ ] **Audio Settings:**
+  - [ ] Sound Settings _(Volume, Pitch, Pan)_
+  - [ ] Playback Control _(Play, Pause, Stop)_
+  - [ ] Audio Channels & Control
 
 ## Render System
 
@@ -19,7 +30,4 @@
 
 ## Misc
 
-- **Add:** `zen::assert` into **zen-log** library
-- **Add:** `const zen::log_tag*` as a parameter to `zen::log_tag` constructor
-- **Add:** `zen::fmt()` function to stylize ansi output
-- **Fix:** `pycraft.Builder` unnecessary linking of a completely _up-to-date_ project
+...

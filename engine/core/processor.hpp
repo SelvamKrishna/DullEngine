@@ -30,11 +30,11 @@ namespace dull::core {
         static constexpr void _FnUpdateVoid(const util::GlobalAccessor&) noexcept {}
 
     public:
-        std::function<void()> fnInit = ProcessingFunctions::_FnVoid;
-        std::function<void(const util::GlobalAccessor&)> fnUpdate = ProcessingFunctions::_FnUpdateVoid;
-        std::function<void(const util::GlobalAccessor&)> fnFixedUpdate = ProcessingFunctions::_FnUpdateVoid;
-        std::function<void(const render::DrawHandle&)> fnDraw = ProcessingFunctions::_FnDrawVoid;
-        std::function<void()> fnShutdown = ProcessingFunctions::_FnVoid;
+        std::function<void()> fnInit {ProcessingFunctions::_FnVoid};
+        std::function<void(const util::GlobalAccessor&)> fnUpdate {ProcessingFunctions::_FnUpdateVoid};
+        std::function<void(const util::GlobalAccessor&)> fnFixedUpdate {ProcessingFunctions::_FnUpdateVoid};
+        std::function<void(const render::DrawHandle&)> fnDraw {ProcessingFunctions::_FnDrawVoid};
+        std::function<void()> fnShutdown {ProcessingFunctions::_FnVoid};
     };
 
     struct DirectProcessor final : public dull::core::IProcessor {
@@ -58,8 +58,8 @@ namespace dull::core {
         void IShutdown() final { this->_processFn.fnShutdown(); }
 
     public:
-        explicit DirectProcessor(const ProcessingFunctions&& processContext = {})
-            : _processFn {std::move(processContext)}
+        explicit DirectProcessor(const ProcessingFunctions&& processFn = {})
+            : _processFn {std::move(processFn)}
         {}
 
         template<typename Fn>
@@ -77,6 +77,5 @@ namespace dull::core {
         template<typename Fn>
         void SetFnShutdown(Fn&& fn) noexcept { this->_processFn.fnShutdown = std::forward<Fn>(fn); }
     };
-
 
 } // namespace dull::core
