@@ -8,67 +8,72 @@
 
 namespace dull::render {
 
-    DrawHandle::DrawHandle(core::IRenderSystem& refRenderSys) : _refRenderSys {refRenderSys}
+    DrawHandle::DrawHandle(IRenderer& refRenderer) : _refRenderer {refRenderer}
     { rl::BeginDrawing(); rl::ClearBackground(color::BLACK); }
 
     DrawHandle::~DrawHandle() { rl::EndDrawing(); }
 
     void DrawHandle::DrawRectangle(
         const util::Rect& rectangle,
-        zen::angle rotation,
-        const ShapeContext& shapeCtx
-    ) const
-    {
+        const DrawContext& ctxDraw,
+        const ShapeContext& ctxShape
+    ) const {
+        util::Rect rectangleModified {rectangle};
+        rectangleModified.Move(ctxDraw.transform.position);
+        rectangleModified.Scale(ctxDraw.transform.scale);
+
         rl::DrawRectanglePro(
-            rectangle,
-            rl_cast(rectangle.GetDimension() * 0.5f),
-            rotation.as_deg(),
-            shapeCtx.fillColor
+            rectangleModified,
+            rl_cast(rectangleModified.GetDimension() * 0.5f),
+            ctxDraw.transform.rotation.as_deg(),
+            ctxShape.fillColor
         );
 
-        if (!shapeCtx.HasOutline()) return;
-        rl::DrawRectangleLinesEx(rectangle, shapeCtx.outlineThinkness, shapeCtx.outlineColor);
+        if (ctxShape.HasOutline()) rl::DrawRectangleLinesEx(
+            rectangle, ctxShape.outlineThinkness, ctxShape.outlineColor
+        );
     }
 
     void DrawHandle::DrawCircle(
-        const zen::vec2& position,
-        float radius,
-        const ShapeContext& shapeCtx
+        const DrawContext& ctxDraw,
+        const ShapeContext& ctxShape
     ) const
     {
-        if (shapeCtx.HasOutline()) rl::DrawCircleV(
-            rl_cast(position), radius + shapeCtx.outlineThinkness, shapeCtx.outlineColor
+        if (ctxShape.HasOutline()) rl::DrawCircleV(
+            rl_cast(ctxDraw.transform.position),
+            ctxDraw.transform.GetScaleUnit() + ctxShape.outlineThinkness,
+            ctxShape.outlineColor
         );
 
-        rl::DrawCircleV(rl_cast(position), radius, shapeCtx.fillColor);
+        rl::DrawCircleV(rl_cast(ctxDraw.transform.position), ctxDraw.transform.GetScaleUnit(), ctxShape.fillColor);
     }
 
     void DrawHandle::DrawLine(
         const zen::vec2& pointA,
         const zen::vec2& pointB,
-        const ShapeContext& shapeCtx
+        const ShapeContext& ctxShape
     ) const
     {
         rl::DrawLineEx(
             rl_cast(pointA), rl_cast(pointB),
-            shapeCtx.outlineThinkness, shapeCtx.fillColor
+            ctxShape.outlineThinkness, ctxShape.fillColor
         );
     }
 
-    void DrawHandle::DrawText(std::string_view text, const TextContext& textCtx) const
+    void DrawHandle::DrawText(std::string_view text, const DrawContext& ctxDraw, const TextContext& ctxText) const
     {
         thread_local std::string buffer {text};
         buffer.assign(text.data(), text.size());
 
         rl::DrawTextPro(
-            textCtx.font,
+            ctxText.font,
             text.data(),
-            rl_cast(textCtx.position),
-            rl_cast(textCtx.origin),
-            textCtx.rotation.as_rad(),
-            textCtx.fontSize,
-            textCtx.spacing,
-            textCtx.color
+            rl_cast(ctxDraw.transform.position),
+            rl_cast(ctxText.origin),
+            ctxDraw.transform.rotation.as_rad(),
+            ctxDraw.transform.GetScaleUnit(),
+            ctxText.spacing,
+            ctxDraw.tintOverlay
         );
     }
 

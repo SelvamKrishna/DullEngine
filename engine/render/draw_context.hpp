@@ -5,11 +5,19 @@
 
 namespace dull::render {
 
-    struct DrawContext {
-        const util::Transform2D& TRANSFORM_PTR {};
+    using ZIndex = uint32_t;
 
-        util::Color tintOverlay {color::WHITE};
-        uint32_t    zAxisIndex  {0};
+    #define _BUILD_FN(_type, _name, _param_type, _param_name, _member) \
+        [[nodiscard]] _type _name(_param_type _param_name) && { this->_member = _param_name; return std::move(*this); }
+
+    struct DrawContext {
+        util::Transform2D transform   {};
+        util::Color       tintOverlay {color::WHITE};
+        ZIndex            zAxisIndex  {0};
+
+        _BUILD_FN(DrawContext, WithTransform, util::Transform2D, transform, transform)
+        _BUILD_FN(DrawContext, WithTintOverlay, util::Color, tintOverlay, tintOverlay)
+        _BUILD_FN(DrawContext, WithZAxisIndex, ZIndex, zAxisIndex, zAxisIndex)
     };
 
     struct ShapeContext {
@@ -18,16 +26,22 @@ namespace dull::render {
         float       outlineThinkness {0.0F};
 
         [[nodiscard]] bool HasOutline() const noexcept { return this->outlineThinkness > 0.0F; }
+
+        _BUILD_FN(ShapeContext, WithFillColor, util::Color, fillColor, fillColor)
+        _BUILD_FN(ShapeContext, WithOutlineColor, util::Color, outlineColor, outlineColor)
+        _BUILD_FN(ShapeContext, WithOutlineThinkness, float, outlineThinkness, outlineThinkness)
     };
 
     struct TextContext {
-        util::Color color    {color::WHITE};
-        zen::vec2   position {0};
         rl::Font    font     {rl::GetFontDefault()};
         zen::vec2   origin   {0};
-        zen::angle  rotation {zen::angle::from_deg(0)};
         float       spacing  {2.0F};
-        float       fontSize {12.0F};
+
+        _BUILD_FN(TextContext, WithFont, rl::Font, font, font)
+        _BUILD_FN(TextContext, WithOrigin, zen::vec2, origin, origin)
+        _BUILD_FN(TextContext, WithSpacing, float, spacing, spacing)
     };
+
+    #undef _BUILD_FN
 
 } // namespace dull::render

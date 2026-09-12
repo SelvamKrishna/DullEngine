@@ -12,7 +12,7 @@ namespace dull::core {
 
     private:
         double _deltaTime;
-        double _unscaledDeltaTime;
+        double _deltaTimeUnscaled;
         double _timeScale   {1.0};
         double _accumulator {0.0};
         double _gameTime    {0.0};
@@ -32,7 +32,7 @@ namespace dull::core {
         constexpr TimeSystem& operator=(const TimeSystem&) noexcept = delete;
 
         [[nodiscard]] constexpr double GetDelta() const noexcept { return this->_deltaTime; }
-        [[nodiscard]] constexpr double GetUnscaledDelta() const noexcept { return this->_unscaledDeltaTime; }
+        [[nodiscard]] constexpr double GetUnscaledDelta() const noexcept { return this->_deltaTimeUnscaled; }
         [[nodiscard]] constexpr double GetGameTime() const noexcept { return this->_gameTime; }
         [[nodiscard]] constexpr double GetTimeScale() const noexcept { return this->_timeScale; }
 

@@ -3,13 +3,13 @@
 // Forward Declaration
 namespace dull::core { struct Engine; }
 
-namespace dull::core {
+namespace dull::render {
 
-    struct IRenderSystem {
+    struct IRenderer {
         friend core::Engine;
 
     public:
-        virtual ~IRenderSystem() = default;
+        virtual ~IRenderer() = default;
 
     protected:
         virtual void IInit() {}

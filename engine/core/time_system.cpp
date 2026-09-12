@@ -7,7 +7,7 @@ namespace dull::core {
     void TimeSystem::_Update(double frameTime) noexcept
     {
         frameTime = zen::clamp(frameTime, 0.0, 0.25);
-        this->_unscaledDeltaTime = frameTime;
+        this->_deltaTimeUnscaled = frameTime;
         this->_deltaTime = frameTime * this->_timeScale;
         this->_accumulator += this->_deltaTime;
         this->_gameTime += this->_deltaTime;

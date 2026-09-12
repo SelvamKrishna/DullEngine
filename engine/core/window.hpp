@@ -41,7 +41,7 @@ namespace dull::core {
         inline constexpr void Maximize()                 noexcept { rl::MaximizeWindow(); }
         inline constexpr void Minimize()                 noexcept { rl::MinimizeWindow(); }
 
-        /// TODO: void SetIcon(Image image);
+        #pragma warning "void SetIcon(Image image);"
         void SetTitle(std::string_view title) noexcept { rl::SetWindowTitle(title.data()); }
         void SetPosition(Dimension position)  noexcept { rl::SetWindowPosition(position[0], position[1]); }
         void SetMinSize(Dimension size)       noexcept { rl::SetWindowMinSize(size[0], size[1]); }

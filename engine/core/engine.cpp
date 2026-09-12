@@ -67,7 +67,7 @@ namespace dull::core {
             : ctxProcess.ptrProcessor;
 
         inst._ctxProcess->ptrRenderSys = (ctxProcess.ptrRenderSys == nullptr)
-            ? new IRenderSystem {}
+            ? new render::IRenderer {}
             : ctxProcess.ptrRenderSys;
 
         inst._isRunning = true;

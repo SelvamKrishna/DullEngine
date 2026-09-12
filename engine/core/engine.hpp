@@ -4,7 +4,7 @@
 #include "engine/core/window.hpp"
 #include "engine/core/audio_system.hpp"
 #include "engine/core/time_system.hpp"
-#include "engine/core/render_system.hpp"
+#include "engine/render/renderer.hpp"
 
 #include <zen/log.hpp>
 
@@ -24,7 +24,7 @@ namespace dull::util {
 
     struct ProcessContext final {
         core::IProcessor*    ptrProcessor {nullptr};
-        core::IRenderSystem* ptrRenderSys {nullptr};
+        render::IRenderer* ptrRenderSys {nullptr};
     };
 
     struct GlobalAccessor final {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/core/render_system.hpp"
+#include "engine/render/renderer.hpp"
 #include "engine/render/draw_context.hpp"
 #include "engine/util/rect.hpp"
 
@@ -15,9 +15,9 @@ namespace dull::render {
         friend core::Engine;
 
     private:
-        core::IRenderSystem& _refRenderSys;
+        IRenderer& _refRenderer;
 
-        explicit DrawHandle(core::IRenderSystem& refRenderSys);
+        explicit DrawHandle(IRenderer& refRenderer);
         ~DrawHandle();
 
     public:
@@ -26,17 +26,16 @@ namespace dull::render {
         DrawHandle& operator=(DrawHandle&&)      = delete;
         DrawHandle& operator=(const DrawHandle&) = delete;
 
-        [[nodiscard]] const core::IRenderSystem& GetRenderSystem() const { return this->_refRenderSys; }
+        [[nodiscard]] const IRenderer& GetRenderer() const { return this->_refRenderer; }
 
         void DrawRectangle(
             const util::Rect& rectangle,
-            zen::angle rotation = zen::angle::from_deg(0),
+            const DrawContext& ctxDraw = {},
             const ShapeContext& ctxShape = {}
         ) const;
 
         void DrawCircle(
-            const zen::vec2& position,
-            float radius,
+            const DrawContext& ctxDraw = {},
             const ShapeContext& ctxShape = {}
         ) const;
 
@@ -47,7 +46,11 @@ namespace dull::render {
         ) const;
 
         #warning "TODO: `rl::Font` wrapper class"
-        void DrawText(std::string_view text, const TextContext& ctxText = {}) const;
+        void DrawText(
+            std::string_view text,
+            const DrawContext& ctxDraw = {},
+            const TextContext& ctxText = {}
+        ) const;
 
         void DrawFPS(int posX, int posY) const;
     };
